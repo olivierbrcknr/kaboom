@@ -15,7 +15,7 @@ const Home = () => {
   return (
     <div className={classes.join(' ')}>
 
-      <Head title="Home" />
+      <Head title="Kaboom" />
 
       <Game />
 

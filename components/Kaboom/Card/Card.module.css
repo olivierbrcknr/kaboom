@@ -18,6 +18,19 @@
   color: var(--color-red);
 }
 
+.isBack {
+
+}
+
+.BackArtwork {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  bottom: 2px;
+  right: 2px;
+  background-image: url('/CardBack.png');
+  background-size: 30px 30px;
+}
 
 .Number {
   font-weight: bold;

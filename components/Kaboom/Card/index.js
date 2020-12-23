@@ -11,18 +11,18 @@ const Card = (props) => {
   let symbol = null;
   let color = 'black';
   switch( props.symbol ){
-    case 1:
+    case 0:
       symbol = "♦";
       color = 'red';
       break;
-    case 2:
+    case 1:
       symbol = "♥";
       color = 'red';
       break;
-    case 3:
+    case 2:
       symbol = "♠";
       break;
-    case 4:
+    case 3:
       symbol = "♣";
       break;
   }
@@ -31,19 +31,34 @@ const Card = (props) => {
     classes.push( styles.isRed );
   }
 
-  return (
-    <div className={classes.join(" ")}>
+  if( props.isBack ){
+    classes.push(styles.isBack);
 
-      <div className={styles.Number}>
-        {props.number}
+    return (
+      <div className={classes.join(" ")}>
+
+        <div className={styles.BackArtwork}>
+        </div>
+
       </div>
+    )
 
-      <div className={styles.Symbol}>
-        {symbol}
+  }else{
+
+    return (
+      <div className={classes.join(" ")}>
+
+        <div className={styles.Number}>
+          {props.number}
+        </div>
+
+        <div className={styles.Symbol}>
+          {symbol}
+        </div>
+
       </div>
-
-    </div>
-  )
+    )
+  }
 }
 
 export default Card
