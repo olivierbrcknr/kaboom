@@ -1,0 +1,27 @@
+.Card {
+  width: 80px;
+  height: 112px;
+  border: solid 2px var(--color-black);
+  background: var(--color-white);
+  border-radius: 3px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 30px;
+
+  padding: 10px;
+}
+
+.isRed {
+  color: var(--color-red);
+}
+
+
+.Number {
+  font-weight: bold;
+}
+.Symbol {
+
+}

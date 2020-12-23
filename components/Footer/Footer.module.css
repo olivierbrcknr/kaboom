@@ -1,0 +1,27 @@
+footer.Footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  font-size: 10px;
+  padding: 0 0 8px 8px;
+  font-weight: 500;
+
+  color: rgba(0,0,0,0.4);
+}
+
+footer.Footer a:hover {
+  color: rgba(0,0,0,1);
+}
+
+
+@media (prefers-color-scheme: dark) {
+  footer.Footer {
+    color: rgba(255,255,255,0.4);
+  }
+
+  footer.Footer a:hover {
+    color: var(--color-white);
+  }
+}

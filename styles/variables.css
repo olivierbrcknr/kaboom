@@ -1,0 +1,25 @@
+:root {
+  /* Typography */
+  --font-family-reg: sans-serif;
+  --font-family-mono: 'Space Mono', monospace;
+;
+
+  /* Colors */
+  --color-white: #FFF;
+  --color-black: #000;
+
+  --color-red: #F00;
+
+  /* Sizes */
+  --grid-unit: 10px;
+  --max-width: 1200px;
+
+}
+
+
+/*@media (prefers-color-scheme: dark) {
+  :root {
+    --color-white: #000;
+    --color-black: #FFF;
+  }
+}*/
