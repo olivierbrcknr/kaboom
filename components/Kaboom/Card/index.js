@@ -7,7 +7,6 @@ const Card = (props) => {
   let classes = [styles.Card];
   classes.push(props.className);
 
-
   let symbol = null;
   let color = 'black';
   switch( props.symbol ){
@@ -31,11 +30,16 @@ const Card = (props) => {
     classes.push( styles.isRed );
   }
 
+
+  let clickHandler = () => {
+    props.onClick();
+  }
+
   if( props.isBack ){
     classes.push(styles.isBack);
 
     return (
-      <div className={classes.join(" ")}>
+      <div onClick={clickHandler} className={classes.join(" ")} style={props.style}>
 
         <div className={styles.BackArtwork}>
         </div>
@@ -45,19 +49,34 @@ const Card = (props) => {
 
   }else{
 
-    return (
-      <div className={classes.join(" ")}>
+    if( props.number === 'X' ){
 
-        <div className={styles.Number}>
-          {props.number}
+      return (
+        <div onClick={clickHandler} className={classes.join(" ")} style={props.style}>
+
+          <div className={styles.Joker}>
+            ⍟
+          </div>
+
         </div>
+      )
 
-        <div className={styles.Symbol}>
-          {symbol}
+    }else{
+
+      return (
+        <div onClick={clickHandler} className={classes.join(" ")} style={props.style}>
+
+          <div className={styles.Number}>
+            {props.number}
+          </div>
+
+          <div className={styles.Symbol}>
+            {symbol}
+          </div>
+
         </div>
-
-      </div>
-    )
+      )
+    }
   }
 }
 

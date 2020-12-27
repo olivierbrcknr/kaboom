@@ -1,6 +1,6 @@
 .Card {
-  width: 80px;
-  height: 112px;
+  width: var(--card-width);
+  height: var(--card-height);
   border: solid 2px var(--color-black);
   background: var(--color-white);
   border-radius: 3px;
@@ -12,6 +12,12 @@
   font-size: 30px;
 
   padding: 10px;
+
+  cursor: pointer;
+}
+
+.Card:hover {
+  box-shadow: var(--color-interaction) 0px 0px 0px 4px;
 }
 
 .isRed {
@@ -37,4 +43,9 @@
 }
 .Symbol {
 
+}
+
+
+.Joker {
+  font-size: 60px;
 }

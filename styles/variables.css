@@ -7,12 +7,20 @@
   /* Colors */
   --color-white: #FFF;
   --color-black: #000;
+  --color-gray: #EEE;
 
   --color-red: #F00;
+
+  --color-interaction: #58E1FF;
 
   /* Sizes */
   --grid-unit: 10px;
   --max-width: 1200px;
+
+
+  --card-width: 80px;
+  --card-height: 112px;
+  --card-margin: 10px;
 
 }
 

@@ -2,6 +2,9 @@
 
 module.exports =
   {
+    onDemandEntries: {
+      websocketPort: 3000,
+    },
     trailingSlash: true,
       exportPathMap: function() {
       return {

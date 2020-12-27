@@ -1,12 +1,14 @@
-import socketIOClient from "socket.io-client";
+import io from "socket.io-client";
 
 const dev = process.env.NODE_ENV !== 'production'
 
-let socketURL = 'https://kaboomgame.vercel.app/';
-if( dev ){
-  socketURL = "localhost:3000"
-}
+// let socketURL = 'https://kaboomgame-server.herokuapp.com:8003/';
+// if( dev ){
+let socketURL = "https://localhost:3001"
+// }
 
-const socket = socketIOClient(socketURL);
+
+let socket = io("http://localhost:3001");
+socket.on('connect',(data)=>{ console.log('connected to the Kaboom Server') })
 
 export default socket;

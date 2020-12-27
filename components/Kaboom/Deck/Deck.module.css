@@ -1,9 +1,20 @@
 .Deck {
-
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%,-50%);
-  display: flex;
+  transform: translate(-50%, -50%);
+  width: calc( var(--card-width) * 2 + var(--card-margin));
+  height: calc( var(--card-height) + 20px );
+}
 
+.OpenDeck {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.ClosedDeck {
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
