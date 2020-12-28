@@ -32,7 +32,11 @@ const Card = (props) => {
 
 
   let clickHandler = () => {
-    props.onClick();
+
+    if( props.onClick ){
+      props.onClick()
+    }
+
   }
 
   if( props.isBack ){

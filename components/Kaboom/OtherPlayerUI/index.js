@@ -49,7 +49,6 @@ const OtherPlayerUI = (props) => {
         number={c.value}
         key={'player-'+props.player.name+'-Card_'+k}
         //isBack
-
         /> )
     } )
   }

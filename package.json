@@ -4,8 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build"
+    "dev": "node server/server.js",
+    "build": "next build",
+    "start": "NODE_ENV=production node server/server.js"
   },
   "dependencies": {
     "@svgr/webpack": "^5.5.0",

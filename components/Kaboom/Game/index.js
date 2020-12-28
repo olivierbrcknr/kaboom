@@ -8,7 +8,6 @@ import DisplayPlayers from '../DisplayPlayers'
 import MainPlayerUI from '../MainPlayerUI'
 import OtherPlayerUI from '../OtherPlayerUI'
 
-
 import socket from "../socket";
 
 const Game = (props) => {
@@ -49,7 +48,7 @@ const Game = (props) => {
       setMyState({
         ...myState,
         id: socket.id,
-        name: myPlayerData.name
+        // name: myPlayerData.name
       });
 
     });
@@ -57,6 +56,11 @@ const Game = (props) => {
     socket.on('gameIsRunningUpdate', (data) => {
       setGameIsRunning( data );
     });
+
+    socket.on('disconnect', function () {
+      console.log('disconnect client event....');
+    });
+
 
     return () => {
       // detach listeners
