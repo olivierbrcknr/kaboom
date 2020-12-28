@@ -4,66 +4,29 @@ const io = require('socket.io')(server)
 const next = require('next')
 const colors = require('colors');
 
+const deckFn = require('./deckFunctions.js');
+const rules = require('./kaboomRules.js');
+
 const dev = process.env.NODE_ENV !== 'production'
+
 const nextApp = next({ dev })
 const nextHandler = nextApp.getRequestHandler()
 
+const PORT = process.env.PORT || 3000;
 
 // generate deck
-let createDefaultCardSet = () => {
-
-  let defaultCardSet = [
-    2,3,4,5,6,7,8,9,10,'J','Q','K','A'
-  ];
-
-  let cards = [];
-
-  for ( let c = 0; c < 4; c++ ){
-    for( let i = 0; i < defaultCardSet.length; i++ ){
-      cards.push( {
-        color: c,
-        value: defaultCardSet[i],
-        position: 'deck'
-      } );
-    }
-  }
-
-  for ( let j = 0; j < 3; j++ ){
-    cards.push( {
-      color: null,
-      value: 'X',
-      position: 'deck'
-    } );
-  }
-
-  cards = shuffleDeck(cards);
-
-  return cards;
-}
-
-let shuffleDeck = (array) => {
-  var currentIndex = array.length, temporaryValue, randomIndex;
-
-  while (0 !== currentIndex) {
-
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
-  }
-
-  return array;
-}
-
-let deck = createDefaultCardSet();
+let deck = deckFn.createDefault();
 
 // players
 let players = [];
 
 // gameIsRunning
 let gameIsRunning = false;
+let roundCount = 0;
+let currentPlayer = 0;
+
+console.log(`🧘‍♀️ Server is waiting`.black)
+
 
 // socket.io server
 io.on('connection', socket => {
@@ -100,8 +63,40 @@ io.on('connection', socket => {
 
   });
 
+  socket.on('startStop', (data)=>{
+    gameIsRunning = !gameIsRunning;
+
+    // start game
+    if( gameIsRunning ){
+      deck = deckFn.distribute( deck, players );
+      console.log('deck distributed');
+
+    // reset game
+    }else{
+      deck = deckFn.createDefault();
+      roundCount = 0;
+    }
+
+    socket.emit('gameIsRunningUpdate', gameIsRunning);
+    socket.broadcast.emit('gameIsRunningUpdate', gameIsRunning);
+
+    socket.emit('getDeck', deck);
+    socket.broadcast.emit('getDeck', deck);
+  });
+
   socket.on('initialSetup', (data) => {
     console.log( 'inital setup sent to ' + '' );
+
+    socket.emit('getDeck', deck);
+    socket.emit('gameIsRunningUpdate', gameIsRunning);
+  });
+
+
+  socket.on('cardPlayed', (card)=>{
+
+    console.log(card)
+
+    deck = rules.checkIfPlayable( deck, card );
 
     socket.emit('getDeck', deck);
     socket.emit('gameIsRunningUpdate', gameIsRunning);
@@ -114,8 +109,8 @@ nextApp.prepare().then(() => {
     return nextHandler(req, res)
   })
 
-  server.listen(3000, (err) => {
+  server.listen(PORT, (err) => {
     if (err) throw err
-    console.log('> Ready on http://localhost:3000')
+    console.log('> Ready on ',PORT)
   });
 })
