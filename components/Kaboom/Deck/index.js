@@ -15,26 +15,8 @@ const Deck = (props) => {
     value : null,
   };
 
-
-  let countInDeck = 0;
-  let countInGraveyard = 0;
-
-  if( props.deck ){
-    // currentCard = props.deck[0];
-    props.deck.map( (c,k) => {
-      switch( c.position ){
-        case 'deck':
-          countInDeck++;
-          break;
-        case 'graveyard':
-          if( countInGraveyard === 0 ){
-            currentCard = c;
-          }
-          countInGraveyard++;
-          break;
-      }
-    });
-  }
+  let countInDeck = props.deck.deck ? props.deck.deck.length : 0;
+  let countInGraveyard = props.deck.graveyard ? props.deck.graveyard.length : 0;
 
   let closedDeckStyle = {
     borderBottomWidth: 2 + countInDeck/3 + 'px',
@@ -49,6 +31,9 @@ const Deck = (props) => {
   let openDeck = null;
 
   if( countInGraveyard > 0 ){
+
+    currentCard = props.deck.graveyard[ countInGraveyard-1 ];
+
     openDeck = <Card symbol={currentCard.color}
       style={openDeckStyle}
       number={currentCard.value}

@@ -20,33 +20,39 @@ let createDefaultCardSet = () => {
     2,3,4,5,6,7,8,9,10,'J','Q','K','A'
   ];
 
-  let cards = [];
+  let cards = {
+    graveyard: [],
+    deck: [],
+    hand: []
+  };
+
+  // let cards = [];
 
   let cID = 0;
 
   for ( let c = 0; c < 4; c++ ){
     for( let i = 0; i < defaultCardSet.length; i++ ){
-      cards.push( {
+      cards.deck.push( {
         id: cID,
         color: c,
         value: defaultCardSet[i],
-        position: 'deck'
+        // position: 'deck'
       } );
       cID++;
     }
   }
 
   for ( let j = 0; j < 3; j++ ){
-    cards.push( {
+    cards.deck.push( {
       id: cID,
       color: null,
       value: 'X',
-      position: 'deck'
+      // position: 'deck'
     } );
     cID++;
   }
 
-  cards = shuffleDeck(cards);
+  cards.deck = shuffleDeck(cards.deck);
 
   return cards;
 }
@@ -58,29 +64,39 @@ let distributeCards = ( deck, players ) => {
 
   let lastOnTopID = 1;
 
-  // four cards
-
-    // for each player
+  // for each player
   for ( let i = 0; i < players.length; i++ ){
 
+    // four cards
     for ( let k = 0; k < 4; k++ ){
 
-      let num = i*4 + k;
+      // let num = i*4 + k;
 
-      newDeck[num] = {
-        ...newDeck[num],
-        position: players[i].id
-      }
+      // newDeck[num] = {
+      //   ...newDeck[num],
+      //   position: players[i].id
+      // }
+
+      let card = newDeck.deck[0];
+      newDeck.hand.push( {
+        ...card,
+        player: players[i].id
+      } );
+      newDeck.deck.shift();
 
       lastOnTopID++;
     }
   }
 
-  newDeck[lastOnTopID] = {
-    ...newDeck[lastOnTopID],
-    position: 'graveyard',
-    isCurrent: true
-  }
+  let card = newDeck.deck[0];
+  newDeck.graveyard.push( card );
+  newDeck.deck.shift();
+
+  // newDeck[lastOnTopID] = {
+  //   ...newDeck[lastOnTopID],
+  //   position: 'graveyard',
+  //   isCurrent: true
+  // }
 
   return newDeck;
 

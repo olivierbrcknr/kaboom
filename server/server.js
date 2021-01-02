@@ -50,9 +50,9 @@ io.on('connection', socket => {
   socket.on("disconnect", () => {
 
     const closedSocketIndex = players.findIndex(element => element.id === socket.id);
-    const closedSocket = players[closedSocketIndex];
+    // const closedSocket = players[closedSocketIndex];
 
-    console.log(`⭕️ ${closedSocket.name} disconnected`.red)
+    console.log(`⭕️ ${closedSocketIndex+1} disconnected`.red)
 
     if (closedSocketIndex > -1) {
       players.splice(closedSocketIndex, 1);

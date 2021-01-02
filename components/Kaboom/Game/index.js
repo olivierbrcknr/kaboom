@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react'
 
 import styles from './Game.module.css';
 
-
 import Deck from '../Deck'
 import DisplayPlayers from '../DisplayPlayers'
 import MainPlayerUI from '../MainPlayerUI'
@@ -73,9 +72,10 @@ const Game = (props) => {
   useEffect( ()=>{
     let arr = [];
 
-    if( Array.isArray(currentDeck) ){
+    // build deck
+    if( Array.isArray(currentDeck.hand) && currentDeck.hand.length > 0 ){
 
-      arr = currentDeck.filter( (c) => c.position === myState.id );
+      arr = currentDeck.hand.filter( (c) => c.player === myState.id );
       arr = arr.map( (c,k) => {
         return {
           ...c,
@@ -87,6 +87,8 @@ const Game = (props) => {
       });
 
       setMyCards( arr );
+    }else{
+      setMyCards( [] );
     }
 
   }, [currentDeck,myState.id ] )
@@ -94,6 +96,12 @@ const Game = (props) => {
   useEffect( ()=>{
     // console.log(myState)
   }, [myState] )
+
+  useEffect( ()=>{
+
+    console.log(currentDeck)
+
+  }, [currentDeck] )
 
 
   let cardClick = (card) => {
@@ -104,8 +112,8 @@ const Game = (props) => {
   playerUIs = players.map( (p,k) => {
     if( p.id == myState.id /* || k > 2 */ ){
       return null;
-    }else{
-      let playerCards = currentDeck.filter( (c) => c.position === p.id );
+    }else if ( currentDeck.hand && currentDeck.hand.length > 0 ){
+      let playerCards = currentDeck.hand.filter( (c) => c.player === p.id );
       return <OtherPlayerUI key={'player-no_'+k} k={k} player={p} cards={playerCards} />;
     }
   } )
