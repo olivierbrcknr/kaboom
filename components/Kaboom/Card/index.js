@@ -30,6 +30,10 @@ const Card = (props) => {
     classes.push( styles.isRed );
   }
 
+  if( props.isHighlight ){
+    classes.push( styles.isHighlight );
+  }
+
 
   let clickHandler = () => {
 

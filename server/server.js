@@ -24,9 +24,9 @@ let players = [];
 let gameIsRunning = false;
 let roundCount = 0;
 let currentPlayer = 0;
+let lastStartingPlayer = 0;
 
 console.log(`🧘‍♀️ Server is waiting`.black)
-
 
 // socket.io server
 io.on('connection', socket => {
@@ -75,6 +75,10 @@ io.on('connection', socket => {
     }else{
       deck = deckFn.createDefault();
       roundCount = 0;
+      currentPlayer = lastStartingPlayer+1;
+      if( currentPlayer >= players.length ){
+        currentPlayer = 0;
+      }
     }
 
     socket.emit('gameIsRunningUpdate', gameIsRunning);
@@ -82,26 +86,67 @@ io.on('connection', socket => {
 
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);
+
+    socket.emit('currentPlayer', players[currentPlayer].id);
+    socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
   });
 
   socket.on('initialSetup', (data) => {
     console.log( 'inital setup sent to ' + '' );
 
     socket.emit('getDeck', deck);
-    socket.emit('gameIsRunningUpdate', gameIsRunning);
+    socket.broadcast.emit('gameIsRunningUpdate', gameIsRunning);
+  });
+
+
+  socket.on('nextTurn',()=>{
+
+    currentPlayer++;
+    if( currentPlayer >= players.length ){
+      currentPlayer = 0;
+    }
+
+    socket.emit('currentPlayer', players[currentPlayer].id);
+    socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
   });
 
 
   socket.on('cardPlayed', (card)=>{
 
-    console.log(card)
-
     deck = rules.checkIfPlayable( deck, card );
 
     socket.emit('getDeck', deck);
-    socket.emit('gameIsRunningUpdate', gameIsRunning);
-  })
-})
+    socket.broadcast.emit('getDeck', deck);
+  });
+
+  socket.on('cardSwoppedFromDeck', (card)=>{
+
+    deck = rules.swopCardFromDeck( deck, card );
+
+    socket.emit('getDeck', deck);
+    socket.broadcast.emit('getDeck', deck);
+  });
+
+  socket.on('cardSwoppedFromGraveyard', (card)=>{
+
+    deck = rules.swopCardFromGraveyard( deck, card );
+
+    socket.emit('getDeck', deck);
+    socket.broadcast.emit('getDeck', deck);
+  });
+
+  socket.on('cardFromDeckToGraveyard', ()=>{
+
+    deck = rules.cardFromDeckToGraveyard( deck );
+
+    socket.emit('getDeck', deck);
+    socket.broadcast.emit('getDeck', deck);
+
+    socket.emit('playEffect');
+    socket.broadcast.emit('playEffect');
+  });
+
+});
 
 nextApp.prepare().then(() => {
 

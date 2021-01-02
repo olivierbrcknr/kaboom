@@ -12,13 +12,11 @@
   font-size: 30px;
 
   padding: 10px;
-
-  cursor: pointer;
 }
 
-.Card:hover {
+/*.Card:hover {
   box-shadow: var(--color-interaction) 0px 0px 0px 4px;
-}
+}*/
 
 .isRed {
   color: var(--color-red);
@@ -26,6 +24,14 @@
 
 .isBack {
 
+}
+
+.isHighlight {
+  box-shadow: var(--color-highlight) 0px 0px 0px 2px;
+  cursor: pointer;
+}
+.Card.isHighlight:hover {
+  box-shadow: var(--color-interaction) 0px 0px 0px 4px;
 }
 
 .BackArtwork {

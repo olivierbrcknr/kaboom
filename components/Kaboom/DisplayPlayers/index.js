@@ -8,8 +8,15 @@ const DisplayPlayers = (props) => {
   classes.push(props.className);
 
   let list = props.players.map( (p,k)=>{
+
+    let playerClasses = [];
+
+    if( p.id === props.currentPlayer && props.gameIsRunning ){
+      playerClasses.push(styles.isCurrent);
+    }
+
     return(
-      <div className="" key={p.id}>
+      <div className={playerClasses.join(" ")} key={p.id}>
         {p.name} [{p.points}]
       </div>
     )

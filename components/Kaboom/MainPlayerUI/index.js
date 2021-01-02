@@ -12,6 +12,10 @@ const MainPlayerUI = (props) => {
   // map
   let cards = null;
 
+  if( props.isCurrent ){
+    classes.push(styles.isCurrent);
+  }
+
   if( props.cards && props.cards.length > 0 ){
 
     cards = props.cards.map( (c,k)=>{
@@ -27,6 +31,7 @@ const MainPlayerUI = (props) => {
         symbol={c.color}
         number={c.value}
         key={'myCard-'+k}
+        isHighlight={ props.isHighlight }
         onClick={() => { props.onClick(c) } }
         //isBack
 

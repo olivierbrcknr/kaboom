@@ -4,38 +4,22 @@ import styles from './OtherPlayerUI.module.css';
 
 import Card from '../Card'
 
-import {positionCard} from '../utils'
 
 const OtherPlayerUI = (props) => {
-
-  const [cardPositions,setCardPositions] = useState([]);
 
   let classes = [styles.OtherPlayerUI];
   classes.push(props.className);
 
+  if( props.isCurrent ){
+    classes.push(styles.isCurrent);
+  }
+
   // map
   let cards = null;
 
-  useEffect( ()=>{
+  if( props.cards && props.cards.length > 0 ){
 
-    let arr = props.cards.map( (c,k)=>{
-
-      let slot = positionCard(k);
-
-      return {
-        ...c,
-        slot: slot
-      }
-
-    });
-
-    setCardPositions(arr);
-
-  }, [props.cards])
-
-  if( cardPositions && cardPositions.length > 0 ){
-
-    cards = cardPositions.map( (c,k)=>{
+    cards = props.cards.map( (c,k)=>{
 
       let cardStyle = {
         left: 'calc( var(--card-margin) + ( var(--card-width) + var(--card-margin) ) * '+c.slot.x+' )',
@@ -47,6 +31,7 @@ const OtherPlayerUI = (props) => {
         style={cardStyle}
         symbol={c.color}
         number={c.value}
+        isHighlight={ props.isHighlight }
         key={'player-'+props.player.name+'-Card_'+k}
         //isBack
         /> )

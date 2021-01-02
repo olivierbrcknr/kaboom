@@ -60,3 +60,9 @@
 .OtherPlayerUI:nth-child( 3 ) .Name {
   transform: translate(40px,60px);
 }
+
+
+
+.isCurrent .CardGrid {
+  border-color: var(--color-black);
+}

@@ -3,3 +3,9 @@
   bottom: 10px;
   right: 10px;
 }
+
+
+.isCurrent {
+  color: var(--color-highlight);
+  font-weight: bold;
+}

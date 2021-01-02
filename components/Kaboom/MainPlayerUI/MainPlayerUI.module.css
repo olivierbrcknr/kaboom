@@ -26,3 +26,8 @@
 .CardGrid_Card {
   position: absolute;
 }
+
+
+.isCurrent {
+  box-shadow: var(--color-black) 0px 0px 0px 4px;
+}
