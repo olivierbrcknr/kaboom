@@ -143,6 +143,14 @@ io.on('connection', socket => {
     socket.broadcast.emit('getDeck', deck);
   });
 
+  socket.on('cardSwoppedBetweenPlayers', (cards)=>{
+
+    deck = rules.cardSwoppedBetweenPlayers( deck, cards );
+
+    socket.emit('getDeck', deck);
+    socket.broadcast.emit('getDeck', deck);
+  });
+
 
   socket.on('cardShiftedToPlayer', (card,oldCard)=>{
 
@@ -160,7 +168,7 @@ io.on('connection', socket => {
     socket.broadcast.emit('getDeck', deck);
 
     socket.emit('playEffect');
-    socket.broadcast.emit('playEffect');
+    // socket.broadcast.emit('playEffect');
   });
 
   socket.on('endRound', ()=>{

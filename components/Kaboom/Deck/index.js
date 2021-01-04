@@ -34,6 +34,19 @@ const Deck = (props) => {
     height: 'calc( var(--card-height) + '+countInGraveyard/3+'px )'
   }
 
+  let deckClickFn = () => {
+
+    if( props.isCurrent ){
+      setShowNext( true )
+      props.drawCard();
+    }
+  }
+
+  let graveyardClickFn = () => {
+    setShowNext( false );
+    props.clickGraveyard();
+  }
+
   let openDeck = null;
 
   if( countInGraveyard > 0 ){
@@ -46,20 +59,11 @@ const Deck = (props) => {
       number={currentCard.value}
       isHighlight={ props.isHighlight.graveyard }
       className={styles.OpenDeck.toString()}
-      onClick={ () => { props.clickGraveyard() } }  />
+      onClick={ () => { graveyardClickFn() } }  />
   }
 
   if( countInDeck > 0 ){
     nextCard = props.deck.deck[ 0 ];
-  }
-
-
-  let deckClickFn = () => {
-
-    if( props.isCurrent ){
-      setShowNext( true )
-      props.drawCard();
-    }
   }
 
 

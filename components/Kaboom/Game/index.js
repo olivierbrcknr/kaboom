@@ -18,6 +18,13 @@ const Game = (props) => {
   const [gameIsRunning,setGameIsRunning] = useState(false);
   const [playEffect,setPlayEffect] = useState(false);
 
+  const [effectContainer,setEffectContainer] = useState({
+    effect: '',
+    cards: [],
+    timer: 2000,
+    needsInteraction: false
+  });
+
   const [currentPlayer,setCurrentPlayer] = useState('');
   const [currentDeck,setCurrentDeck] = useState([]);
   const [highlight,setHighlight] = useState({
@@ -141,6 +148,14 @@ const Game = (props) => {
 
       // turn off effect, just in case...
       setPlayEffect(false);
+
+      // empty effectContainer, just in case...
+      setEffectContainer({
+        effect: '',
+        cards: [],
+        timer: 2000,
+        needsInteraction: false
+      });
     }
 
 
@@ -179,41 +194,137 @@ const Game = (props) => {
   }, [focusCard] );
 
 
+  useEffect( ()=>{
+
+    if( effectContainer.effect && effectContainer.effect !== '' && !effectContainer.needsInteraction ){
+
+      setTimeout(()=>{
+
+        if( effectContainer.effect === 'lookAtKing' ){
+
+          setEffectContainer({
+            effect: 'swop',
+            cards: [],
+            timer: 500,
+            needsInteraction: true
+          });
+
+        }else{
+
+          if( effectContainer.effect === 'swop' ){
+            socket.emit('cardSwoppedBetweenPlayers',effectContainer.cards);
+          }
+
+          // empty effect container again
+          // show card only for x seconds
+          setEffectContainer({
+            effect: '',
+            cards: [],
+            timer: 2000,
+            needsInteraction: false
+          });
+
+          socket.emit('nextTurn');
+        }
+
+      },effectContainer.timer);
+    }
+
+  }, [effectContainer] );
+
+
   let cardClick = (card) => {
 
-    switch(focusCard.position){
+    if( playEffect ){
 
-    // swopped with deck
-    case 'deck':
+      switch(focusCard.value.toString()){
 
-      socket.emit('cardSwoppedFromDeck', card);
-      socket.emit('nextTurn');
+        case '7':
+        case '8':
+        case '9':
+        case '10':
+          var cards = [card];
+          setEffectContainer({
+            effect: 'lookAt',
+            cards: cards,
+            timer: 2000,
+            needsInteraction: false
+          });
+          break;
 
-      break;
+        case 'J':
+        case 'Q':
+          var cards = effectContainer.cards;
+          cards.push(card)
+          setEffectContainer({
+            effect: 'swop',
+            cards: cards,
+            timer: 500,
+            needsInteraction: (cards.length < 2) ? true : false
+          });
+          break;
 
-    // swopped with graveyard
-    case 'graveyard':
+        case 'K':
+          var cards = effectContainer.cards;
+          cards.push(card);
+          if( effectContainer.effect !== 'swop' ){
+            setEffectContainer({
+              effect: 'lookAtKing',
+              cards: cards,
+              timer: 2000,
+              needsInteraction: false
+            });
+          }else{
+            setEffectContainer({
+              effect: 'swop',
+              cards: cards,
+              timer: 500,
+              needsInteraction: (cards.length < 2) ? true : false
+            });
+          }
+          break;
 
-      socket.emit('cardSwoppedFromGraveyard', card);
-      socket.emit('nextTurn');
+        default:
+          // nothing
+          break;
+      }
 
-      break;
+    }else{
 
-    // select to swop
-    case 'swop':
+      switch(focusCard.position){
 
-      socket.emit('cardShiftedToPlayer', card, focusCard);
-      setFocusCard({
-        position: null,
-      });
+      // swopped with deck
+      case 'deck':
 
-      break;
+        socket.emit('cardSwoppedFromDeck', card);
+        socket.emit('nextTurn');
 
-    // regular getting rid of card
-    default:
-      socket.emit('cardPlayed', card);
+        break;
 
-      break;
+      // swopped with graveyard
+      case 'graveyard':
+
+        socket.emit('cardSwoppedFromGraveyard', card);
+        socket.emit('nextTurn');
+
+        break;
+
+      // select to swop
+      case 'swop':
+
+        socket.emit('cardShiftedToPlayer', card, focusCard);
+        setFocusCard({
+          position: null,
+        });
+
+        break;
+
+      // regular getting rid of card
+      default:
+        socket.emit('cardPlayed', card);
+
+        break;
+      }
     }
   }
 
@@ -246,27 +357,52 @@ const Game = (props) => {
     }
   }
 
+
   let executeEffect = (card) => {
 
     switch( card.value.toString() ){
 
       case '7':
       case '8':
-        socket.emit('nextTurn'); // not done yet
+        console.log('Look at own card');
+        setHighlight({
+          ownCards: true,
+          otherCards: false,
+          graveyard: false,
+          deck: false,
+        });
         break;
 
       case '9':
       case '10':
-        socket.emit('nextTurn'); // not done yet
+        console.log('Look at opponent‘s card');
+        setHighlight({
+          ownCards: false,
+          otherCards: true,
+          graveyard: false,
+          deck: false,
+        });
         break;
 
       case 'J':
       case 'Q':
-        socket.emit('nextTurn'); // not done yet
+        console.log('Swop 2 cards');
+        setHighlight({
+          ownCards: true,
+          otherCards: true,
+          graveyard: false,
+          deck: false,
+        });
         break;
 
       case 'K':
-        socket.emit('nextTurn'); // not done yet
+        setHighlight({
+          ownCards: true,
+          otherCards: true,
+          graveyard: false,
+          deck: false,
+        });
+        console.log('Look at 1 card and swop 2 cards');
         break;
 
       default:
@@ -300,6 +436,7 @@ const Game = (props) => {
     }
 
     return <PlayerUI
+      effects={effectContainer}
       startingPos={myPos}
       key={'player-no_'+k}
       k={k}
@@ -336,9 +473,11 @@ const Game = (props) => {
 
       {startButton}
 
-      <button onClick={()=>{ socket.emit('nextTurn'); }} >Next Turn</button>
+      <button onClick={()=>{ socket.emit('nextTurn'); }}>Next Turn</button>
 
-      <button onClick={()=>{ socket.emit('endRound'); }} >End Round</button>
+      <button onClick={()=>{ socket.emit('endRound'); }}>End Round</button>
+
+      <button onClick={()=>{ socket.emit('startRound'); }}>Start Round</button>
 
     </div>
   )

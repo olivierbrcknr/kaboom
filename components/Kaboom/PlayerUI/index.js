@@ -47,6 +47,34 @@ const PlayerUI = (props) => {
 
     cards = props.cards.map( (c,k)=>{
 
+      let isVisible = false;
+      let isSelected = false;
+
+      if( props.effects.effect && props.effects.effect !== '' ){
+
+        for ( let i = 0; i < props.effects.cards.length; i++ ){
+
+          if ( c.id === props.effects.cards[i].id ){
+
+            switch( props.effects.effect ){
+
+              case 'lookAt':
+              case 'lookAtKing':
+                isVisible = true;
+                break;
+
+              case 'swop':
+                isSelected = true;
+                break;
+
+              default:
+                // do nothing
+                break;
+            }
+          }
+        }
+      }
+
       let cardStyle = {
         left: 'calc( var(--card-margin) + ( var(--card-width) + var(--card-margin) ) * '+c.slot.x+' )',
         top: 'calc( var(--card-margin) + ( var(--card-height) + var(--card-margin) ) * '+c.slot.y+' )'
@@ -59,8 +87,9 @@ const PlayerUI = (props) => {
         number={c.value}
         key={'myCard-'+k}
         isHighlight={ props.isHighlight }
+        isSelected={ isSelected }
         onClick={() => { props.onClick(c) } }
-        //isBack
+        isBack={!isVisible}
         /> )
     } )
   }

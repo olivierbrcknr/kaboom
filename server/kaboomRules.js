@@ -130,6 +130,36 @@ let cardFromDeckToGraveyard = (deck) => {
   return pseudoDeck;
 }
 
+let cardSwoppedBetweenPlayers = (deck,cards) => {
+
+  let pseudoDeck = deck;
+
+  let card1 = cards[0];
+  let card2 = cards[1];
+
+  pseudoDeck.hand = pseudoDeck.hand.map(c => {
+    if( c.id === card1.id ){
+      return {
+        ...c,
+        player: card2.player,
+        slot: card2.slot
+      }
+    }else if( c.id === card2.id ){
+      return {
+        ...c,
+        player: card1.player,
+        slot: card1.slot
+      }
+    }{
+      return c;
+    }
+  })
+
+  pseudoDeck = deckFn.checkDeck(pseudoDeck);
+
+  return pseudoDeck;
+}
+
 let cardShiftedToPlayer = ( deck, card, oldCard ) => {
 
   let pseudoDeck = deck;
@@ -219,9 +249,12 @@ let calcPlayerPoints = ( players, deck ) => {
 }
 
 
+
+
 exports.checkIfPlayable = checkIfPlayable;
 exports.swopCardFromDeck = swopCardFromDeck;
 exports.swopCardFromGraveyard = swopCardFromGraveyard;
 exports.cardFromDeckToGraveyard = cardFromDeckToGraveyard;
 exports.cardShiftedToPlayer = cardShiftedToPlayer;
 exports.calcPlayerPoints = calcPlayerPoints;
+exports.cardSwoppedBetweenPlayers = cardSwoppedBetweenPlayers;

@@ -34,6 +34,10 @@ const Card = (props) => {
     classes.push( styles.isHighlight );
   }
 
+  if( props.isSelected ){
+    classes.push( styles.isSelected );
+  }
+
 
   let clickHandler = () => {
 

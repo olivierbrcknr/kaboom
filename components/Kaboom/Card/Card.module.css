@@ -2,7 +2,7 @@
   width: var(--card-width);
   height: var(--card-height);
   border: solid 2px var(--color-black);
-  background: var(--color-white);
+  background-color: var(--color-white);
   border-radius: 3px;
 
   display: flex;
@@ -24,6 +24,10 @@
 
 .isBack {
 
+}
+
+.isSelected {
+  background-color: var(--color-highlight);
 }
 
 .isHighlight {
