@@ -8,6 +8,8 @@ import PlayerUI from '../PlayerUI'
 
 import socket from "../socket";
 
+const isDev = process.env.NODE_ENV !== 'production'
+
 const Game = (props) => {
 
   const [myState,setMyState] = useState({
@@ -44,6 +46,8 @@ const Game = (props) => {
     }
   });
 
+  const [swopHighlightCards,setSwopHighlightCards] = useState([]);
+
   let classes = [styles.Game];
   classes.push(props.className);
 
@@ -68,28 +72,31 @@ const Game = (props) => {
       setMyState({
         ...myState,
         id: socket.id,
-        // name: myPlayerData.name
+        name: myPlayerData.name
       });
-
     });
 
     socket.on('gameIsRunningUpdate', (data) => {
       setGameIsRunning( data );
     });
 
-    socket.on('currentPlayer', function (pID) {
+    socket.on('currentPlayer', (pID) => {
       setCurrentPlayer(pID);
     });
 
-    socket.on('playEffect', function () {
+    socket.on('playEffect', () => {
       setPlayEffect(true);
     });
 
-    socket.on('selectCardToSwop', function (targetCard) {
+    socket.on('selectCardToSwop', (targetCard) => {
       setFocusCard({
         ...targetCard,
         position: 'swop'
       });
+    });
+
+    socket.on('highlightSwop', (cards) => {
+      setSwopHighlightCards(cards);
     });
 
     return () => {
@@ -100,16 +107,45 @@ const Game = (props) => {
       socket.off('currentPlayer');
       socket.off('playEffect');
       socket.off('selectCardToSwop');
+      socket.off('highlightSwop');
     }
   }, []);
 
-  useEffect( ()=>{
-    // console.log(myState)
-  }, [myState] );
 
   useEffect( ()=>{
 
-    console.log(currentDeck)
+    if( gameIsRunning ){
+      setTimeout(()=>{
+        setEffectContainer({
+          effect: 'initialBottomRow',
+          cards: [],
+          timer: 5000,
+          needsInteraction: false
+        });
+      },500);
+    }
+
+  }, [gameIsRunning] );
+
+  useEffect( ()=>{
+
+    // hide highlight after 2sec
+    if( swopHighlightCards.length > 0 ){
+      setTimeout(()=>{
+
+        setSwopHighlightCards([]);
+
+      },2000);
+    }
+
+  }, [swopHighlightCards] );
+
+  useEffect( ()=>{
+
+    if(isDev){
+      // only log deck in development
+      console.log(currentDeck)
+    }
 
     if( playEffect ){
       executeEffect( currentDeck.graveyard[ currentDeck.graveyard.length-1 ] );
@@ -157,7 +193,6 @@ const Game = (props) => {
         needsInteraction: false
       });
     }
-
 
   }, [currentPlayer,myState.id] );
 
@@ -231,6 +266,13 @@ const Game = (props) => {
     }
 
   }, [effectContainer] );
+
+
+  useEffect( ()=>{
+
+    // console.log(myState)
+
+  }, [myState] );
 
 
   let cardClick = (card) => {
@@ -413,6 +455,12 @@ const Game = (props) => {
 
   }
 
+
+  let changeName = (name) => {
+    socket.emit('nameChange',name);
+  }
+
+
   let playerUIs = null;
   let myPos = players.findIndex(p => p.id === myState.id);
 
@@ -437,11 +485,13 @@ const Game = (props) => {
 
     return <PlayerUI
       effects={effectContainer}
+      swopHighlight={swopHighlightCards}
       startingPos={myPos}
       key={'player-no_'+k}
       k={k}
       player={p}
       isMainPlayer={isSelf}
+      onNameChange={ (name) => changeName(name) }
       isCurrent={ p.id === currentPlayer && gameIsRunning ? true : false }
       cards={cards}
       onClick={  (c)=>cardClick(c) }

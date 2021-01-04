@@ -12,6 +12,10 @@ const PlayerUI = (props) => {
   // map
   let cards = null;
 
+  let nameLabel = (<div className={styles.Name}>
+                    {props.player.name}
+                  </div>)
+
   if( props.isCurrent ){
     classes.push(styles.isCurrent);
   }
@@ -19,6 +23,13 @@ const PlayerUI = (props) => {
   if( props.isMainPlayer ){
     classes.push(styles.isMainPlayer);
     classes.push(styles.posBottom);
+
+    nameLabel = <input
+      type="text"
+      onChange={ (v) => props.onNameChange(v.target.value) }
+      className={styles.Name}
+      value={props.player.name} />
+
   }else{
 
     switch( props.k-props.startingPos ){
@@ -49,9 +60,18 @@ const PlayerUI = (props) => {
 
       let isVisible = false;
       let isSelected = false;
+      let isSwopped = false;
 
+
+      // see effects
       if( props.effects.effect && props.effects.effect !== '' ){
 
+        // initial effect
+        if( props.effects.effect === 'initialBottomRow' && c.slot.y === 1 && props.isMainPlayer ){
+          isVisible = true;
+        }
+
+        // regular effect
         for ( let i = 0; i < props.effects.cards.length; i++ ){
 
           if ( c.id === props.effects.cards[i].id ){
@@ -75,6 +95,15 @@ const PlayerUI = (props) => {
         }
       }
 
+      // see swop
+      if(props.swopHighlight.length > 0){
+        for ( let i = 0; i < props.swopHighlight.length; i++ ){
+          if ( c.id === props.swopHighlight[i].id ){
+            isSwopped = true;
+          }
+        }
+      }
+
       let cardStyle = {
         left: 'calc( var(--card-margin) + ( var(--card-width) + var(--card-margin) ) * '+c.slot.x+' )',
         top: 'calc( var(--card-margin) + ( var(--card-height) + var(--card-margin) ) * '+c.slot.y+' )'
@@ -88,11 +117,13 @@ const PlayerUI = (props) => {
         key={'myCard-'+k}
         isHighlight={ props.isHighlight }
         isSelected={ isSelected }
+        isSwopped={ isSwopped }
         onClick={() => { props.onClick(c) } }
         isBack={!isVisible}
         /> )
     } )
   }
+
 
   return (
     <div className={classes.join(" ")}>
@@ -101,9 +132,7 @@ const PlayerUI = (props) => {
         {cards}
       </div>
 
-      <div className={styles.Name}>
-        {props.player.name}
-      </div>
+      {nameLabel}
 
     </div>
   )

@@ -62,6 +62,16 @@ io.on('connection', socket => {
 
   });
 
+  socket.on('nameChange', (newName)=>{
+
+    const relID = players.findIndex(element => element.id === socket.id);
+    players[relID].name = newName;
+
+    socket.emit("playersUpdated", players);
+    socket.broadcast.emit("playersUpdated", players);
+
+  });
+
   socket.on('startStop', (data)=>{
     gameIsRunning = !gameIsRunning;
 
@@ -147,6 +157,8 @@ io.on('connection', socket => {
 
     deck = rules.cardSwoppedBetweenPlayers( deck, cards );
 
+    socket.broadcast.emit('highlightSwop', cards);
+
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);
   });
@@ -155,6 +167,8 @@ io.on('connection', socket => {
   socket.on('cardShiftedToPlayer', (card,oldCard)=>{
 
     deck = rules.cardShiftedToPlayer( deck, card, oldCard );
+
+    socket.broadcast.emit('highlightSwop', [card]);
 
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);

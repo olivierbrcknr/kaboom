@@ -38,6 +38,10 @@ const Card = (props) => {
     classes.push( styles.isSelected );
   }
 
+  if( props.isSwopped ){
+    classes.push( styles.isSwopped );
+  }
+
 
   let clickHandler = () => {
 
