@@ -16,15 +16,17 @@ const DisplayPlayers = (props) => {
     }
 
     return(
-      <div className={playerClasses.join(" ")} key={p.id}>
+      <li className={playerClasses.join(" ")} key={p.id}>
         {p.name} [{p.points}]
-      </div>
+      </li>
     )
   } );
 
   return (
     <div className={classes.join(" ")}>
-      {list}
+      <ul>
+        {list}
+      </ul>
     </div>
   )
 }

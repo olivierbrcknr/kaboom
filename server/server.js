@@ -33,14 +33,13 @@ io.on('connection', socket => {
 
   console.log(`🔌 New client connected`.green);
 
-  if( !gameIsRunning ){
-    // add new player
-    players.push( {
-      id: socket.id,
-      name: 'Player ' + players.length,
-      points: 0,
-    } );
-  }
+  // add new player
+  players.push( {
+    id: socket.id,
+    name: 'Player ' + players.length,
+    points: 0,
+    isPlaying: false
+  } );
 
   // send update to all:
   // sending to the client
@@ -50,9 +49,9 @@ io.on('connection', socket => {
   socket.on("disconnect", () => {
 
     const closedSocketIndex = players.findIndex(element => element.id === socket.id);
-    // const closedSocket = players[closedSocketIndex];
+    const closedPlayer = players[closedSocketIndex];
 
-    console.log(`⭕️ ${closedSocketIndex+1} disconnected`.red)
+    console.log(`⭕️ ${closedPlayer.name} disconnected`.red)
 
     if (closedSocketIndex > -1) {
       players.splice(closedSocketIndex, 1);
@@ -92,10 +91,15 @@ io.on('connection', socket => {
   });
 
   socket.on('initialSetup', (data) => {
-    console.log( 'inital setup sent to ' + '' );
+
+    const thisSIndex = players.findIndex(element => element.id === socket.id);
+    const playerName = players[thisSIndex].name;
+
+    console.log( 'inital setup sent to ' + playerName );
 
     socket.emit('getDeck', deck);
-    socket.broadcast.emit('gameIsRunningUpdate', gameIsRunning);
+    socket.emit('gameIsRunningUpdate', gameIsRunning);
+    socket.emit("playersUpdated", players);
   });
 
 

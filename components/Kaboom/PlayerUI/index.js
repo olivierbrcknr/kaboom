@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react'
 
-import styles from './MainPlayerUI.module.css';
+import styles from './PlayerUI.module.css';
 
 import Card from '../Card'
 
-const MainPlayerUI = (props) => {
+const PlayerUI = (props) => {
 
-  let classes = [styles.MainPlayerUI];
+  let classes = [styles.PlayerUI];
   classes.push(props.className);
 
   // map
@@ -14,6 +14,33 @@ const MainPlayerUI = (props) => {
 
   if( props.isCurrent ){
     classes.push(styles.isCurrent);
+  }
+
+  if( props.isMainPlayer ){
+    classes.push(styles.isMainPlayer);
+    classes.push(styles.posBottom);
+  }else{
+
+    switch( props.k-props.startingPos ){
+
+      case -3:
+      case 1:
+        classes.push(styles.posLeft);
+        break;
+      case -2:
+      case 2:
+        classes.push(styles.posTop);
+        break;
+      case -1:
+      case 3:
+        classes.push(styles.posRight);
+        break;
+
+      // aka you are not playing
+      default:
+        classes.push(styles.posBottom);
+        break;
+    }
   }
 
   if( props.cards && props.cards.length > 0 ){
@@ -34,7 +61,6 @@ const MainPlayerUI = (props) => {
         isHighlight={ props.isHighlight }
         onClick={() => { props.onClick(c) } }
         //isBack
-
         /> )
     } )
   }
@@ -46,7 +72,6 @@ const MainPlayerUI = (props) => {
         {cards}
       </div>
 
-
       <div className={styles.Name}>
         {props.player.name}
       </div>
@@ -55,4 +80,4 @@ const MainPlayerUI = (props) => {
   )
 }
 
-export default MainPlayerUI
+export default PlayerUI

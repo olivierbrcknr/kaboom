@@ -1,0 +1,75 @@
+.PlayerUI {
+  position: absolute;
+}
+
+
+
+.Name {
+  position: absolute;
+  top: calc( 100% + 10px);
+  left: 0%;
+  text-align: center;
+  width: 100%;
+}
+
+.CardGrid {
+  width: calc( var(--card-width) * 4 + 8px + 5 * var(--card-margin));
+  height: calc( var(--card-height) * 2 + 8px + 3 * var(--card-margin));
+
+  border-radius: 8px;
+  border: solid 4px var(--color-gray);
+}
+
+.CardGrid_Card {
+  position: absolute;
+}
+
+.isCurrent .CardGrid {
+  border-color: var(--color-black);
+}
+
+
+
+/* Positions */
+.posBottom {
+  bottom: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.isMainPlayer .CardGrid {
+  background: var(--color-gray);
+}
+
+
+.posTop {
+  left: 50%;
+  top: 10px;
+  transform: translate(-50%, 0);
+}
+.posTop .CardGrid {
+  transform: rotate(180deg);
+}
+
+.posLeft {
+  left: 10px;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+.posLeft .CardGrid {
+  transform: rotate(90deg) translate(0, 20%);
+}
+.posLeft .Name {
+  transform: translate(-40px, 60px);
+}
+
+.posRight {
+  right: 10px;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+.posRight .CardGrid {
+  transform: rotate(-90deg) translate(0, 20%);
+}
+.posRight .Name {
+  transform: translate(40px, 60px);
+}

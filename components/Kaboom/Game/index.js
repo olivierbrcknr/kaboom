@@ -4,8 +4,7 @@ import styles from './Game.module.css';
 
 import Deck from '../Deck'
 import DisplayPlayers from '../DisplayPlayers'
-import MainPlayerUI from '../MainPlayerUI'
-import OtherPlayerUI from '../OtherPlayerUI'
+import PlayerUI from '../PlayerUI'
 
 import socket from "../socket";
 
@@ -21,7 +20,6 @@ const Game = (props) => {
 
   const [currentPlayer,setCurrentPlayer] = useState('');
   const [currentDeck,setCurrentDeck] = useState([]);
-  const [myCards,setMyCards] = useState([]);
   const [highlight,setHighlight] = useState({
     ownCards: false,
     otherCards: false,
@@ -85,19 +83,6 @@ const Game = (props) => {
       socket.off('playEffect');
     }
   }, []);
-
-  useEffect( ()=>{
-    let arr = [];
-
-    // build deck
-    if( Array.isArray(currentDeck.hand) && currentDeck.hand.length > 0 ){
-      arr = currentDeck.hand.filter( (c) => c.player === myState.id );
-      setMyCards( arr );
-    }else{
-      setMyCards( [] );
-    }
-
-  }, [currentDeck,myState.id] );
 
   useEffect( ()=>{
     // console.log(myState)
@@ -249,27 +234,38 @@ const Game = (props) => {
   }
 
   let playerUIs = null;
-  playerUIs = players.map( (p,k) => {
-    if( p.id == myState.id /* || k > 2 */ ){
-      return null;
-    }else if ( currentDeck.hand && currentDeck.hand.length > 0 ){
-      let playerCards = currentDeck.hand.filter( (c) => c.player === p.id );
-      return <OtherPlayerUI
-        key={'player-no_'+k}
-        k={k}
-        player={p}
-        isCurrent={ p.id === currentPlayer && gameIsRunning ? true : false }
-        cards={playerCards}
-        isHighlight={ highlight.otherCards } />;
-    }
-  } )
+  let myPos = players.findIndex(p => p.id === myState.id);
 
-  let myPlayerUI = <MainPlayerUI
-    player={myState}
-    cards={myCards}
-    isCurrent={ myState.id === currentPlayer && gameIsRunning ? true : false }
-    onClick={  (c)=>cardClick(c) }
-    isHighlight={ highlight.ownCards } />;
+  playerUIs = players.map( (p,k) => {
+
+    if( k>3 ){
+      return null;
+    }
+
+    let isHighlight = highlight.otherCards;
+    let cards = [];
+    let isSelf = false;
+
+    if( currentDeck.hand ){
+      cards = currentDeck.hand.filter( (c) => c.player === p.id );
+    }
+
+    if( p.id == myState.id /* || k > 2 */ ){
+      isHighlight = highlight.ownCards;
+      isSelf = true;
+    }
+
+    return <PlayerUI
+      startingPos={myPos}
+      key={'player-no_'+k}
+      k={k}
+      player={p}
+      isMainPlayer={isSelf}
+      isCurrent={ p.id === currentPlayer && gameIsRunning ? true : false }
+      cards={cards}
+      onClick={  (c)=>cardClick(c) }
+      isHighlight={ isHighlight } />;
+  } )
 
   // let buttons = [];
 
@@ -288,8 +284,6 @@ const Game = (props) => {
         clickGraveyard={()=>{graveyardClick()}}
         isCurrent={ myState.id === currentPlayer && gameIsRunning ? true : false }
         isHighlight={ highlight } />
-
-      {myPlayerUI}
 
       <DisplayPlayers
         currentPlayer={currentPlayer}

@@ -5,6 +5,10 @@
 }
 
 
+.DisplayPlayers li {
+  margin-top: 4px;
+}
+
 .isCurrent {
   color: var(--color-highlight);
   font-weight: bold;
