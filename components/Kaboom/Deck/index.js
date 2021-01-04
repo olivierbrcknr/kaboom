@@ -9,6 +9,10 @@ const Deck = (props) => {
 
   const [showNext,setShowNext] = useState(false);
 
+  useEffect( ()=>{
+    setShowNext(false);
+  }, [props.isCurrent]);
+
   let classes = [styles.Deck];
   classes.push(props.className);
 

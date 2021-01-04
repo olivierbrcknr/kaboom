@@ -99,7 +99,7 @@ io.on('connection', socket => {
 
     socket.emit('getDeck', deck);
     socket.emit('gameIsRunningUpdate', gameIsRunning);
-    socket.emit("playersUpdated", players);
+    socket.emit('playersUpdated', players);
   });
 
 
@@ -117,7 +117,11 @@ io.on('connection', socket => {
 
   socket.on('cardPlayed', (card)=>{
 
-    deck = rules.checkIfPlayable( deck, card );
+    let callBack = (targetCard) => {
+      socket.emit('selectCardToSwop',targetCard);
+    }
+
+    deck = rules.checkIfPlayable( deck, card, socket.id, callBack );
 
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);
@@ -139,6 +143,15 @@ io.on('connection', socket => {
     socket.broadcast.emit('getDeck', deck);
   });
 
+
+  socket.on('cardShiftedToPlayer', (card,oldCard)=>{
+
+    deck = rules.cardShiftedToPlayer( deck, card, oldCard );
+
+    socket.emit('getDeck', deck);
+    socket.broadcast.emit('getDeck', deck);
+  });
+
   socket.on('cardFromDeckToGraveyard', ()=>{
 
     deck = rules.cardFromDeckToGraveyard( deck );
@@ -148,6 +161,28 @@ io.on('connection', socket => {
 
     socket.emit('playEffect');
     socket.broadcast.emit('playEffect');
+  });
+
+  socket.on('endRound', ()=>{
+
+    // calculate points
+    players = rules.calcPlayerPoints( players, deck );
+
+    // reset all data
+    deck = deckFn.createDefault();
+    roundCount = 0;
+    currentPlayer = lastStartingPlayer+1;
+    if( currentPlayer >= players.length ){
+      currentPlayer = 0;
+    }
+    gameIsRunning=false;
+
+    socket.emit('getDeck', deck);
+    socket.broadcast.emit('getDeck', deck);
+    socket.emit('gameIsRunningUpdate', gameIsRunning);
+    socket.broadcast.emit('gameIsRunningUpdate', gameIsRunning);
+    socket.emit('playersUpdated', players);
+    socket.broadcast.emit('playersUpdated', players);
   });
 
 });

@@ -31,6 +31,10 @@ const Game = (props) => {
     value: null,
     color: null,
     position: null,
+    slot: {
+      x: null,
+      y: null,
+    }
   });
 
   let classes = [styles.Game];
@@ -74,6 +78,13 @@ const Game = (props) => {
       setPlayEffect(true);
     });
 
+    socket.on('selectCardToSwop', function (targetCard) {
+      setFocusCard({
+        ...targetCard,
+        position: 'swop'
+      });
+    });
+
     return () => {
       // detach listeners
       socket.off('getDeck');
@@ -81,6 +92,7 @@ const Game = (props) => {
       socket.off('gameIsRunningUpdate');
       socket.off('currentPlayer');
       socket.off('playEffect');
+      socket.off('selectCardToSwop');
     }
   }, []);
 
@@ -121,6 +133,10 @@ const Game = (props) => {
         value: null,
         color: null,
         position: null,
+        slot: {
+          x: null,
+          y: null,
+        }
       });
 
       // turn off effect, just in case...
@@ -133,7 +149,7 @@ const Game = (props) => {
   useEffect( ()=>{
 
     switch( focusCard.position){
-     case 'deck':
+      case 'deck':
         setHighlight({
           ownCards: true,
           otherCards: false,
@@ -141,9 +157,18 @@ const Game = (props) => {
           deck: false,
         });
         break;
+      case 'swop':
       case 'graveyard':
         setHighlight({
           ownCards: true,
+          otherCards: false,
+          graveyard: false,
+          deck: false,
+        });
+        break;
+      default:
+        setHighlight({
+          ownCards: false,
           otherCards: false,
           graveyard: false,
           deck: false,
@@ -153,23 +178,42 @@ const Game = (props) => {
 
   }, [focusCard] );
 
+
   let cardClick = (card) => {
 
+    switch(focusCard.position){
+
     // swopped with deck
-    if( focusCard.position === 'deck' ){
+    case 'deck':
 
       socket.emit('cardSwoppedFromDeck', card);
       socket.emit('nextTurn');
 
+      break;
+
     // swopped with graveyard
-    }else if( focusCard.position === 'graveyard' ){
+    case 'graveyard':
 
       socket.emit('cardSwoppedFromGraveyard', card);
       socket.emit('nextTurn');
 
+      break;
+
+    // select to swop
+    case 'swop':
+
+      socket.emit('cardShiftedToPlayer', card, focusCard);
+      setFocusCard({
+        position: null,
+      });
+
+      break;
+
     // regular getting rid of card
-    }else{
+    default:
       socket.emit('cardPlayed', card);
+
+      break;
     }
   }
 
@@ -293,6 +337,8 @@ const Game = (props) => {
       {startButton}
 
       <button onClick={()=>{ socket.emit('nextTurn'); }} >Next Turn</button>
+
+      <button onClick={()=>{ socket.emit('endRound'); }} >End Round</button>
 
     </div>
   )

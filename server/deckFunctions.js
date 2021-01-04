@@ -1,46 +1,58 @@
-let positionCard = (id) => {
+let positionCard = (id,handCards=false) => {
 
-  let posX = 0;
+  const upperRow = [2,3,6,7,10,11,14,15,18,19,22,23];
+
+  let slotsTaken = [];
+
+  let k = id;
+
+  let posX = 1;
   let posY = 0;
 
-  if( id % 2 == 0 ){
-    posY = 1;
+  let fits = false;
+
+
+  // only check for a different k if slot is already taken
+  if( handCards && handCards.length > 0 ){
+    for( let i = 0; i < handCards.length; i++ ){
+      slotsTaken.push( handCards[i].slot );
+    }
   }
 
-  // columns
-  switch (id){
-    case 0:
-      posX = 1;
-      posY = 1;
-      break;
-    case 1:
-      posX = 2;
-      posY = 1;
-      break;
-    case 2:
-      posX = 1;
+  let fitTries = 0;
+  while( fits === false ){
+
+    // check if above or below
+    if( upperRow.includes(k) ){
       posY = 0;
-      break;
-    case 3:
-      posX = 2;
-      posY = 0;
-      break;
-    case 4:
-      posX = 3;
-      posY = 0;
-      break;
-    case 5:
-      posX = 3;
+    }else{
       posY = 1;
-      break;
-    case 6:
-      posX = 0;
-      posY = 0;
-      break;
-    case 7:
-      posX = 0;
-      posY = 1;
-      break;
+    }
+
+    // even --> left
+    if( k % 2 == 0 ){
+      posX -= parseInt(k/4);
+    // odd --> right
+    }else{
+      posX += parseInt(k/4) + 1;
+    }
+
+    fits = true;
+
+    for (let i = 0; i < slotsTaken.length; i++){
+      if( slotsTaken[i].x == posX && slotsTaken[i].y == posY ){
+        fits = false;
+      }
+    }
+
+    if( fitTries === 0 ){
+      k = 3;
+    }else{
+      k++;
+    }
+
+    fitTries++;
+
   }
 
   return {
@@ -143,9 +155,36 @@ let distributeCards = ( deck, players ) => {
 
 }
 
+// check if deck is empty and reshuffle
+let checkDeck = (deck) => {
+
+  let pseudoDeck = deck;
+
+  // if deck has less than 5 cards, reshuffle and add graveyard
+  if( pseudoDeck.deck.length < 5 ){
+
+    let graveDeck = pseudoDeck.graveyard;
+
+    // add only last card from graveyard
+    pseudoDeck.graveyard = [ graveDeck[ graveDeck.length-1 ] ];
+
+    // remove card that still is on stack and shuffle
+    graveDeck.shift();
+    graveDeck = shuffleDeck(graveDeck);
+
+    // add do deck again
+    pseudoDeck.deck.push( ...graveDeck );
+  }
+
+
+  return pseudoDeck;
+
+}
 
 
 
 exports.createDefault = createDefaultCardSet;
 exports.shuffle = shuffleDeck;
 exports.distribute = distributeCards;
+exports.positionCard = positionCard;
+exports.checkDeck = checkDeck;
