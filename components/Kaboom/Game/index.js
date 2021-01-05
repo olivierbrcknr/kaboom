@@ -46,7 +46,12 @@ const Game = (props) => {
     }
   });
 
-  const [swopHighlightCards,setSwopHighlightCards] = useState([]);
+  const [swopHighlightCards,setSwopHighlightCards] = useState({
+    cards: [],
+    type: null
+  });
+
+  const [highlightDeck,setHighlightDeck] = useState(false);
 
   let classes = [styles.Game];
   classes.push(props.className);
@@ -95,8 +100,15 @@ const Game = (props) => {
       });
     });
 
-    socket.on('highlightSwop', (cards) => {
-      setSwopHighlightCards(cards);
+    socket.on('highlightSwop', (cards,type=null) => {
+      setSwopHighlightCards({
+        cards: cards,
+        type: type
+      });
+    });
+
+    socket.on('highlightDeck', (type)=>{
+      setHighlightDeck(type);
     });
 
     return () => {
@@ -108,6 +120,7 @@ const Game = (props) => {
       socket.off('playEffect');
       socket.off('selectCardToSwop');
       socket.off('highlightSwop');
+      socket.off('highlightDeck');
     }
   }, []);
 
@@ -129,11 +142,19 @@ const Game = (props) => {
 
   useEffect( ()=>{
 
+    console.log(swopHighlightCards)
+
     // hide highlight after 2sec
-    if( swopHighlightCards.length > 0 ){
+    if( swopHighlightCards.cards.length > 0 ){
+
       setTimeout(()=>{
 
-        setSwopHighlightCards([]);
+        setSwopHighlightCards({
+          cards: [],
+          type: null,
+        });
+
+        setHighlightDeck(false);
 
       },2000);
     }
@@ -268,13 +289,6 @@ const Game = (props) => {
   }, [effectContainer] );
 
 
-  useEffect( ()=>{
-
-    // console.log(myState)
-
-  }, [myState] );
-
-
   let cardClick = (card) => {
 
     if( playEffect ){
@@ -285,13 +299,16 @@ const Game = (props) => {
         case '8':
         case '9':
         case '10':
-          var cards = [card];
-          setEffectContainer({
-            effect: 'lookAt',
-            cards: cards,
-            timer: 2000,
-            needsInteraction: false
-          });
+          if( effectContainer.cards.length < 1 ){
+            var cards = [card];
+            setEffectContainer({
+              effect: 'lookAt',
+              cards: cards,
+              timer: 2000,
+              needsInteraction: false
+            });
+            socket.emit('highlightCard',cards,'lookAt');
+          }
           break;
 
         case 'J':
@@ -309,13 +326,14 @@ const Game = (props) => {
         case 'K':
           var cards = effectContainer.cards;
           cards.push(card);
-          if( effectContainer.effect !== 'swop' ){
+          if( effectContainer.effect !== 'swop' && cards.length < 1 ){
             setEffectContainer({
               effect: 'lookAtKing',
               cards: cards,
               timer: 2000,
               needsInteraction: false
             });
+            socket.emit('highlightCard',cards,'lookAt');
           }else{
             setEffectContainer({
               effect: 'swop',
@@ -339,6 +357,7 @@ const Game = (props) => {
       case 'deck':
 
         socket.emit('cardSwoppedFromDeck', card);
+
         socket.emit('nextTurn');
 
         break;
@@ -347,6 +366,7 @@ const Game = (props) => {
       case 'graveyard':
 
         socket.emit('cardSwoppedFromGraveyard', card);
+
         socket.emit('nextTurn');
 
         break;
@@ -377,18 +397,20 @@ const Game = (props) => {
       position: 'deck'
     });
 
-    //socket.emit('drawCard');
+    socket.emit('drawCard','deck');
   }
 
   let graveyardClick = () => {
 
     if( focusCard.position === 'deck' ){
 
+      socket.emit('drawCard',false);
       socket.emit('cardFromDeckToGraveyard');
 
     // regular getting rid of card
     }else if( myState.id === currentPlayer && gameIsRunning && !focusCard.value ){
 
+      socket.emit('drawCard','graveyard');
       setFocusCard({
         ...currentDeck.graveyard[ currentDeck.graveyard.length-1 ],
         position: 'graveyard'
@@ -514,7 +536,8 @@ const Game = (props) => {
         drawCard={()=>{drawCardFn()}}
         clickGraveyard={()=>{graveyardClick()}}
         isCurrent={ myState.id === currentPlayer && gameIsRunning ? true : false }
-        isHighlight={ highlight } />
+        isHighlight={ highlight }
+        swopHighlight={ highlightDeck } />
 
       <DisplayPlayers
         currentPlayer={currentPlayer}

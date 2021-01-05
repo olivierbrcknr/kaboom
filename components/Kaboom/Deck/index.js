@@ -58,6 +58,7 @@ const Deck = (props) => {
       style={openDeckStyle}
       number={currentCard.value}
       isHighlight={ props.isHighlight.graveyard }
+      indicatorType={ props.swopHighlight === 'graveyard' ? 'lookAt' : null }
       className={styles.OpenDeck.toString()}
       onClick={ () => { graveyardClickFn() } }  />
   }
@@ -78,6 +79,7 @@ const Deck = (props) => {
         symbol={nextCard.color}
         style={closedDeckStyle}
         isHighlight={ props.isHighlight.deck }
+        indicatorType={ props.swopHighlight === 'deck' ? 'lookAt' : null }
         className={styles.ClosedDeck.toString()}
         onClick={ () => { deckClickFn() } } />
 

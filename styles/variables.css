@@ -15,8 +15,8 @@
   --color-highlight: #58E1FF;
 
   /* special card colors */
-  --color-lookAt: #F00;
-  --color-lookAt: #F00;
+  --color-lookAt: #FFC700;
+  --color-swop: #D43232;
   --color-select: var(--color-highlight);
 
   /* Sizes */

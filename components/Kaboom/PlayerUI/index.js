@@ -62,6 +62,8 @@ const PlayerUI = (props) => {
       let isSelected = false;
       let isSwopped = false;
 
+      let indicatorType = null;
+
 
       // see effects
       if( props.effects.effect && props.effects.effect !== '' ){
@@ -96,10 +98,10 @@ const PlayerUI = (props) => {
       }
 
       // see swop
-      if(props.swopHighlight.length > 0){
-        for ( let i = 0; i < props.swopHighlight.length; i++ ){
-          if ( c.id === props.swopHighlight[i].id ){
-            isSwopped = true;
+      if(props.swopHighlight.cards.length > 0){
+        for ( let i = 0; i < props.swopHighlight.cards.length; i++ ){
+          if ( c.id === props.swopHighlight.cards[i].id ){
+            indicatorType = props.swopHighlight.type;
           }
         }
       }
@@ -115,9 +117,9 @@ const PlayerUI = (props) => {
         symbol={c.color}
         number={c.value}
         key={'myCard-'+k}
+        indicatorType={ indicatorType }
         isHighlight={ props.isHighlight }
         isSelected={ isSelected }
-        isSwopped={ isSwopped }
         onClick={() => { props.onClick(c) } }
         isBack={!isVisible}
         /> )

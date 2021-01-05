@@ -125,6 +125,12 @@ io.on('connection', socket => {
   });
 
 
+
+  socket.on('drawCard',(type)=>{
+    socket.broadcast.emit('highlightDeck', type);
+  });
+
+
   socket.on('cardPlayed', (card)=>{
 
     let callBack = (targetCard) => {
@@ -139,7 +145,10 @@ io.on('connection', socket => {
 
   socket.on('cardSwoppedFromDeck', (card)=>{
 
+    let nextCard = deck.deck[ 0 ];
     deck = rules.swopCardFromDeck( deck, card );
+
+    socket.broadcast.emit('highlightSwop', [nextCard], 'lookAt');
 
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);
@@ -147,7 +156,10 @@ io.on('connection', socket => {
 
   socket.on('cardSwoppedFromGraveyard', (card)=>{
 
+    let currentCard = deck.graveyard[ deck.graveyard.length-1 ];
     deck = rules.swopCardFromGraveyard( deck, card );
+
+    socket.broadcast.emit('highlightSwop', [currentCard], 'lookAt');
 
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);
@@ -157,7 +169,7 @@ io.on('connection', socket => {
 
     deck = rules.cardSwoppedBetweenPlayers( deck, cards );
 
-    socket.broadcast.emit('highlightSwop', cards);
+    socket.broadcast.emit('highlightSwop', cards, 'swop');
 
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);
@@ -168,7 +180,7 @@ io.on('connection', socket => {
 
     deck = rules.cardShiftedToPlayer( deck, card, oldCard );
 
-    socket.broadcast.emit('highlightSwop', [card]);
+    socket.broadcast.emit('highlightSwop', [card], 'swop');
 
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);
@@ -183,6 +195,10 @@ io.on('connection', socket => {
 
     socket.emit('playEffect');
     // socket.broadcast.emit('playEffect');
+  });
+
+  socket.on('highlightCard', (cards,type)=>{
+    socket.broadcast.emit('highlightSwop',cards,type);
   });
 
   socket.on('endRound', ()=>{

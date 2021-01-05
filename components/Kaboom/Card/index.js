@@ -38,8 +38,22 @@ const Card = (props) => {
     classes.push( styles.isSelected );
   }
 
-  if( props.isSwopped ){
-    classes.push( styles.isSwopped );
+  // if( props.isSwopped ){
+  //   classes.push( styles.isSwopped );
+  // }
+
+  if( props.indicatorType ){
+    switch( props.indicatorType ){
+      case 'lookAt':
+        classes.push( styles.isLookedAt );
+        break;
+      case 'swop':
+        classes.push( styles.isSwopped );
+        break;
+      default:
+
+        break;
+    }
   }
 
 
