@@ -14,6 +14,11 @@
   --color-interaction: #58E1FF;
   --color-highlight: #58E1FF;
 
+  /* special card colors */
+  --color-lookAt: #F00;
+  --color-lookAt: #F00;
+  --color-select: var(--color-highlight);
+
   /* Sizes */
   --grid-unit: 10px;
   --max-width: 1200px;
@@ -26,9 +31,15 @@
 }
 
 
-/*@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
   :root {
-    --color-white: #000;
-    --color-black: #FFF;
+    --color-white: #111;
+    --color-black: #aaa;
+    --color-gray: #333;
+
+    --color-red: #F00;
+
+    --color-interaction: #99edff;
+    --color-highlight: #99edff;
   }
-}*/
+}

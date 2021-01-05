@@ -18,6 +18,15 @@
   box-shadow: var(--color-interaction) 0px 0px 0px 4px;
 }*/
 
+.isSwopped {
+  background-color: var(--color-swop);
+}
+
+.isLookedAt {
+  background-color: var(--color-lookAt);
+}
+
+
 .isRed {
   color: var(--color-red);
 }
@@ -27,16 +36,12 @@
 }
 
 .isSelected {
-  background-color: var(--color-highlight);
+  background-color: var(--color-select);
 }
 
 .isHighlight {
   box-shadow: var(--color-highlight) 0px 0px 0px 2px;
   cursor: pointer;
-}
-
-.isSwopped {
-  background-color: var(--color-red);
 }
 
 .Card.isHighlight:hover {
@@ -52,6 +57,12 @@
   background-image: url('/CardBack.png');
   background-size: 30px 30px;
 }
+@media (prefers-color-scheme: dark) {
+  .BackArtwork {
+    filter: invert(100%) contrast(2);
+  }
+}
+
 
 .Number {
   font-weight: bold;
@@ -59,7 +70,6 @@
 .Symbol {
 
 }
-
 
 .Joker {
   font-size: 60px;
