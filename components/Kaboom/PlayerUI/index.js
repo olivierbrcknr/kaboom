@@ -95,6 +95,11 @@ const PlayerUI = (props) => {
             }
           }
         }
+
+        // endround effect
+        if( props.effects.effect === 'endRound' ){
+          isVisible = true;
+        }
       }
 
       // see swop

@@ -128,6 +128,7 @@ const Game = (props) => {
   useEffect( ()=>{
 
     if( gameIsRunning ){
+
       setTimeout(()=>{
         setEffectContainer({
           effect: 'initialBottomRow',
@@ -136,6 +137,15 @@ const Game = (props) => {
           needsInteraction: false
         });
       },500);
+
+    }else{
+
+      setEffectContainer({
+        effect: 'endRound',
+        cards: [],
+        timer: 10*1000,
+        needsInteraction: false
+      });
     }
 
   }, [gameIsRunning] );

@@ -205,22 +205,25 @@ io.on('connection', socket => {
 
     // calculate points
     players = rules.calcPlayerPoints( players, deck );
-
-    // reset all data
-    deck = deckFn.createDefault();
-    roundCount = 0;
-    currentPlayer = lastStartingPlayer+1;
-    if( currentPlayer >= players.length ){
-      currentPlayer = 0;
-    }
     gameIsRunning=false;
 
-    socket.emit('getDeck', deck);
-    socket.broadcast.emit('getDeck', deck);
     socket.emit('gameIsRunningUpdate', gameIsRunning);
     socket.broadcast.emit('gameIsRunningUpdate', gameIsRunning);
     socket.emit('playersUpdated', players);
     socket.broadcast.emit('playersUpdated', players);
+
+    setTimeout(()=>{
+      // reset all data after 10 sec
+      deck = deckFn.createDefault();
+      roundCount = 0;
+      currentPlayer = lastStartingPlayer+1;
+      if( currentPlayer >= players.length ){
+        currentPlayer = 0;
+      }
+
+      socket.emit('getDeck', deck);
+      socket.broadcast.emit('getDeck', deck);
+    },10*1000)
   });
 
 });
