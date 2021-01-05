@@ -524,6 +524,44 @@ const Game = (props) => {
 
   let startButton = <button onClick={()=>{ socket.emit('startStop'); }} >{ gameIsRunning ? 'Stop Game' : 'Start Game' }</button>
 
+  let effectDisplay = null;
+
+  if( playEffect ){
+
+    let effectDisplayText = null;
+
+    switch( currentDeck.graveyard[ currentDeck.graveyard.length-1 ].value.toString() ){
+
+      case '7':
+      case '8':
+        effectDisplayText = 'Look at an own card';
+        break;
+
+      case '9':
+      case '10':
+        effectDisplayText = 'Look at an opponent‘s card';
+        break;
+
+      case 'J':
+      case 'Q':
+        effectDisplayText = 'Swop 2 cards';
+        break;
+
+      case 'K':
+        effectDisplayText = 'Look at 1 card and swop 2 cards';
+        break;
+
+      default:
+        // display nothing
+        break;
+    }
+
+
+    effectDisplay = (<div className={styles.EffectDisplay}>
+                      {effectDisplayText}
+                    </div>)
+  }
+
   return (
     <div className={classes.join(" ")}>
 
@@ -538,6 +576,8 @@ const Game = (props) => {
         isCurrent={ myState.id === currentPlayer && gameIsRunning ? true : false }
         isHighlight={ highlight }
         swopHighlight={ highlightDeck } />
+
+      {effectDisplay}
 
       <DisplayPlayers
         currentPlayer={currentPlayer}
