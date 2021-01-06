@@ -15,9 +15,17 @@ const DisplayPlayers = (props) => {
       playerClasses.push(styles.isCurrent);
     }
 
+    let playerName = <div className={styles.PlayerName}>
+      {p.name}
+    </div>;
+
+    let pointDisplay = <div className={styles.PlayerTotalPointDisplay}>
+      [{p.points}]
+    </div>;
+
     return(
       <li className={playerClasses.join(" ")} key={p.id}>
-        {p.name} [{p.points}]
+        {playerName} {pointDisplay}
       </li>
     )
   } );

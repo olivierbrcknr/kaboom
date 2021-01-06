@@ -186,7 +186,10 @@ let calcPlayerPoints = ( players, deck ) => {
 
   let pseudoPlayers = players.map( (p,k)=>{
 
-    let updatedPoints = p.points;
+    let oldPoints = p.points;
+    let newPoints = 0;
+
+    let wasFifty = oldPoints === 50 ? true : false;
 
     for( let i = 0; i < deck.hand.length; i++ ){
 
@@ -227,20 +230,26 @@ let calcPlayerPoints = ( players, deck ) => {
         }
 
 
-        updatedPoints+=cardVal;
+        newPoints+=cardVal;
       }
     }
 
+    let updatedPoints = oldPoints + newPoints;
+
     // jump backs
-    if( updatedPoints === 50 ){
+    if( updatedPoints === 50 && !wasFifty ){
       updatedPoints = 0;
     }else if( updatedPoints === 100 ){
       updatedPoints = 50;
     }
 
+    let newRoundPoints = p.roundPoints;
+    newRoundPoints.push(newPoints);
+
     return {
       ...p,
-      points: updatedPoints
+      points: updatedPoints,
+      roundPoints: newRoundPoints
     }
 
   } );

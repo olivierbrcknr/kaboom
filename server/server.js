@@ -38,6 +38,7 @@ io.on('connection', socket => {
     id: socket.id,
     name: 'Player ' + players.length,
     points: 0,
+    roundPoints: [],
     isPlaying: false
   } );
 

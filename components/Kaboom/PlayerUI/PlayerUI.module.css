@@ -11,6 +11,7 @@
 
   font-family: var(--font-family-mono);
   font-size: 14px;
+  color: var(--color-black);
 
   -moz-appearance: none;
   -webkit-appearance: none;
@@ -39,7 +40,9 @@
   border-color: var(--color-black);
 }
 
-
+.isCurrent .Name {
+  font-weight: bold;
+}
 
 /* Positions */
 .posBottom {

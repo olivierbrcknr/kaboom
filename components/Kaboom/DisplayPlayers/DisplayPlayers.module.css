@@ -4,11 +4,24 @@
   right: 10px;
 }
 
-
 .DisplayPlayers li {
   margin-top: 4px;
+  display: flex;
 }
 
 .isCurrent {
   font-weight: bold;
+}
+
+.PlayerTotalPointDisplay {
+  width: 42px;
+  text-align: right;
+}
+
+.PlayerName {
+  overflow-x: hidden;
+  white-space: nowrap;
+  width: 120px;
+  height: 1.2em;
+  text-overflow: ellipsis;
 }
