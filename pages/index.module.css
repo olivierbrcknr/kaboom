@@ -1,0 +1,107 @@
+.Home {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.GameContainer {
+  width: 100vw;
+  height: 100vh;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  transition: width 0.4s;
+}
+
+.RulesContainer {
+  width: var(--rules-width);
+  padding: 15px;
+  padding-bottom: 30px;
+
+  background: var(--color-gray);
+
+  overflow-y: scroll;
+
+  position: absolute;
+  top: 0;
+  right: calc( var(--rules-width) * -1 );
+  bottom: 0;
+  transition: right 0.4s;
+}
+
+.showRules .GameContainer {
+  width: calc(100vw - var(--rules-width) );
+}
+.showRules .RulesContainer {
+  right: 0;
+}
+
+.Rules {
+  font-family: var(--font-family-reg);
+
+  line-height: 1.6;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  user-select: text;
+}
+
+.Rules * {
+  user-select: text;
+}
+
+.Rules p + p {
+  margin-top: 10px;
+}
+
+.Rules ::selection {
+  background-color: var(--color-highlight);
+}
+
+.Rules h1 {
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+.Rules h2 {
+  font-size: 18px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+.Rules h3 {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.Rules img {
+  zoom: 0.5;
+  margin: 20px 0;
+}
+
+.Rules table {
+  border: solid 1px var(--color-black);
+  width: 100%;
+  margin: 10px 0;
+}
+.Rules tr:nth-child(2n) {
+  background: var(--color-white);
+}
+.Rules th,
+.Rules td {
+  text-align: left;
+  border: solid 1px var(--color-black);
+  padding: 4px;
+}
+.Rules th {
+  background: var(--color-white);
+}
+
+.toggleRulesBtn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}

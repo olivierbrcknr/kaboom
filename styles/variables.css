@@ -1,6 +1,6 @@
 :root {
   /* Typography */
-  --font-family-reg: sans-serif;
+  --font-family-reg: 'IBM Plex Sans', sans-serif;
   --font-family-mono: 'Space Mono', monospace;
 ;
 
@@ -27,6 +27,8 @@
   --card-width: 80px;
   --card-height: 112px;
   --card-margin: 10px;
+
+  --rules-width: 320px;
 
 }
 
