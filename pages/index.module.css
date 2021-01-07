@@ -80,6 +80,12 @@
   zoom: 0.5;
   margin: 20px 0;
 }
+@media (prefers-color-scheme: dark) {
+  .Rules img {
+    filter: invert(100%) contrast(0.6);
+  }
+}
+
 
 .Rules table {
   border: solid 1px var(--color-black);
