@@ -9,6 +9,10 @@ const DisplayPlayers = (props) => {
 
   let list = props.players.map( (p,k)=>{
 
+    if( !p.isPlaying ){
+      return null;
+    }
+
     let playerClasses = [];
 
     if( p.id === props.currentPlayer && props.gameIsRunning ){

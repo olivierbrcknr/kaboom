@@ -58,6 +58,13 @@ const Game = (props) => {
   let classes = [styles.Game];
   classes.push(props.className);
 
+  let iAmPlaying = true;
+  for( let i = 0; i < players.length; i++ ){
+    if( players[i].id == myState.id ){
+      iAmPlaying = players[i].isPlaying
+    }
+  }
+
   // Init new state
   useEffect(() => {
 
@@ -304,6 +311,11 @@ const Game = (props) => {
 
   let cardClick = (card) => {
 
+    if( !iAmPlaying ){
+      console.log('nenenenenenenene..')
+      return;
+    }
+
     if( playEffect ){
 
       switch(focusCard.value.toString()){
@@ -519,12 +531,14 @@ const Game = (props) => {
       cards = currentDeck.hand.filter( (c) => c.player === p.id );
     }
 
-    if( p.id == myState.id /* || k > 2 */ ){
+    if( p.id == myState.id ){
       isHighlight = highlight.ownCards;
       isSelf = true;
     }
 
-    playerNo++;
+    if( p.isPlaying ){
+      playerNo++;
+    }
 
     return <PlayerUI
       effects={effectContainer}
@@ -537,6 +551,7 @@ const Game = (props) => {
       isMainPlayer={isSelf}
       isCurrent={ p.id === currentPlayer && gameIsRunning ? true : false }
       cards={cards}
+      spectatorMode={ !iAmPlaying }
       onClick={  (c)=>cardClick(c) }
       isHighlight={ isHighlight } />;
   } )

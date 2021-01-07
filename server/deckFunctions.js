@@ -181,6 +181,25 @@ let checkDeck = (deck) => {
 
 }
 
+let checkNextPlayer = ( players, currentPlayer) => {
+
+  let nextPlayer = currentPlayer;
+
+  let foundNextPlayer = false;
+
+  while( !foundNextPlayer ){
+    nextPlayer++;
+    if( nextPlayer >= players.length ){
+      nextPlayer = 0;
+    }
+    if( players[nextPlayer].isPlaying ){
+      foundNextPlayer = true;
+    }
+  }
+
+  return nextPlayer
+}
+
 
 
 exports.createDefault = createDefaultCardSet;
@@ -188,3 +207,4 @@ exports.shuffle = shuffleDeck;
 exports.distribute = distributeCards;
 exports.positionCard = positionCard;
 exports.checkDeck = checkDeck;
+exports.checkNextPlayer = checkNextPlayer;

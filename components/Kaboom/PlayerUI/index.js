@@ -106,6 +106,10 @@ const PlayerUI = (props) => {
         top: 'calc( var(--card-margin) + ( var(--card-height) + var(--card-margin) ) * '+c.slot.y+' )'
       };
 
+      if( props.spectatorMode ){
+        isVisible = true;
+      }
+
       return( <Card
         className={styles.CardGrid_Card.toString()}
         style={cardStyle}

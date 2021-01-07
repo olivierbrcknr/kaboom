@@ -42,7 +42,7 @@ io.on('connection', socket => {
     isPlaying: false
   } );
 
-  if( players.length < 4 ){
+  if( players.length < 4 && !gameIsRunning ){
     players[ players.length-1 ].isPlaying = true;
   }
 
@@ -117,10 +117,7 @@ io.on('connection', socket => {
     }else{
       deck = deckFn.createDefault();
       roundCount = 0;
-      currentPlayer = lastStartingPlayer+1;
-      if( currentPlayer >= players.length ){
-        currentPlayer = 0;
-      }
+      currentPlayer = deckFn.checkNextPlayer( players, lastStartingPlayer );
     }
 
     socket.emit('gameIsRunningUpdate', gameIsRunning);
@@ -148,10 +145,7 @@ io.on('connection', socket => {
 
   socket.on('nextTurn',()=>{
 
-    currentPlayer++;
-    if( currentPlayer >= players.length ){
-      currentPlayer = 0;
-    }
+    currentPlayer = deckFn.checkNextPlayer( players, currentPlayer );
 
     socket.emit('currentPlayer', players[currentPlayer].id);
     socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
