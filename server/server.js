@@ -23,6 +23,7 @@ let players = [];
 // gameIsRunning
 let gameIsRunning = false;
 let roundCount = 0;
+roundIsRunning = false;
 let currentPlayer = 0;
 let lastStartingPlayer = 0;
 
@@ -105,31 +106,6 @@ io.on('connection', socket => {
 
   });
 
-  socket.on('startStop', (data)=>{
-    gameIsRunning = !gameIsRunning;
-
-    // start game
-    if( gameIsRunning ){
-      deck = deckFn.distribute( deck, players );
-      console.log('deck distributed');
-
-    // reset game
-    }else{
-      deck = deckFn.createDefault();
-      roundCount = 0;
-      currentPlayer = deckFn.checkNextPlayer( players, lastStartingPlayer );
-    }
-
-    socket.emit('gameIsRunningUpdate', gameIsRunning);
-    socket.broadcast.emit('gameIsRunningUpdate', gameIsRunning);
-
-    socket.emit('getDeck', deck);
-    socket.broadcast.emit('getDeck', deck);
-
-    socket.emit("playersUpdated", players);
-    socket.broadcast.emit("playersUpdated", players);
-  });
-
   socket.on('initialSetup', (data) => {
 
     const thisSIndex = players.findIndex(element => element.id === socket.id);
@@ -140,23 +116,15 @@ io.on('connection', socket => {
     socket.emit('getDeck', deck);
     socket.emit('gameIsRunningUpdate', gameIsRunning);
     socket.emit("playersUpdated", players);
+    socket.emit('roundUpdate', roundCount, roundIsRunning);
   });
 
 
-  socket.on('nextTurn',()=>{
-
-    currentPlayer = deckFn.checkNextPlayer( players, currentPlayer );
-
-    socket.emit('currentPlayer', players[currentPlayer].id);
-    socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
-  });
-
-
+  // Card fns —————————————————————————————————————————————
 
   socket.on('drawCard',(type)=>{
     socket.broadcast.emit('highlightDeck', type);
   });
-
 
   socket.on('cardPlayed', (card)=>{
 
@@ -228,29 +196,92 @@ io.on('connection', socket => {
     socket.broadcast.emit('highlightSwop',cards,type);
   });
 
-  socket.on('endRound', ()=>{
 
-    // calculate points
-    players = rules.calcPlayerPoints( players, deck );
-    gameIsRunning=false;
+  // Game fns —————————————————————————————————————————————
+
+  socket.on('startGame', ()=>{
+    gameIsRunning=true;
+    roundCount = 0;
+    players = players.map( (p,k)=>{
+      return {
+        ...p,
+        points: 0,
+        roundPoints: []
+      }
+    } );
+    currentPlayer = deckFn.checkNextPlayer( players, 0 );
+
+    deck = deckFn.createDefault();
+
+    socket.emit('getDeck', deck);
+    socket.broadcast.emit('getDeck', deck);
 
     socket.emit('gameIsRunningUpdate', gameIsRunning);
     socket.broadcast.emit('gameIsRunningUpdate', gameIsRunning);
+
+    socket.emit("playersUpdated", players);
+    socket.broadcast.emit("playersUpdated", players);
+
+    socket.emit('currentPlayer', players[currentPlayer].id);
+    socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
+  });
+
+  socket.on('endGame', ()=>{
+    gameIsRunning=false;
+    roundIsRunning = false;
+
+    socket.emit('roundUpdate', roundCount, roundIsRunning);
+    socket.broadcast.emit('roundUpdate', roundCount, roundIsRunning);
+
+    socket.emit('gameIsRunningUpdate', gameIsRunning);
+    socket.broadcast.emit('gameIsRunningUpdate', gameIsRunning);
+  });
+
+  socket.on('startRound', ()=>{
+
+    roundIsRunning = true;
+
+    deck = deckFn.createDefault();
+    deck = deckFn.distribute( deck, players );
+    console.log('deck distributed');
+
+    currentPlayer = deckFn.checkNextPlayer( players, lastStartingPlayer );
+    if( currentPlayer >= players.length ){
+      currentPlayer = 0;
+    }
+
+    socket.emit('roundUpdate', roundCount, roundIsRunning);
+    socket.broadcast.emit('roundUpdate', roundCount, roundIsRunning);
+
+    socket.emit('currentPlayer', players[currentPlayer].id);
+    socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
+
+    socket.emit('getDeck', deck);
+    socket.broadcast.emit('getDeck', deck);
+
+  });
+
+  socket.on('endRound', ()=>{
+
+    roundIsRunning = false;
+    roundCount++;
+
+    // calculate points
+    players = rules.calcPlayerPoints( players, deck );
+
+    socket.emit('roundUpdate', roundCount, roundIsRunning);
+    socket.broadcast.emit('roundUpdate', roundCount, roundIsRunning);
+
     socket.emit('playersUpdated', players);
     socket.broadcast.emit('playersUpdated', players);
+  });
 
-    setTimeout(()=>{
-      // reset all data after 10 sec
-      deck = deckFn.createDefault();
-      roundCount = 0;
-      currentPlayer = lastStartingPlayer+1;
-      if( currentPlayer >= players.length ){
-        currentPlayer = 0;
-      }
+  socket.on('nextTurn',()=>{
 
-      socket.emit('getDeck', deck);
-      socket.broadcast.emit('getDeck', deck);
-    },10*1000)
+    currentPlayer = deckFn.checkNextPlayer( players, currentPlayer );
+
+    socket.emit('currentPlayer', players[currentPlayer].id);
+    socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
   });
 
 });

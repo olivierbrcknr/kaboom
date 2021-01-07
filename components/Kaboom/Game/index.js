@@ -55,6 +55,11 @@ const Game = (props) => {
 
   const [highlightDeck,setHighlightDeck] = useState(false);
 
+  const [roundState,setRoundState] = useState({
+    count: 0,
+    isRunning: false
+  })
+
   let classes = [styles.Game];
   classes.push(props.className);
 
@@ -94,6 +99,13 @@ const Game = (props) => {
       setGameIsRunning( data );
     });
 
+    socket.on('roundUpdate', (roundCount, roundIsRunning) => {
+      setRoundState({
+        count: roundCount,
+        isRunning: roundIsRunning
+      });
+    });
+
     socket.on('currentPlayer', (pID) => {
       setCurrentPlayer(pID);
     });
@@ -125,6 +137,7 @@ const Game = (props) => {
       socket.off('getDeck');
       socket.off('playersUpdated');
       socket.off('gameIsRunningUpdate');
+      socket.off('roundUpdate');
       socket.off('currentPlayer');
       socket.off('playEffect');
       socket.off('selectCardToSwop');
@@ -136,7 +149,7 @@ const Game = (props) => {
 
   useEffect( ()=>{
 
-    if( gameIsRunning ){
+    if( roundState.isRunning ){
 
       setTimeout(()=>{
         setEffectContainer({
@@ -147,17 +160,9 @@ const Game = (props) => {
         });
       },500);
 
-    }else{
-
-      setEffectContainer({
-        effect: 'endRound',
-        cards: [],
-        timer: 10*1000,
-        needsInteraction: false
-      });
     }
 
-  }, [gameIsRunning] );
+  }, [roundState.isRunning] );
 
   useEffect( ()=>{
 
@@ -300,7 +305,10 @@ const Game = (props) => {
             needsInteraction: false
           });
 
-          socket.emit('nextTurn');
+          if( effectContainer.effect !== 'initialBottomRow' ){
+            socket.emit('nextTurn');
+          }
+
         }
 
       },effectContainer.timer);
@@ -311,7 +319,7 @@ const Game = (props) => {
 
   let cardClick = (card) => {
 
-    if( !iAmPlaying ){
+    if( !iAmPlaying || !roundState.isRunning ){
       console.log('nenenenenenenene..')
       return;
     }
@@ -417,6 +425,11 @@ const Game = (props) => {
 
   let drawCardFn = () => {
 
+    if( !iAmPlaying || !roundState.isRunning ){
+      console.log('nenenenenenenene..')
+      return;
+    }
+
     setFocusCard({
       ...currentDeck.deck[0],
       position: 'deck'
@@ -427,13 +440,18 @@ const Game = (props) => {
 
   let graveyardClick = () => {
 
+    if( !iAmPlaying || !roundState.isRunning ){
+      console.log('nenenenenenenene..')
+      return;
+    }
+
     if( focusCard.position === 'deck' ){
 
       socket.emit('drawCard',false);
       socket.emit('cardFromDeckToGraveyard');
 
     // regular getting rid of card
-    }else if( myState.id === currentPlayer && gameIsRunning && !focusCard.value ){
+    }else if( myState.id === currentPlayer && roundState.isRunning && !focusCard.value ){
 
       socket.emit('drawCard','graveyard');
       setFocusCard({
@@ -549,16 +567,12 @@ const Game = (props) => {
       playerNo={playerNo-1}
       player={p}
       isMainPlayer={isSelf}
-      isCurrent={ p.id === currentPlayer && gameIsRunning ? true : false }
+      isCurrent={ p.id === currentPlayer && roundState.isRunning ? true : false }
       cards={cards}
-      spectatorMode={ !iAmPlaying }
+      spectatorMode={ ( !iAmPlaying || !roundState.isRunning ) ? true : false }
       onClick={  (c)=>cardClick(c) }
       isHighlight={ isHighlight } />;
   } )
-
-  // let buttons = [];
-
-  let startButton = <button onClick={()=>{ socket.emit('startStop'); }} >{ gameIsRunning ? 'Stop Game' : 'Start Game' }</button>
 
   let effectDisplay = null;
 
@@ -611,7 +625,7 @@ const Game = (props) => {
           deck={currentDeck}
           drawCard={()=>{drawCardFn()}}
           clickGraveyard={()=>{graveyardClick()}}
-          isCurrent={ myState.id === currentPlayer && gameIsRunning ? true : false }
+          isCurrent={ myState.id === currentPlayer && roundState.isRunning ? true : false }
           isHighlight={ highlight }
           swopHighlight={ highlightDeck } />
 
@@ -619,10 +633,10 @@ const Game = (props) => {
 
         <DisplayPlayers
           currentPlayer={currentPlayer}
-          gameIsRunning={gameIsRunning}
+          gameIsRunning={roundState.isRunning}
           players={players} />
 
-        {startButton}
+        <button onClick={()=>{ socket.emit('endGame'); }} >End Game</button>
 
         <button onClick={()=>{ socket.emit('nextTurn'); }}>Next Turn</button>
 
@@ -650,7 +664,7 @@ const Game = (props) => {
           isID={myState.id}
           players={players} />
 
-        <div className={styles.StartButton} onClick={()=>{ socket.emit('startStop'); }}>
+        <div className={styles.StartButton} onClick={()=>{ socket.emit('startGame'); }}>
           Start Game
         </div>
 

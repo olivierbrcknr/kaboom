@@ -57,7 +57,7 @@ const Deck = (props) => {
       symbol={currentCard.color}
       style={openDeckStyle}
       number={currentCard.value}
-      isHighlight={ props.isHighlight.graveyard }
+      isHighlight={ props.isCurrent && props.isHighlight.graveyard ? true : false }
       indicatorType={ props.swopHighlight === 'graveyard' ? 'lookAt' : null }
       className={styles.OpenDeck.toString()}
       onClick={ () => { graveyardClickFn() } }  />
@@ -78,7 +78,7 @@ const Deck = (props) => {
         number={nextCard.value}
         symbol={nextCard.color}
         style={closedDeckStyle}
-        isHighlight={ props.isHighlight.deck }
+        isHighlight={ props.isCurrent && props.isHighlight.deck ? true : false }
         indicatorType={ props.swopHighlight === 'deck' ? 'lookAt' : null }
         className={styles.ClosedDeck.toString()}
         onClick={ () => { deckClickFn() } } />
