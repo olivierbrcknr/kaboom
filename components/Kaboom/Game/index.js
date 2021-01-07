@@ -6,6 +6,8 @@ import Deck from '../Deck'
 import DisplayPlayers from '../DisplayPlayers'
 import PlayerUI from '../PlayerUI'
 
+import PlayerSelection from '../PlayerSelection'
+
 import socket from "../socket";
 
 const isDev = process.env.NODE_ENV !== 'production'
@@ -183,6 +185,7 @@ const Game = (props) => {
     }
 
   }, [currentDeck,playEffect] );
+
 
   useEffect( ()=>{
 
@@ -492,13 +495,19 @@ const Game = (props) => {
     socket.emit('nameChange',name);
   }
 
+  let playerToggle = (pID) => {
+    socket.emit('playerToggle',pID);
+  }
+
 
   let playerUIs = null;
   let myPos = players.findIndex(p => p.id === myState.id);
 
+  let playerNo = 0;
+
   playerUIs = players.map( (p,k) => {
 
-    if( k>3 ){
+    if( p.isPlaying === false ){
       return null;
     }
 
@@ -515,15 +524,17 @@ const Game = (props) => {
       isSelf = true;
     }
 
+    playerNo++;
+
     return <PlayerUI
       effects={effectContainer}
       swopHighlight={swopHighlightCards}
       startingPos={myPos}
       key={'player-no_'+k}
       k={k}
+      playerNo={playerNo-1}
       player={p}
       isMainPlayer={isSelf}
-      onNameChange={ (name) => changeName(name) }
       isCurrent={ p.id === currentPlayer && gameIsRunning ? true : false }
       cards={cards}
       onClick={  (c)=>cardClick(c) }
@@ -572,38 +583,68 @@ const Game = (props) => {
                     </div>)
   }
 
-  return (
-    <div className={classes.join(" ")}>
+  if( gameIsRunning ){
 
-      <div className={styles.PlayerUIsContainer}>
-        {playerUIs}
+    return (
+      <div className={classes.join(" ")}>
+
+        <div className={styles.PlayerUIsContainer}>
+          {playerUIs}
+        </div>
+
+        <Deck
+          deck={currentDeck}
+          drawCard={()=>{drawCardFn()}}
+          clickGraveyard={()=>{graveyardClick()}}
+          isCurrent={ myState.id === currentPlayer && gameIsRunning ? true : false }
+          isHighlight={ highlight }
+          swopHighlight={ highlightDeck } />
+
+        {effectDisplay}
+
+        <DisplayPlayers
+          currentPlayer={currentPlayer}
+          gameIsRunning={gameIsRunning}
+          players={players} />
+
+        {startButton}
+
+        <button onClick={()=>{ socket.emit('nextTurn'); }}>Next Turn</button>
+
+        <button onClick={()=>{ socket.emit('endRound'); }}>End Round</button>
+
+        <button onClick={()=>{ socket.emit('startRound'); }}>Start Round</button>
+
       </div>
+    )
 
-      <Deck
-        deck={currentDeck}
-        drawCard={()=>{drawCardFn()}}
-        clickGraveyard={()=>{graveyardClick()}}
-        isCurrent={ myState.id === currentPlayer && gameIsRunning ? true : false }
-        isHighlight={ highlight }
-        swopHighlight={ highlightDeck } />
+  }else{
 
-      {effectDisplay}
+    classes.push(styles.isStartScreen);
 
-      <DisplayPlayers
-        currentPlayer={currentPlayer}
-        gameIsRunning={gameIsRunning}
-        players={players} />
+    return (
+      <div className={classes.join(" ")}>
 
-      {startButton}
+        <h1>
+          Kaboom
+        </h1>
 
-      <button onClick={()=>{ socket.emit('nextTurn'); }}>Next Turn</button>
+        <PlayerSelection
+          onNameChange={ (name) => changeName(name) }
+          onPlayerToggle={ (pID) => playerToggle(pID) }
+          isID={myState.id}
+          players={players} />
 
-      <button onClick={()=>{ socket.emit('endRound'); }}>End Round</button>
+        <div className={styles.StartButton} onClick={()=>{ socket.emit('startStop'); }}>
+          Start Game
+        </div>
 
-      <button onClick={()=>{ socket.emit('startRound'); }}>Start Round</button>
+      </div>
+    )
 
-    </div>
-  )
+  }
+
+
 }
 
 export default Game

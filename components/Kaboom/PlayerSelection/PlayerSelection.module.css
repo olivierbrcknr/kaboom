@@ -1,0 +1,65 @@
+.PlayerSelection {
+  max-width: 400px;
+  min-width: 200px;
+  margin: 20px;
+}
+
+.PlayerSelection li {
+  padding: 10px 0;
+  display: flex;
+  font-size: 16px;
+  border-top: solid 2px var(--color-gray);
+}
+
+.PlayerSelection li:first-child {
+  border: none;
+}
+
+.isSelf .PlayerName {
+  font-weight: bold;
+}
+
+.PlayerName {
+  font-family: var(--font-family-mono);
+  font-size: 14px;
+  color: var(--color-black);
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  background: none;
+  margin: 0;
+  display: block;
+  resize: none;
+  padding: 0;
+  width: calc( 100% - 3em);
+}
+
+.Toggle {
+  border-radius: 10000px;
+  width: 2em;
+  height: 1.2em;
+  background: var(--color-gray);
+  cursor: pointer;
+  margin-left: 1em;
+  transition: background 0.4s;
+}
+
+.ToggleKnob {
+  width: 0.8em;
+  height: 0.8em;
+  top: 0.2em;
+  right: 0.2em;
+  position: absolute;
+  border-radius: 1000px;
+  background: var(--color-white);
+  transition: right 0.2s;
+}
+
+.Toggle.ToggleOn {
+  background: var(--color-highlight);
+}
+
+.Toggle.ToggleOn .ToggleKnob {
+  right: 0.9em;
+}

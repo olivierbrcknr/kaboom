@@ -12,10 +12,6 @@ const PlayerUI = (props) => {
   // map
   let cards = null;
 
-  let nameLabel = (<div className={styles.Name}>
-                    {props.player.name}
-                  </div>)
-
   if( props.isCurrent ){
     classes.push(styles.isCurrent);
   }
@@ -24,15 +20,9 @@ const PlayerUI = (props) => {
     classes.push(styles.isMainPlayer);
     classes.push(styles.posBottom);
 
-    nameLabel = <input
-      type="text"
-      onChange={ (v) => props.onNameChange(v.target.value) }
-      className={styles.Name}
-      value={props.player.name} />
-
   }else{
 
-    switch( props.k-props.startingPos ){
+    switch( props.playerNo-props.startingPos ){
 
       case -3:
       case 1:
@@ -139,7 +129,9 @@ const PlayerUI = (props) => {
         {cards}
       </div>
 
-      {nameLabel}
+      <div className={styles.Name}>
+        {props.player.name}
+      </div>
 
     </div>
   )

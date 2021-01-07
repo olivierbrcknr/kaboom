@@ -42,10 +42,9 @@ io.on('connection', socket => {
     isPlaying: false
   } );
 
-  // send update to all:
-  // sending to the client
-  socket.emit("playersUpdated", players);
-  socket.broadcast.emit("playersUpdated", players);
+  if( players.length < 4 ){
+    players[ players.length-1 ].isPlaying = true;
+  }
 
   socket.on("disconnect", () => {
 
@@ -67,6 +66,39 @@ io.on('connection', socket => {
 
     const relID = players.findIndex(element => element.id === socket.id);
     players[relID].name = newName;
+
+    socket.emit("playersUpdated", players);
+    socket.broadcast.emit("playersUpdated", players);
+
+  });
+
+  socket.on('playerToggle', (pID)=>{
+
+    const pIndex = players.findIndex(element => element.id === pID);
+
+    let arePlaying = 0;
+
+    // check how many are currently playing
+    for ( let i = 0; i < players.length; i++ ){
+      if( players[i].isPlaying ){
+        arePlaying++;
+      }
+    }
+
+    let newVal = !players[pIndex].isPlaying;
+
+    // if more playing than allowed && the new index is true
+    if( arePlaying >= 4 && newVal ){
+      let spaceIsMade = false;
+      for ( let i = 0; i < players.length; i++ ){
+        if( players[i].isPlaying && !spaceIsMade ){
+          players[i].isPlaying = false;
+          spaceIsMade = true;
+        }
+      }
+    }
+
+    players[pIndex].isPlaying = newVal;
 
     socket.emit("playersUpdated", players);
     socket.broadcast.emit("playersUpdated", players);
@@ -97,8 +129,8 @@ io.on('connection', socket => {
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);
 
-    socket.emit('currentPlayer', players[currentPlayer].id);
-    socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
+    socket.emit("playersUpdated", players);
+    socket.broadcast.emit("playersUpdated", players);
   });
 
   socket.on('initialSetup', (data) => {
@@ -110,7 +142,7 @@ io.on('connection', socket => {
 
     socket.emit('getDeck', deck);
     socket.emit('gameIsRunningUpdate', gameIsRunning);
-    socket.emit('playersUpdated', players);
+    socket.emit("playersUpdated", players);
   });
 
 

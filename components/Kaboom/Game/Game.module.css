@@ -24,3 +24,31 @@
   background: var(--color-black);
   color: var(--color-white);
 }
+
+
+.isStartScreen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.isStartScreen h1 {
+  font-size: 64px;
+  text-transform: uppercase;
+}
+
+.StartButton {
+  border-radius: 8px;
+  min-width: 200px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--color-gray);
+  transition: background 0.2s;
+  font-size: 18px;
+}
+.StartButton:hover {
+  color: var(--color-white);
+  background: var(--color-highlight);
+}
