@@ -44,6 +44,8 @@ const Home = () => {
           source={rulesMD}
           className={styles.Rules}
           renderers={{image: ImgRenderer}} />
+
+        <Footer />
       </div>
 
       <div className={styles.toggleRulesBtn} onClick={ ()=>{ setShowRules(!showRules) } }>
