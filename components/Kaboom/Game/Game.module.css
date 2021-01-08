@@ -16,7 +16,7 @@
 
 .EffectDisplay {
   position: absolute;
-  top: calc( 50% + var(--card-height) / 2 + 26px );
+  top: calc( 50% + var(--card-height) / 2 + 26px);
   left: 50%;
   transform: translateX(-50%);
   padding: 4px 8px;
@@ -25,6 +25,20 @@
   color: var(--color-white);
 }
 
+.IEndButton {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+
+  border-radius: 8px;
+  min-width: 200px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--color-gray);
+  transition: background 0.2s;
+  font-size: 18px;
+}
 
 .isStartScreen {
   display: flex;
@@ -38,6 +52,8 @@
   text-transform: uppercase;
 }
 
+.EndGameButton,
+.StartRoundButton,
 .StartButton {
   border-radius: 8px;
   min-width: 200px;
@@ -48,7 +64,63 @@
   transition: background 0.2s;
   font-size: 18px;
 }
+
+.IEndButton:hover,
+.EndGameButton:hover,
+.StartRoundButton:hover,
 .StartButton:hover {
   color: var(--color-white);
   background: var(--color-highlight);
 }
+
+.EndGameContainer,
+.StartRoundContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  background-color: rgba(255,255,255,0.3);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.EndGameContainer {
+  background-color: rgba(255,255,255,0.7);
+}
+
+@media (prefers-color-scheme: dark) {
+  .StartRoundContainer {
+    background-color: rgba(0,0,0,0.3);
+  }
+  .EndGameContainer {
+    background-color: rgba(0,0,0,0.7);
+  }
+}
+
+.Podium {
+  margin-bottom: 40px;
+  list-style: decimal;
+  margin-left: 40px;
+}
+.Podium li {
+  font-size: 20px;
+  margin-bottom: 14px;
+}
+
+.Podium li.isCurrent {
+  font-weight: bold;
+}
+.Podium li.isCurrent:before {
+  content: '→';
+  position: absolute;
+  left: -60px;
+}
+.Podium li:nth-child( n+2 ) {
+  opacity: 0.5;
+}
+
+

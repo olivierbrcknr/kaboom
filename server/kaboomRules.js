@@ -182,7 +182,12 @@ let cardShiftedToPlayer = ( deck, card, oldCard ) => {
 
 }
 
-let calcPlayerPoints = ( players, deck ) => {
+let calcPlayerPoints = ( players, deck, endingPlayer, endingByChoice ) => {
+
+  let thisRoundPoints = [];
+  let thisEndingPlayersRoundPoints = 0;
+  let lastPlayerPrevPoints = 0;
+  let lastPlayerPoints = 0;
 
   let pseudoPlayers = players.map( (p,k)=>{
 
@@ -245,6 +250,16 @@ let calcPlayerPoints = ( players, deck ) => {
 
     let newRoundPoints = p.roundPoints;
     newRoundPoints.push(newPoints);
+    thisRoundPoints.push({
+      id: p.id,
+      points: newPoints
+    });
+
+    if( p.id === endingPlayer ){
+      thisEndingPlayersRoundPoints = newPoints;
+      lastPlayerPrevPoints = p.points;
+      lastPlayerPoints = newPoints;
+    }
 
     return {
       ...p,
@@ -254,10 +269,87 @@ let calcPlayerPoints = ( players, deck ) => {
 
   } );
 
+
+  if( endingPlayer ){
+
+    // if someone has less or the same amount of points add or remove points
+    let checkIfSomeoneHadFever = false;
+    let lastPlayerIndex = 0;
+
+    for( let i = 0; i < thisRoundPoints.length; i++ ){
+      if( thisRoundPoints[i].id !== endingPlayer ){
+        if( thisRoundPoints[i].points <= thisEndingPlayersRoundPoints ){
+          checkIfSomeoneHadFever = true;
+        }
+      }else{
+        lastPlayerIndex = i;
+      }
+    }
+
+    if( checkIfSomeoneHadFever ){
+      lastPlayerPoints += 20;
+      if( lastPlayerPoints === 50 ){
+        lastPlayerPoints = 0;
+      }
+      if( lastPlayerPoints === 100 ){
+        lastPlayerPoints = 50;
+      }
+    }else if( endingByChoice ){
+      lastPlayerPoints -= 5;
+      if( lastPlayerPoints === 50 ){
+        lastPlayerPoints = 0;
+      }
+      if( lastPlayerPoints === 100 ){
+        lastPlayerPoints = 50;
+      }
+    }
+
+    let newRoundPoints = pseudoPlayers[lastPlayerIndex].roundPoints;
+    newRoundPoints[newRoundPoints.length-1] = lastPlayerPoints;
+
+    pseudoPlayers[lastPlayerIndex] = {
+      ...pseudoPlayers[lastPlayerIndex],
+      points: lastPlayerPrevPoints + lastPlayerPoints,
+      roundPoints: newRoundPoints
+    }
+
+  }
+
   return pseudoPlayers;
 }
 
 
+let calcIfEnded = (players) => {
+
+  let hasEnded = false;
+
+  for (let i = 0; i < players.length; i++){
+    if( players[i].points > 100 ){
+      hasEnded = true;
+    }
+  }
+
+  return hasEnded;
+}
+
+let checkIfPlayerHasZeroCards = (players,deck) => {
+
+  let hasZeroCards = false;
+
+  for (let i = 0; i < players.length; i++){
+    let cardCount = 0;
+    for( let c = 0; c < deck.hand.length; c++ ){
+      if( deck.hand[c].player === players[i].id ){
+        cardCount++;
+      }
+    }
+    if( cardCount <= 0 ){
+      hasZeroCards = players[i].id;
+    }
+  }
+
+  return hasZeroCards;
+}
 
 
 exports.checkIfPlayable = checkIfPlayable;
@@ -267,3 +359,5 @@ exports.cardFromDeckToGraveyard = cardFromDeckToGraveyard;
 exports.cardShiftedToPlayer = cardShiftedToPlayer;
 exports.calcPlayerPoints = calcPlayerPoints;
 exports.cardSwoppedBetweenPlayers = cardSwoppedBetweenPlayers;
+exports.calcIfEnded = calcIfEnded;
+exports.checkIfPlayerHasZeroCards = checkIfPlayerHasZeroCards;

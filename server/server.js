@@ -26,6 +26,8 @@ let roundCount = 0;
 roundIsRunning = false;
 let currentPlayer = 0;
 let lastStartingPlayer = 0;
+let endingPlayer = false;
+let endingByChoice = false;
 
 console.log(`🧘‍♀️ Server is waiting`.black)
 
@@ -226,9 +228,11 @@ io.on('connection', socket => {
     socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
   });
 
+
   socket.on('endGame', ()=>{
     gameIsRunning=false;
     roundIsRunning = false;
+    roundCount=0;
 
     socket.emit('roundUpdate', roundCount, roundIsRunning);
     socket.broadcast.emit('roundUpdate', roundCount, roundIsRunning);
@@ -240,6 +244,8 @@ io.on('connection', socket => {
   socket.on('startRound', ()=>{
 
     roundIsRunning = true;
+    endingPlayer = false;
+    endingByChoice = false;
 
     deck = deckFn.createDefault();
     deck = deckFn.distribute( deck, players );
@@ -259,29 +265,65 @@ io.on('connection', socket => {
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);
 
+    socket.emit('endingPlayerID', endingPlayer);
+    socket.broadcast.emit('endingPlayerID', endingPlayer);
   });
 
-  socket.on('endRound', ()=>{
-
+  let roundHasEnded = (socket) => {
     roundIsRunning = false;
     roundCount++;
 
     // calculate points
-    players = rules.calcPlayerPoints( players, deck );
+    players = rules.calcPlayerPoints( players, deck, endingPlayer, endingByChoice );
+
+    let gameHasEnded = rules.calcIfEnded( players );
 
     socket.emit('roundUpdate', roundCount, roundIsRunning);
     socket.broadcast.emit('roundUpdate', roundCount, roundIsRunning);
 
     socket.emit('playersUpdated', players);
     socket.broadcast.emit('playersUpdated', players);
+
+    if( gameHasEnded ){
+      socket.emit('gameHasEnded');
+      socket.broadcast.emit('gameHasEnded');
+    }
+  }
+
+  socket.on('endRound', ()=>{
+
+    roundHasEnded( socket );
+
   });
+
+  socket.on( 'playerIsEnding', (pID) => {
+
+    endingByChoice = true;
+    endingPlayer = pID;
+
+    socket.emit('endingPlayerID', endingPlayer);
+    socket.broadcast.emit('endingPlayerID', endingPlayer);
+
+  } )
 
   socket.on('nextTurn',()=>{
 
     currentPlayer = deckFn.checkNextPlayer( players, currentPlayer );
 
-    socket.emit('currentPlayer', players[currentPlayer].id);
-    socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
+    if( !endingPlayer ){
+      endingPlayer = rules.checkIfPlayerHasZeroCards( players,deck );
+      socket.emit('endingPlayerID', endingPlayer);
+      socket.broadcast.emit('endingPlayerID', endingPlayer);
+    }
+
+    if( endingPlayer === players[currentPlayer].id ){
+
+      roundHasEnded( socket );
+
+    }else{
+      socket.emit('currentPlayer', players[currentPlayer].id);
+      socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
+    }
   });
 
 });

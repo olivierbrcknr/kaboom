@@ -2,6 +2,7 @@
   position: absolute;
   bottom: 10px;
   right: 10px;
+  z-index: 3;
 }
 
 .DisplayPlayers li {
@@ -11,6 +12,12 @@
 
 .isCurrent {
   font-weight: bold;
+}
+.isSelf:before {
+  content: '→';
+  position: absolute;
+  left: -1em;
+  margin-top: -1px;
 }
 
 .PlayerTotalPointDisplay {
@@ -24,4 +31,17 @@
   width: 120px;
   height: 1.2em;
   text-overflow: ellipsis;
+}
+
+
+.RoundPointDisplay {
+  display: flex;
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+.RoundPointDisplay li {
+  margin: 2px 3px;
+  width: 14px;
+  text-align: right;
 }

@@ -27,9 +27,23 @@ const DisplayPlayers = (props) => {
       [{p.points}]
     </div>;
 
+    let roundPoints = p.roundPoints.map( (point,i)=>{
+      return (<li key={'roundPoint-'+p.id+'-'+i}>
+          {point}
+        </li>);
+    } )
+
+    if( p.id === props.isID ){
+      playerClasses.push(styles.isSelf);
+    }
+
+    let roundPointDisplay = <ul className={styles.RoundPointDisplay}>
+      {roundPoints}
+    </ul>;
+
     return(
       <li className={playerClasses.join(" ")} key={p.id}>
-        {playerName} {pointDisplay}
+        {playerName} {roundPointDisplay} {pointDisplay}
       </li>
     )
   } );

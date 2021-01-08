@@ -20,7 +20,9 @@ const Game = (props) => {
   });
   const [players,setPlayers] = useState([]);
   const [gameIsRunning,setGameIsRunning] = useState(false);
+  const [gameHasEnded,setGameHasEnded] = useState(false);
   const [playEffect,setPlayEffect] = useState(false);
+  const [lastRound,setLastRound] = useState(false);
 
   const [effectContainer,setEffectContainer] = useState({
     effect: '',
@@ -132,6 +134,15 @@ const Game = (props) => {
       setHighlightDeck(type);
     });
 
+    socket.on('gameHasEnded', (type)=>{
+      console.log('game has ended')
+      setGameHasEnded(true);
+    });
+
+    socket.on('endingPlayerID', (pID)=>{
+      setLastRound(pID);
+    });
+
     return () => {
       // detach listeners
       socket.off('getDeck');
@@ -143,8 +154,17 @@ const Game = (props) => {
       socket.off('selectCardToSwop');
       socket.off('highlightSwop');
       socket.off('highlightDeck');
+      socket.off('gameHasEnded');
+      socket.off('endingPlayerID');
     }
   }, []);
+
+
+  useEffect( ()=>{
+    if(!gameIsRunning){
+      setGameHasEnded(false);
+    }
+  }, [gameIsRunning] );
 
 
   useEffect( ()=>{
@@ -165,8 +185,6 @@ const Game = (props) => {
   }, [roundState.isRunning] );
 
   useEffect( ()=>{
-
-    console.log(swopHighlightCards)
 
     // hide highlight after 2sec
     if( swopHighlightCards.cards.length > 0 ){
@@ -359,7 +377,7 @@ const Game = (props) => {
         case 'K':
           var cards = effectContainer.cards;
           cards.push(card);
-          if( effectContainer.effect !== 'swop' && cards.length < 1 ){
+          if( effectContainer.effect !== 'swop' && cards.length <= 1 ){
             setEffectContainer({
               effect: 'lookAtKing',
               cards: cards,
@@ -530,89 +548,148 @@ const Game = (props) => {
   }
 
 
-  let playerUIs = null;
-  let myPos = players.findIndex(p => p.id === myState.id);
-
-  let playerNo = 0;
-
-  playerUIs = players.map( (p,k) => {
-
-    if( p.isPlaying === false ){
-      return null;
-    }
-
-    let isHighlight = highlight.otherCards;
-    let cards = [];
-    let isSelf = false;
-
-    if( currentDeck.hand ){
-      cards = currentDeck.hand.filter( (c) => c.player === p.id );
-    }
-
-    if( p.id == myState.id ){
-      isHighlight = highlight.ownCards;
-      isSelf = true;
-    }
-
-    if( p.isPlaying ){
-      playerNo++;
-    }
-
-    return <PlayerUI
-      effects={effectContainer}
-      swopHighlight={swopHighlightCards}
-      startingPos={myPos}
-      key={'player-no_'+k}
-      k={k}
-      playerNo={playerNo-1}
-      player={p}
-      isMainPlayer={isSelf}
-      isCurrent={ p.id === currentPlayer && roundState.isRunning ? true : false }
-      cards={cards}
-      spectatorMode={ ( !iAmPlaying || !roundState.isRunning ) ? true : false }
-      onClick={  (c)=>cardClick(c) }
-      isHighlight={ isHighlight } />;
-  } )
-
-  let effectDisplay = null;
-
-  if( playEffect ){
-
-    let effectDisplayText = null;
-
-    switch( currentDeck.graveyard[ currentDeck.graveyard.length-1 ].value.toString() ){
-
-      case '7':
-      case '8':
-        effectDisplayText = 'Look at an own card';
-        break;
-
-      case '9':
-      case '10':
-        effectDisplayText = 'Look at an opponent‘s card';
-        break;
-
-      case 'J':
-      case 'Q':
-        effectDisplayText = 'Swop 2 cards';
-        break;
-
-      case 'K':
-        effectDisplayText = 'Look at 1 card and swop 2 cards';
-        break;
-
-      default:
-        // display nothing
-        break;
-    }
-
-
-    effectDisplay = (<div className={styles.EffectDisplay}>
-                      {effectDisplayText}
-                    </div>)
-  }
-
   if( gameIsRunning ){
+
+    let playerUIs = null;
+    let myPos = players.findIndex(p => p.id === myState.id);
+
+    let playerNo = 0;
+
+    playerUIs = players.map( (p,k) => {
+
+      if( p.isPlaying === false ){
+        return null;
+      }
+
+      let isHighlight = highlight.otherCards;
+      let cards = [];
+      let isSelf = false;
+
+      if( currentDeck.hand ){
+        cards = currentDeck.hand.filter( (c) => c.player === p.id );
+      }
+
+      if( p.id == myState.id ){
+        isHighlight = highlight.ownCards;
+        isSelf = true;
+      }
+
+      if( p.isPlaying ){
+        playerNo++;
+      }
+
+      return <PlayerUI
+        effects={effectContainer}
+        swopHighlight={swopHighlightCards}
+        startingPos={myPos}
+        key={'player-no_'+k}
+        k={k}
+        playerNo={playerNo-1}
+        player={p}
+        isMainPlayer={isSelf}
+        isCurrent={ p.id === currentPlayer && roundState.isRunning ? true : false }
+        cards={cards}
+        spectatorMode={ ( !iAmPlaying || !roundState.isRunning ) ? true : false }
+        onClick={  (c)=>cardClick(c) }
+        isHighlight={ isHighlight } />;
+    } )
+
+    let effectDisplay = null;
+
+    if( playEffect ){
+
+      let effectDisplayText = null;
+
+      switch( currentDeck.graveyard[ currentDeck.graveyard.length-1 ].value.toString() ){
+
+        case '7':
+        case '8':
+          effectDisplayText = 'Look at an own card';
+          break;
+
+        case '9':
+        case '10':
+          effectDisplayText = 'Look at an opponent‘s card';
+          break;
+
+        case 'J':
+        case 'Q':
+          effectDisplayText = 'Swop 2 cards';
+          break;
+
+        case 'K':
+          effectDisplayText = 'Look at 1 card and swop 2 cards';
+          break;
+
+        default:
+          // display nothing
+          break;
+      }
+
+
+      effectDisplay = (<div className={styles.EffectDisplay}>
+                        {effectDisplayText}
+                      </div>)
+    }
+
+    let startRoundButton = <div className={styles.StartRoundContainer}>
+      <div className={styles.StartRoundButton} onClick={ () => socket.emit('startRound') }>
+        Start {roundState.count > 0 ? 'Next' : null} Round
+      </div>
+    </div>;
+
+    let gameEndedDisplay = null;
+
+    if(gameHasEnded){
+
+      let podiumPlayers = players.sort( (p1,p2)=>{
+
+        let comparison = 0;
+        if (p1.points > p2.points) {
+          comparison = 1;
+        } else if (p1.points < p2.points) {
+          comparison = -1;
+        }
+        return comparison;
+
+      } );
+
+      let podiumList = podiumPlayers.map( (player,k)=>{
+        return(<li key={'podium-'+k} className={ player.id === myState.id ? styles.isCurrent : '' }>
+            {player.name} [{player.points}]
+          </li>)
+      } )
+
+      let podium = <ol className={styles.Podium}>{podiumList}</ol>
+
+      gameEndedDisplay = <div className={styles.EndGameContainer}>
+
+        {podium}
+
+        <div className={styles.EndGameButton} onClick={ () => socket.emit('endGame') }>
+          End Game
+        </div>
+
+      </div>
+    }
+
+
+    let endingButton = <div className={styles.IEndButton} onClick={ () => {
+      socket.emit('playerIsEnding',myState.id);  // set I want to end
+      socket.emit('nextTurn'); // next person's turn
+    } }>
+      I Want To End
+    </div>;
+
+    let devButtons = (<div style={{zIndex: 1000}}>
+        <button onClick={()=>{ socket.emit('endGame'); }} >End Game</button>
+
+        <button onClick={()=>{ socket.emit('nextTurn'); }}>Next Turn</button>
+
+        <button onClick={()=>{ socket.emit('endRound'); }}>End Round</button>
+
+        <button onClick={()=>{ socket.emit('startRound'); }}>Start Round</button>
+      </div>)
 
     return (
       <div className={classes.join(" ")}>
@@ -629,20 +706,21 @@ const Game = (props) => {
           isHighlight={ highlight }
           swopHighlight={ highlightDeck } />
 
-        {effectDisplay}
+        { effectDisplay}
 
         <DisplayPlayers
+          isID={myState.id}
           currentPlayer={currentPlayer}
           gameIsRunning={roundState.isRunning}
           players={players} />
 
-        <button onClick={()=>{ socket.emit('endGame'); }} >End Game</button>
+        { currentPlayer === myState.id && !lastRound && !playEffect && highlight.deck ? endingButton : null}
 
-        <button onClick={()=>{ socket.emit('nextTurn'); }}>Next Turn</button>
+        { isDev ? devButtons : null}
 
-        <button onClick={()=>{ socket.emit('endRound'); }}>End Round</button>
+        { !roundState.isRunning && !gameHasEnded ? startRoundButton : null }
 
-        <button onClick={()=>{ socket.emit('startRound'); }}>Start Round</button>
+        { gameHasEnded ? gameEndedDisplay : null }
 
       </div>
     )
