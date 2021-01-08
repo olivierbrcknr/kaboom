@@ -40,6 +40,23 @@
   font-size: 18px;
 }
 
+.ForceEndBtn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  border-radius: 3px;
+  padding: 3px 5px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--color-gray);
+  transition: all 0.2s;
+  font-size: 11px;
+}
+.ForceEndBtn:hover {
+  background: var(--color-red);
+  color: #FFF;
+}
+
 .isStartScreen {
   display: flex;
   justify-content: center;

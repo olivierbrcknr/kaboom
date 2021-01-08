@@ -589,7 +589,7 @@ const Game = (props) => {
         isMainPlayer={isSelf}
         isCurrent={ p.id === currentPlayer && roundState.isRunning ? true : false }
         cards={cards}
-        spectatorMode={ ( !iAmPlaying || !roundState.isRunning ) ? true : false }
+        spectatorMode={ ( /*!iAmPlaying ||*/ !roundState.isRunning ) ? true : false }
         onClick={  (c)=>cardClick(c) }
         isHighlight={ isHighlight } />;
     } )
@@ -681,7 +681,7 @@ const Game = (props) => {
       I Want To End
     </div>;
 
-    let devButtons = (<div style={{zIndex: 1000}}>
+    let devButtons = (<div style={{zIndex: 9}}>
         <button onClick={()=>{ socket.emit('endGame'); }} >End Game</button>
 
         <button onClick={()=>{ socket.emit('nextTurn'); }}>Next Turn</button>
@@ -721,6 +721,8 @@ const Game = (props) => {
         { !roundState.isRunning && !gameHasEnded ? startRoundButton : null }
 
         { gameHasEnded ? gameEndedDisplay : null }
+
+        <div onClick={()=>{ socket.emit('endGame'); }} className={styles.ForceEndBtn}>Force End Game</div>
 
       </div>
     )
