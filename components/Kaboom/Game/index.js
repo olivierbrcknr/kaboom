@@ -722,7 +722,7 @@ const Game = (props) => {
 
         { gameHasEnded ? gameEndedDisplay : null }
 
-        <div onClick={()=>{ socket.emit('endGame'); }} className={styles.ForceEndBtn}>Force End Game</div>
+        <div style={{zIndex: 10}} onClick={()=>{ socket.emit('endGame'); }} className={styles.ForceEndBtn}>Force End Game</div>
 
       </div>
     )

@@ -23,7 +23,7 @@ let players = [];
 // gameIsRunning
 let gameIsRunning = false;
 let roundCount = 0;
-roundIsRunning = false;
+let roundIsRunning = false;
 let currentPlayer = 0;
 let lastStartingPlayer = 0;
 let endingPlayer = false;
@@ -61,6 +61,17 @@ io.on('connection', socket => {
 
     if (closedSocketIndex > -1) {
       players.splice(closedSocketIndex, 1);
+    }
+
+    // end game --> start UI if noone is left
+    if( players.length <= 0 ){
+      gameIsRunning=false;
+      roundIsRunning=false;
+      roundCount=0;
+      currentPlayer=0;
+      lastStartingPlayer=0;
+      endingByChoice=false;
+      endingPlayer=false;
     }
 
     // only send to all but sender, because sender does not exist anymore
@@ -206,6 +217,7 @@ io.on('connection', socket => {
   socket.on('startGame', ()=>{
     gameIsRunning=true;
     roundCount = 0;
+    lastStartingPlayer=0;
     players = players.map( (p,k)=>{
       return {
         ...p,
@@ -229,7 +241,6 @@ io.on('connection', socket => {
     socket.emit('currentPlayer', players[currentPlayer].id);
     socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
   });
-
 
   socket.on('endGame', ()=>{
     gameIsRunning=false;
