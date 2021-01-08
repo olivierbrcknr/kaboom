@@ -49,6 +49,9 @@ io.on('connection', socket => {
     players[ players.length-1 ].isPlaying = true;
   }
 
+  // show everyone who playes
+  socket.broadcast.emit("playersUpdated", players);
+
   socket.on("disconnect", () => {
 
     const closedSocketIndex = players.findIndex(element => element.id === socket.id);
@@ -62,7 +65,6 @@ io.on('connection', socket => {
 
     // only send to all but sender, because sender does not exist anymore
     socket.broadcast.emit("playersUpdated", players);
-
   });
 
   socket.on('nameChange', (newName)=>{
