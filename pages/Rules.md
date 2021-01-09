@@ -67,3 +67,29 @@ If a player is confident enough to have **below 5 points** on their hand and it'
 If the player correctly won the round, meaning they are below `5` points and have the least points in the party, they get all points they currently have on their hand plus additional `-5` points. If they were wrong with their guess (having more than `5` points or an opposing player has less or an equal amount of points) they receive additional `20` penalty points.
 
 Another way to end a round is by having no cards on their hand, thus preventing the player from executing another round. In this case, the game immediately stops once the player is reached. But be aware, also here, the less or same amount of points rule applies!
+
+
+-----
+
+## Colors
+
+```colors
+[
+  {
+    color: 'var(--color-draw)',
+    type: 'Drawing A Card'
+  },
+  {
+    color: 'var(--color-lookAt)',
+    type: 'Looking At A Card'
+  },
+  {
+    color: 'var(--color-swop)',
+    type: 'Swopping A Card'
+  },
+  {
+    color: 'var(--color-select)',
+    type: 'Selecting A Card'
+  }
+]
+```

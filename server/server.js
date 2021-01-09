@@ -45,7 +45,7 @@ io.on('connection', socket => {
     isPlaying: false
   } );
 
-  if( players.length < 4 && !gameIsRunning ){
+  if( players.length <= 4 && !gameIsRunning ){
     players[ players.length-1 ].isPlaying = true;
   }
 
@@ -217,7 +217,7 @@ io.on('connection', socket => {
   socket.on('startGame', ()=>{
     gameIsRunning=true;
     roundCount = 0;
-    lastStartingPlayer=0;
+
     players = players.map( (p,k)=>{
       return {
         ...p,
@@ -225,7 +225,6 @@ io.on('connection', socket => {
         roundPoints: []
       }
     } );
-    currentPlayer = deckFn.checkNextPlayer( players, 0 );
 
     deck = deckFn.createDefault();
 
@@ -264,11 +263,6 @@ io.on('connection', socket => {
     deck = deckFn.distribute( deck, players );
     console.log('deck distributed');
 
-    currentPlayer = deckFn.checkNextPlayer( players, lastStartingPlayer );
-    if( currentPlayer >= players.length ){
-      currentPlayer = 0;
-    }
-
     socket.emit('roundUpdate', roundCount, roundIsRunning);
     socket.broadcast.emit('roundUpdate', roundCount, roundIsRunning);
 
@@ -285,6 +279,9 @@ io.on('connection', socket => {
   let roundHasEnded = (socket) => {
     roundIsRunning = false;
     roundCount++;
+
+    currentPlayer=deckFn.checkNextPlayer( players, lastStartingPlayer );
+    lastStartingPlayer=currentPlayer;
 
     // calculate points
     players = rules.calcPlayerPoints( players, deck, endingPlayer, endingByChoice );

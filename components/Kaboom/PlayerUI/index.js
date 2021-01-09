@@ -16,6 +16,10 @@ const PlayerUI = (props) => {
     classes.push(styles.isCurrent);
   }
 
+  if( props.isEndingPlayer ){
+    classes.push(styles.isEnding);
+  }
+
   if( props.isMainPlayer ){
     classes.push(styles.isMainPlayer);
     classes.push(styles.posBottom);
@@ -110,6 +114,12 @@ const PlayerUI = (props) => {
         isVisible = true;
       }
 
+      let clickFn = () => {
+        if( props.isEndingPlayer ){
+          props.onClick(c);
+        }
+      }
+
       return( <Card
         className={styles.CardGrid_Card.toString()}
         style={cardStyle}
@@ -119,7 +129,7 @@ const PlayerUI = (props) => {
         indicatorType={ indicatorType }
         isHighlight={ props.isHighlight }
         isSelected={ isSelected }
-        onClick={() => { props.onClick(c) } }
+        onClick={() => { clickFn() } }
         isBack={!isVisible}
         /> )
     } )

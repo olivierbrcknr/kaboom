@@ -25,6 +25,17 @@
   color: var(--color-white);
 }
 
+.LastRoundIndicator {
+  position: absolute;
+  bottom: calc( 50% + var(--card-height) / 2 + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--color-red);
+  color: #FFF;
+}
+
 .IEndButton {
   position: absolute;
   bottom: 30px;
@@ -88,6 +99,16 @@
 .StartButton:hover {
   color: var(--color-white);
   background: var(--color-highlight);
+}
+
+.StartButtonIsDisabled {
+  opacity: 0.4;
+}
+
+.StartButtonIsDisabled:hover {
+  cursor: default;
+  color: var(--color-black);
+  background: var(--color-gray);
 }
 
 .EndGameContainer,

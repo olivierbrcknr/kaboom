@@ -587,6 +587,7 @@ const Game = (props) => {
         playerNo={playerNo-1}
         player={p}
         isMainPlayer={isSelf}
+        isEndingPlayer={ lastRound === p.id ? true : false }
         isCurrent={ p.id === currentPlayer && roundState.isRunning ? true : false }
         cards={cards}
         spectatorMode={ ( /*!iAmPlaying ||*/ !roundState.isRunning ) ? true : false }
@@ -708,6 +709,8 @@ const Game = (props) => {
 
         { effectDisplay}
 
+        { lastRound ? <div className={styles.LastRoundIndicator}>Last Round</div> : null }
+
         <DisplayPlayers
           isID={myState.id}
           currentPlayer={currentPlayer}
@@ -731,6 +734,19 @@ const Game = (props) => {
 
     classes.push(styles.isStartScreen);
 
+    let startBtnStyles = [styles.StartButton];
+    let playingPlayers = 0;
+
+    for( let i = 0; i < players.length; i++ ){
+      if( players[i].isPlaying ){
+        playingPlayers++;
+      }
+    }
+
+    if( playingPlayers < 2 ){
+      startBtnStyles.push( styles.StartButtonIsDisabled );
+    }
+
     return (
       <div className={classes.join(" ")}>
 
@@ -744,7 +760,7 @@ const Game = (props) => {
           isID={myState.id}
           players={players} />
 
-        <div className={styles.StartButton} onClick={()=>{ socket.emit('startGame'); }}>
+        <div className={startBtnStyles.join(' ')} onClick={()=>{ socket.emit('startGame'); }}>
           Start Game
         </div>
 

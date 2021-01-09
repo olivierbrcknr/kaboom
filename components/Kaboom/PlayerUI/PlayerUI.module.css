@@ -40,6 +40,10 @@
   background: var(--color-gray);
 }
 
+.isEnding .Name {
+  color: var(--color-red) !important;
+}
+
 
 .posTop {
   left: 50%;
