@@ -60,6 +60,8 @@ If a card is lying on top of the graveyard which has the same **value** as a car
 
 If the player selects a wrong card, they receive a hidden penalty which is then added to their hand.
 
+Players are not allowed to fire two times from the same stack. Meaning, if one has fired a card from player 1 not other player can fire a card from player 1 until either a new cards has been drawn or a card from another player's stack has been fired.
+
 ### Ending A Round
 
 If a player is confident enough to have **below 5 points** on their hand and it's the player's turn, they can decide to end the round. The round is still played until it reaches the ending player again. All the other players **must not** interfere with the ending player's hand in any way (e.g. swopping or quick-playing a card).

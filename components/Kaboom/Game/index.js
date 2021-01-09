@@ -37,7 +37,8 @@ const Game = (props) => {
     ownCards: false,
     otherCards: false,
     graveyard: false,
-    deck: false
+    deck: false,
+    dueToEffect: false
   });
 
   const [focusCard,setFocusCard] = useState({
@@ -159,12 +160,37 @@ const Game = (props) => {
     }
   }, []);
 
+  useEffect(()=>{
+
+    if( Array.isArray( currentDeck.hand ) ){
+
+      let cardsOnHand = 0;
+
+      for (let i = 0; i < currentDeck.hand.length; i++){
+        if( currentDeck.hand[i].player === myState.id ){
+          cardsOnHand++;
+        }
+      }
+
+      // console.log('I have '+cardsOnHand+' on my hand')
+
+      if( cardsOnHand === 0 ){
+        socket.emit('playerIsEnding',myState.id);
+      }
+    }
+
+  }, [myState.id,currentDeck.hand])
+
 
   useEffect( ()=>{
     if(!gameIsRunning){
       setGameHasEnded(false);
     }
   }, [gameIsRunning] );
+
+ useEffect( ()=>{
+    console.log(lastRound)
+  }, [lastRound] );
 
 
   useEffect( ()=>{
@@ -224,7 +250,8 @@ const Game = (props) => {
         ownCards: false,
         otherCards: false,
         graveyard: true,
-        deck: true
+        deck: true,
+        dueToEffect: false
       });
     }else{
       // empty highlights
@@ -232,7 +259,8 @@ const Game = (props) => {
         ownCards: false,
         otherCards: false,
         graveyard: false,
-        deck: false
+        deck: false,
+        dueToEffect: false
       });
 
       // empty focus card, just in case...
@@ -258,7 +286,7 @@ const Game = (props) => {
       });
     }
 
-  }, [currentPlayer,myState.id] );
+  }, [currentPlayer,myState.id,roundState.isRunning] );
 
   useEffect( ()=>{
 
@@ -335,14 +363,14 @@ const Game = (props) => {
   }, [effectContainer] );
 
 
-  let cardClick = (card) => {
+  let cardClick = (card,isEffect=false) => {
 
     if( !iAmPlaying || !roundState.isRunning ){
       console.log('nenenenenenenene..')
       return;
     }
 
-    if( playEffect ){
+    if( playEffect && isEffect ){
 
       switch(focusCard.value.toString()){
 
@@ -399,6 +427,10 @@ const Game = (props) => {
           // nothing
           break;
       }
+
+    }else if( playEffect && !isEffect ){
+
+      socket.emit('cardPlayed', card);
 
     }else{
 
@@ -495,6 +527,7 @@ const Game = (props) => {
           otherCards: false,
           graveyard: false,
           deck: false,
+          dueToEffect: true
         });
         break;
 
@@ -506,6 +539,7 @@ const Game = (props) => {
           otherCards: true,
           graveyard: false,
           deck: false,
+          dueToEffect: true
         });
         break;
 
@@ -517,6 +551,7 @@ const Game = (props) => {
           otherCards: true,
           graveyard: false,
           deck: false,
+          dueToEffect: true
         });
         break;
 
@@ -526,6 +561,7 @@ const Game = (props) => {
           otherCards: true,
           graveyard: false,
           deck: false,
+          dueToEffect: true
         });
         console.log('Look at 1 card and swop 2 cards');
         break;
@@ -590,9 +626,10 @@ const Game = (props) => {
         isEndingPlayer={ lastRound === p.id ? true : false }
         isCurrent={ p.id === currentPlayer && roundState.isRunning ? true : false }
         cards={cards}
-        spectatorMode={ ( /*!iAmPlaying ||*/ !roundState.isRunning ) ? true : false }
-        onClick={  (c)=>cardClick(c) }
-        isHighlight={ isHighlight } />;
+        spectatorMode={ ( /*!iAmPlaying || isDev || */ !roundState.isRunning ) ? true : false }
+        onClick={  (c,e)=>cardClick(c,e) }
+        isHighlight={ isHighlight }
+        isHighlightDueToEffect={ highlight.dueToEffect } />;
     } )
 
     let effectDisplay = null;
@@ -707,7 +744,7 @@ const Game = (props) => {
           isHighlight={ highlight }
           swopHighlight={ highlightDeck } />
 
-        { effectDisplay}
+        { effectDisplay }
 
         { lastRound ? <div className={styles.LastRoundIndicator}>Last Round</div> : null }
 

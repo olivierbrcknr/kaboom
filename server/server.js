@@ -28,6 +28,7 @@ let currentPlayer = 0;
 let lastStartingPlayer = 0;
 let endingPlayer = false;
 let endingByChoice = false;
+let lastFiredCardStack = false;
 
 console.log(`🧘‍♀️ Server is waiting`.black)
 
@@ -138,6 +139,7 @@ io.on('connection', socket => {
   // Card fns —————————————————————————————————————————————
 
   socket.on('drawCard',(type)=>{
+    lastFiredCardStack = false;
     socket.broadcast.emit('highlightDeck', type);
   });
 
@@ -147,10 +149,18 @@ io.on('connection', socket => {
       socket.emit('selectCardToSwop',targetCard);
     }
 
-    deck = rules.checkIfPlayable( deck, card, socket.id, callBack );
+    let playable = rules.checkIfPlayable( deck, card, socket.id, lastFiredCardStack, callBack );
+
+    // if was able to fire, not a penalty card
+    if( playable.bool ){
+      lastFiredCardStack = card.player;
+    }
+
+    deck = playable.deck;
 
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);
+
   });
 
   socket.on('cardSwoppedFromDeck', (card)=>{
@@ -158,7 +168,7 @@ io.on('connection', socket => {
     let nextCard = deck.deck[ 0 ];
     deck = rules.swopCardFromDeck( deck, card );
 
-    socket.broadcast.emit('highlightSwop', [nextCard], 'lookAt');
+    socket.broadcast.emit('highlightSwop', [nextCard], 'drew');
 
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);
@@ -169,7 +179,7 @@ io.on('connection', socket => {
     let currentCard = deck.graveyard[ deck.graveyard.length-1 ];
     deck = rules.swopCardFromGraveyard( deck, card );
 
-    socket.broadcast.emit('highlightSwop', [currentCard], 'lookAt');
+    socket.broadcast.emit('highlightSwop', [currentCard], 'drew');
 
     socket.emit('getDeck', deck);
     socket.broadcast.emit('getDeck', deck);
@@ -217,6 +227,8 @@ io.on('connection', socket => {
   socket.on('startGame', ()=>{
     gameIsRunning=true;
     roundCount = 0;
+    endingPlayer = false;
+    endingByChoice = false;
 
     players = players.map( (p,k)=>{
       return {
@@ -239,11 +251,14 @@ io.on('connection', socket => {
 
     socket.emit('currentPlayer', players[currentPlayer].id);
     socket.broadcast.emit('currentPlayer', players[currentPlayer].id);
+
+    socket.emit('endingPlayerID', endingPlayer);
+    socket.broadcast.emit('endingPlayerID', endingPlayer);
   });
 
   socket.on('endGame', ()=>{
     gameIsRunning=false;
-    roundIsRunning = false;
+    roundIsRunning=false;
     roundCount=0;
 
     socket.emit('roundUpdate', roundCount, roundIsRunning);
@@ -258,6 +273,7 @@ io.on('connection', socket => {
     roundIsRunning = true;
     endingPlayer = false;
     endingByChoice = false;
+    lastFiredCardStack=false;
 
     deck = deckFn.createDefault();
     deck = deckFn.distribute( deck, players );

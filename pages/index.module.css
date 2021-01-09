@@ -18,7 +18,6 @@
 .RulesContainer {
   width: var(--rules-width);
   padding: 15px;
-  padding-bottom: 30px;
 
   background: var(--color-gray);
 

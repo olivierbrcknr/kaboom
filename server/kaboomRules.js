@@ -1,14 +1,17 @@
 const deckFn = require('./deckFunctions.js');
 
-let checkIfPlayable = (deck,card,playerID,callback=()=>{}) => {
+let checkIfPlayable = (deck,card,playerID,lastFiredCardStack,callback=()=>{}) => {
 
   let currentCard = deck.graveyard[ deck.graveyard.length-1 ];
-  let nextCard = deck.deck[ 0 ];
+  // add plus one to not interfere with current open card
+  let nextCard = deck.deck[ 1 ];
 
   let pseudoDeck = deck;
 
+  let isPlayable = false;
+
   // has same value as current card
-  if( currentCard.value === card.value ){
+  if( currentCard.value === card.value && card.player !== lastFiredCardStack ){
 
     pseudoDeck.graveyard.push({
       id: card.id,
@@ -23,6 +26,8 @@ let checkIfPlayable = (deck,card,playerID,callback=()=>{}) => {
 
     let removeIndex = pseudoDeck.hand.map(item => item.id).indexOf(card.id);
     pseudoDeck.hand.splice(removeIndex, 1);
+
+    isPlayable = true;
 
   // penalty card
   }else{
@@ -47,7 +52,10 @@ let checkIfPlayable = (deck,card,playerID,callback=()=>{}) => {
 
   pseudoDeck = deckFn.checkDeck(pseudoDeck);
 
-  return pseudoDeck;
+  return {
+    deck: pseudoDeck,
+    bool: isPlayable
+  };
 }
 
 let swopCardFromDeck = (deck,card) => {

@@ -26,6 +26,10 @@
   background-color: var(--color-lookAt);
 }
 
+.isDrawn {
+  background-color: var(--color-draw);
+}
+
 
 .isRed {
   color: var(--color-red);

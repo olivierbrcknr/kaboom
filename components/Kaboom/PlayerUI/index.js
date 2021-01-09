@@ -58,7 +58,6 @@ const PlayerUI = (props) => {
 
       let indicatorType = null;
 
-
       // see effects
       if( props.effects.effect && props.effects.effect !== '' ){
 
@@ -116,7 +115,10 @@ const PlayerUI = (props) => {
 
       let clickFn = () => {
         if( props.isEndingPlayer ){
-          props.onClick(c);
+          console.log('sorry, this player is ending');
+        }else{
+          let isEffect = props.isHighlightDueToEffect && props.isHighlight ? true : false;
+          props.onClick(c,isEffect);
         }
       }
 

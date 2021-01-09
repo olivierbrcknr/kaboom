@@ -15,7 +15,8 @@
   --color-highlight: #58E1FF;
 
   /* special card colors */
-  --color-lookAt: #FFC700;
+  --color-draw: #FFC700;
+  --color-lookAt: #FFA234;
   --color-swop: #D43232;
   --color-select: var(--color-highlight);
 
