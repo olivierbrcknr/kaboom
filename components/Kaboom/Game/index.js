@@ -713,8 +713,8 @@ const Game = (props) => {
 
 
     let endingButton = <div className={styles.IEndButton} onClick={ () => {
-      socket.emit('playerIsEnding',myState.id);  // set I want to end
-      socket.emit('nextTurn'); // next person's turn
+      socket.emit('endRound',myState.id);  // set I want to end
+      // socket.emit('nextTurn'); // next person's turn
     } }>
       I Want To End
     </div>;

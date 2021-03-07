@@ -64,12 +64,9 @@ Players are not allowed to fire two times from the same stack. Meaning, if one h
 
 ### Ending A Round
 
-If a player is confident enough to have **below 5 points** on their hand and it's the player's turn, they can decide to end the round. The round is still played until it reaches the ending player again. All the other players **must not** interfere with the ending player's hand in any way (e.g. swopping or quick-playing a card).
-
-If the player correctly won the round, meaning they are below `5` points and have the least points in the party, they get all points they currently have on their hand plus additional `-5` points. If they were wrong with their guess (having more than `5` points or an opposing player has less or an equal amount of points) they receive additional `20` penalty points.
+At any point in the game, a player can end the round. If the player has the lowest amount if points, they points will simply added to the total point score. However, if the ending player has the same amount of points or more on their hand, they will receive `30` penalty points.
 
 Another way to end a round is by having no cards on their hand, thus preventing the player from executing another round. In this case, the game immediately stops once the player is reached. But be aware, also here, the less or same amount of points rule applies!
-
 
 -----
 

@@ -295,7 +295,8 @@ let calcPlayerPoints = ( players, deck, endingPlayer, endingByChoice ) => {
     }
 
     if( checkIfSomeoneHadFever ){
-      lastPlayerPoints += 20;
+      // add penalty points
+      lastPlayerPoints += 30;
       if( lastPlayerPoints === 50 ){
         lastPlayerPoints = 0;
       }
