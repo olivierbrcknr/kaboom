@@ -80,6 +80,7 @@
 .Rules img {
   zoom: 0.5;
   margin: 20px 0;
+  max-width: 100%;
 }
 @media (prefers-color-scheme: dark) {
   .Rules img {
@@ -148,3 +149,35 @@
   cursor: pointer;
   z-index: 10;
 }
+
+.button {
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--color-gray);
+  transition: background 0.2s;
+  margin-bottom: 1rem;
+  color: var(--color-black);
+  display: block;
+  text-decoration: none;
+}
+
+.button:hover {
+  color: var(--color-white);
+  background: var(--color-highlight);
+}
+
+/* Rules Page */
+
+.RulesPage {
+  padding: calc( var(--grid-unit) * 2 );
+  line-height: 1.4;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.RulesPage .Rules {
+
+}
+
+

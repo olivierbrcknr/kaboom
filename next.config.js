@@ -9,6 +9,7 @@ module.exports =
       exportPathMap: function() {
       return {
         '/': { page: '/' },
+        '/rules': { page: '/rules' },
       };
     },
     webpack(config, options) {
