@@ -1,38 +1,33 @@
 :root {
   /* Typography */
-  --font-family-reg: 'IBM Plex Sans', sans-serif;
-  --font-family-mono: 'Space Mono', monospace;
-;
-
+  --font-family-reg: "IBM Plex Sans", sans-serif;
+  --font-family-mono: "Space Mono", monospace;
   /* Colors */
-  --color-white: #FFF;
+  --color-white: #fff;
   --color-black: #000;
-  --color-gray: #EEE;
+  --color-gray: #eee;
 
-  --color-red: #F00;
+  --color-red: #f00;
 
-  --color-interaction: #58E1FF;
-  --color-highlight: #58E1FF;
+  --color-interaction: #58e1ff;
+  --color-highlight: #58e1ff;
 
   /* special card colors */
-  --color-draw: #FFC700;
-  --color-lookAt: #FFA234;
-  --color-swop: #D43232;
+  --color-draw: #ffc700;
+  --color-lookAt: #ffa234;
+  --color-swop: #d43232;
   --color-select: var(--color-highlight);
 
   /* Sizes */
   --grid-unit: 10px;
   --max-width: 1200px;
 
-
   --card-width: 80px;
   --card-height: 112px;
   --card-margin: 10px;
 
   --rules-width: 320px;
-
 }
-
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -40,7 +35,7 @@
     --color-black: #aaa;
     --color-gray: #333;
 
-    --color-red: #F00;
+    --color-red: #f00;
 
     --color-interaction: #99edff;
     --color-highlight: #99edff;
