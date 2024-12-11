@@ -5,26 +5,43 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development node server/server.js",
+    "start": "NODE_ENV=production node server/server.js",
+    "dev:next": "next dev",
     "build": "next build",
-    "start": "NODE_ENV=production node server/server.js"
+    "predev": "next build",
+    "prettier": "prettier --write './**/*.{t,j}s{,x}'",
+    "lint": "npx eslint './**/*.{t,j}s{,x}'",
+    "lint-fix": "npx eslint './**/*.{j,t}s{,x}' --fix"
   },
   "dependencies": {
-    "@svgr/webpack": "^5.5.0",
+    "@svgr/webpack": "^8.1.0",
+    "clsx": "^2.1.1",
     "colors": "^1.4.0",
-    "express": "^4.17.1",
-    "next": "^10.0.4",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-markdown": "^5.0.3",
-    "remark-gfm": "^1.0.0",
-    "socket.io": "^3.0.4",
-    "socket.io-client": "^3.0.4",
-    "webpack": "^5.11.0"
+    "express": "^4.21.2",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-markdown": "^9.0.1",
+    "remark-gfm": "^4.0.0",
+    "sass": "^1.82.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "webpack": "^5.97.1"
   },
   "devDependencies": {
-    "file-loader": "^6.2.0",
+    "@next/eslint-plugin-next": "^15.1.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "eslint": "^9.16.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-perfectionist": "^4.2.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.4.2",
     "raw-loader": "^4.0.2",
-    "url-loader": "^4.1.1",
-    "yarn-upgrade-all": "^0.5.4"
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0",
+    "yarn-upgrade-all": "^0.7.4"
   }
 }

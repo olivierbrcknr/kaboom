@@ -25,7 +25,7 @@
 
   position: absolute;
   top: 0;
-  right: calc( var(--rules-width) * -1 );
+  right: calc(var(--rules-width) * -1);
   bottom: 0;
   transition: right 0.4s;
 
@@ -38,14 +38,13 @@
 }
 
 .showRules .GameContainer {
-  width: calc(100vw - var(--rules-width) );
+  width: calc(100vw - var(--rules-width));
 }
 .showRules .RulesContainer {
   right: 0;
 }
 
 .Rules {
-
 }
 
 .Rules * {
@@ -88,7 +87,6 @@
   }
 }
 
-
 .Rules table {
   border: solid 1px var(--color-black);
   width: 100%;
@@ -106,7 +104,6 @@
 .Rules th {
   background: var(--color-white);
 }
-
 
 .Rules hr {
   border: none;
@@ -132,7 +129,6 @@
 }
 
 .RulesLegendInfo {
-
 }
 
 .RulesLegendInfo h6 {
@@ -140,7 +136,6 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
-
 
 .toggleRulesBtn {
   position: absolute;
@@ -171,13 +166,10 @@
 /* Rules Page */
 
 .RulesPage {
-  padding: calc( var(--grid-unit) * 2 );
+  padding: calc(var(--grid-unit) * 2);
   line-height: 1.4;
   max-width: 600px;
   margin: 0 auto;
 }
 .RulesPage .Rules {
-
 }
-
-
