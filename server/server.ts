@@ -1,7 +1,13 @@
+import { color } from "console-log-colors";
+import cors from "cors";
+import express, { type Express, type Request, type Response } from "express";
+import { createServer } from "http";
+import next from "next";
+import { Server } from "socket.io";
+
 import type { PlayerID, Player, Card, HandCard, CardPosition } from "../types";
 
-import { color } from "console-log-colors";
-
+import { createDefault, distribute, checkNextPlayer } from "./deckFunctions";
 import {
   checkIfPlayable,
   swopCardFromDeck,
@@ -14,20 +20,8 @@ import {
   checkIfPlayerHasZeroCards,
 } from "./kaboomRules";
 
-import { createDefault, distribute, checkNextPlayer } from "./deckFunctions";
-
-import express, { type Express, type Request, type Response } from "express";
-import cors from "cors";
-
-import next from "next";
-import { createServer } from "http";
-import { Server } from "socket.io";
-
 const app: Express = express();
 app.use(cors());
-// cors({
-//   // origin: "http://localhost",
-// }),
 
 const httpServer = createServer(app);
 
@@ -63,10 +57,10 @@ io.on("connection", (socket) => {
   // add new player
   players.push({
     id: socket.id,
+    isPlaying: false,
     name: "Player " + players.length,
     points: 0,
     roundPoints: [],
-    isPlaying: false,
   });
 
   if (players.length <= 4 && !gameIsRunning) {

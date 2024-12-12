@@ -1,4 +1,11 @@
-import type { CardSlot, CardValue, Deck, HandCard, CardColor } from "../types";
+import type {
+  CardSlot,
+  CardValue,
+  Deck,
+  HandCard,
+  CardColor,
+  Player,
+} from "../types";
 
 const positionCard = (
   id: number,
@@ -97,8 +104,8 @@ const createDefaultCardSet = (): Deck => {
   ];
 
   const cards: Deck = {
-    graveyard: [],
     deck: [],
+    graveyard: [],
     hand: [],
   };
 
@@ -109,8 +116,8 @@ const createDefaultCardSet = (): Deck => {
   for (let c = 0; c < 4; c++) {
     for (let i = 0; i < defaultCardSet.length; i++) {
       cards.deck.push({
-        id: cID,
         color: c as CardColor,
+        id: cID,
         value: defaultCardSet[i],
         // position: 'deck'
       });
@@ -121,8 +128,8 @@ const createDefaultCardSet = (): Deck => {
   // add three jokers
   for (let j = 0; j < 3; j++) {
     cards.deck.push({
-      id: cID,
       color: null,
+      id: cID,
       value: "X",
       // position: 'deck'
     });
@@ -134,7 +141,7 @@ const createDefaultCardSet = (): Deck => {
   return cards;
 };
 
-const distributeCards = (deck, players) => {
+const distributeCards = (deck: Deck, players: Player[]): Deck => {
   const newDeck = deck;
 
   // let lastOnTopID = 1;
@@ -163,7 +170,7 @@ const distributeCards = (deck, players) => {
 };
 
 // check if deck is empty and reshuffle
-const checkDeck = (deck) => {
+const checkDeck = (deck: Deck): Deck => {
   const pseudoDeck = deck;
 
   // if deck has less than 5 cards, reshuffle and add graveyard
@@ -184,7 +191,7 @@ const checkDeck = (deck) => {
   return pseudoDeck;
 };
 
-const checkNextPlayer = (players, currentPlayer) => {
+const checkNextPlayer = (players: Player[], currentPlayer: number) => {
   let nextPlayer = currentPlayer;
 
   let foundNextPlayer = false;

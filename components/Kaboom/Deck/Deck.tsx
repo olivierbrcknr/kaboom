@@ -1,94 +1,105 @@
 import React, { useState, useEffect } from "react";
 
+import type { Deck as DeckType, Card as CardType } from "../../../types";
 import Card from "../Card";
 
 import styles from "./Deck.module.scss";
 
-const Deck = (props) => {
+interface DeckProps {
+  isCurrent: boolean;
+  deck: DeckType;
+  className?: string;
+  drawCard: () => void;
+  clickGraveyard: () => void;
+  swopHighlight: "graveyard" | "lookAt" | "deck";
+  isHighlight: {
+    graveyard: boolean;
+    deck: boolean;
+  };
+}
+
+const Deck = ({
+  className,
+  clickGraveyard,
+  deck,
+  drawCard,
+  isCurrent,
+  isHighlight,
+  swopHighlight,
+}: DeckProps) => {
   const [showNext, setShowNext] = useState(false);
 
   useEffect(() => {
     setShowNext(false);
-  }, [props.isCurrent]);
+  }, [isCurrent]);
 
   const classes = [styles.Deck];
-  classes.push(props.className);
+  className && classes.push(className);
 
-  let currentCard,
-    nextCard = {
-      color: null,
-      value: null,
-    };
+  let currentCard: CardType | null;
+  let nextCard: CardType | null = null;
 
-  const countInDeck = props.deck.deck ? props.deck.deck.length : 0;
-  const countInGraveyard = props.deck.graveyard
-    ? props.deck.graveyard.length
-    : 0;
+  const countInDeck = deck.deck ? deck.deck.length : 0;
+  const countInGraveyard = deck.graveyard ? deck.graveyard.length : 0;
 
-  const closedDeckStyle = {
+  const closedDeckStyle: React.CSSProperties = {
     borderBottomWidth: 2 + countInDeck / 3 + "px",
     height: "calc( var(--card-height) + " + countInDeck / 3 + "px )",
   };
 
-  const openDeckStyle = {
+  const openDeckStyle: React.CSSProperties = {
     borderBottomWidth: 2 + countInGraveyard / 3 + "px",
     height: "calc( var(--card-height) + " + countInGraveyard / 3 + "px )",
   };
 
   const deckClickFn = () => {
-    if (props.isCurrent) {
+    if (isCurrent) {
       setShowNext(true);
-      props.drawCard();
+      drawCard();
     }
   };
 
   const graveyardClickFn = () => {
     setShowNext(false);
-    props.clickGraveyard();
+    clickGraveyard();
   };
 
   let openDeck: React.JSX.Element | null = null;
 
   if (countInGraveyard > 0) {
-    currentCard = props.deck.graveyard[countInGraveyard - 1];
+    currentCard = deck.graveyard[countInGraveyard - 1];
 
     openDeck = (
       <Card
-        symbol={currentCard.color}
+        card={currentCard}
         style={openDeckStyle}
-        number={currentCard.value}
-        isHighlight={
-          props.isCurrent && props.isHighlight.graveyard ? true : false
-        }
-        indicatorType={props.swopHighlight === "graveyard" ? "lookAt" : null}
+        isHighlight={isCurrent && isHighlight.graveyard ? true : false}
+        indicatorType={swopHighlight === "graveyard" ? "lookAt" : undefined}
         className={styles.OpenDeck.toString()}
-        onClick={() => {
-          graveyardClickFn();
-        }}
+        onClick={graveyardClickFn}
       />
     );
   }
 
   if (countInDeck > 0) {
-    nextCard = props.deck.deck[0];
+    nextCard = deck.deck[0];
   }
 
   return (
     <div className={classes.join(" ")}>
       {openDeck}
 
-      <Card
-        isBack={!showNext}
-        number={nextCard.value}
-        symbol={nextCard.color}
-        style={closedDeckStyle}
-        isHighlight={props.isCurrent && props.isHighlight.deck ? true : false}
-        indicatorType={props.swopHighlight === "deck" ? "lookAt" : null}
-        className={styles.ClosedDeck.toString()}
-        onClick={() => {
-          deckClickFn();
-        }}
-      />
+      {nextCard && (
+        <Card
+          isBack={!showNext}
+          card={nextCard}
+          style={closedDeckStyle}
+          isHighlight={isCurrent && isHighlight.deck}
+          indicatorType={swopHighlight === "deck" ? "lookAt" : undefined}
+          className={styles.ClosedDeck.toString()}
+          onClick={deckClickFn}
+        />
+      )}
     </div>
   );
 };

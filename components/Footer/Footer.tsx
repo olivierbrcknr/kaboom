@@ -1,15 +1,16 @@
-import React from "react";
+import clsx from "clsx";
 
 import styles from "./Footer.module.scss";
 
-const Footer = (props) => {
-  const classes = [styles.Footer];
-  classes.push(props.className);
+interface FooterProps {}
 
+const Footer = ({}: FooterProps) => {
   return (
-    <footer className={classes.join(" ")}>
-      2021 &copy; a project by{" "}
-      <a href="https://olivierbrueckner.de/">Olivier Brückner</a>
+    <footer className={clsx(styles.Footer)}>
+      2024 &copy; a project by{" "}
+      <a target="_blank" href="https://olivierbrueckner.de/">
+        Olivier Brückner
+      </a>
     </footer>
   );
 };

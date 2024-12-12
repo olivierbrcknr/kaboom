@@ -1,4 +1,5 @@
 import type { Deck, HandCard, PlayerID, Card, Player } from "../types";
+
 import { positionCard, checkDeck } from "./deckFunctions";
 
 const checkIfPlayable = (
@@ -19,9 +20,9 @@ const checkIfPlayable = (
   // has same value as current card
   if (currentCard.value === card.value && card.player !== lastFiredCardStack) {
     pseudoDeck.graveyard.push({
+      color: card.color,
       id: card.id,
       value: card.value,
-      color: card.color,
     });
 
     // if is not from own hand
@@ -56,12 +57,12 @@ const checkIfPlayable = (
   pseudoDeck = checkDeck(pseudoDeck);
 
   return {
-    deck: pseudoDeck,
     bool: isPlayable,
+    deck: pseudoDeck,
   };
 };
 
-const swopCardFromDeck = (deck, card) => {
+const swopCardFromDeck = (deck: Deck, card: HandCard) => {
   const nextCard = deck.deck[0];
 
   let pseudoDeck = deck;
@@ -70,8 +71,8 @@ const swopCardFromDeck = (deck, card) => {
     if (c.id === card.id) {
       return {
         ...c,
-        id: nextCard.id,
         color: nextCard.color,
+        id: nextCard.id,
         value: nextCard.value,
       };
     } else {
@@ -82,9 +83,9 @@ const swopCardFromDeck = (deck, card) => {
   pseudoDeck.deck.shift();
 
   pseudoDeck.graveyard.push({
+    color: card.color,
     id: card.id,
     value: card.value,
-    color: card.color,
   });
 
   pseudoDeck = checkDeck(pseudoDeck);
@@ -101,8 +102,8 @@ const swopCardFromGraveyard = (deck: Deck, card: Card) => {
     if (c.id === card.id) {
       return {
         ...c,
-        id: currentCard.id,
         color: currentCard.color,
+        id: currentCard.id,
         value: currentCard.value,
       };
     } else {
@@ -113,9 +114,9 @@ const swopCardFromGraveyard = (deck: Deck, card: Card) => {
   pseudoDeck.graveyard.pop();
 
   pseudoDeck.graveyard.push({
+    color: card.color,
     id: card.id,
     value: card.value,
-    color: card.color,
   });
 
   pseudoDeck = checkDeck(pseudoDeck);
@@ -123,7 +124,7 @@ const swopCardFromGraveyard = (deck: Deck, card: Card) => {
   return pseudoDeck;
 };
 
-const cardFromDeckToGraveyard = (deck) => {
+const cardFromDeckToGraveyard = (deck: Deck) => {
   let pseudoDeck = deck;
 
   const transferCard = deck.deck[0];
@@ -136,7 +137,7 @@ const cardFromDeckToGraveyard = (deck) => {
   return pseudoDeck;
 };
 
-const cardSwoppedBetweenPlayers = (deck, cards) => {
+const cardSwoppedBetweenPlayers = (deck: Deck, cards: HandCard[]) => {
   let pseudoDeck = deck;
 
   const card1 = cards[0];

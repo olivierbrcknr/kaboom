@@ -1,45 +1,63 @@
-import React, { useState, useEffect } from "react";
+import clsx from "clsx";
+
+import type { Player, Card as CardType } from "../../../types";
+import Card from "../Card";
 
 import styles from "./PlayerUI.module.scss";
 
-import Card from "../Card";
+interface PlayerUIProps {
+  effects: {};
+  swopHighlight: { cards: CardType[] };
+  startingPos: number;
+  playerNo: number;
+  player: Player;
+  isMainPlayer: boolean;
+  isEndingPlayer: boolean;
+  isCurrent: boolean;
+  cards: CardType[];
+  spectatorMode: boolean;
+  onClick: (card: CardType, effect: boolean) => void;
+  isHighlight: boolean;
+  isHighlightDueToEffect: boolean;
+}
 
-const PlayerUI = (props) => {
-  const classes = [styles.PlayerUI];
-  classes.push(props.className);
-
+const PlayerUI = ({
+  cards,
+  effects,
+  isCurrent,
+  isEndingPlayer,
+  isHighlight,
+  isHighlightDueToEffect,
+  isMainPlayer,
+  onClick,
+  player,
+  playerNo,
+  spectatorMode,
+  startingPos,
+  swopHighlight,
+}: PlayerUIProps) => {
   // map
   let cards = null;
 
-  if (props.isCurrent) {
-    classes.push(styles.isCurrent);
-  }
+  let position: "top" | "right" | "bottom" | "left" = "bottom";
 
-  if (props.isEndingPlayer) {
-    classes.push(styles.isEnding);
-  }
-
-  if (props.isMainPlayer) {
-    classes.push(styles.isMainPlayer);
-    classes.push(styles.posBottom);
-  } else {
-    switch (props.playerNo - props.startingPos) {
+  if (!isMainPlayer) {
+    switch (playerNo - startingPos) {
       case -3:
       case 1:
-        classes.push(styles.posLeft);
+        position = "left";
         break;
       case -2:
       case 2:
-        classes.push(styles.posTop);
+        position = "top";
         break;
       case -1:
       case 3:
-        classes.push(styles.posRight);
+        position = "right";
         break;
-
       // aka you are not playing
       default:
-        classes.push(styles.posBottom);
+        position = "bottom";
         break;
     }
   }
@@ -48,9 +66,9 @@ const PlayerUI = (props) => {
     cards = props.cards.map((c, k) => {
       let isVisible = false;
       let isSelected = false;
-      const isSwopped = false;
+      // const isSwopped = false;
 
-      let indicatorType = null;
+      let indicatorType = undefined;
 
       // see effects
       if (props.effects.effect && props.effects.effect !== "") {
@@ -98,7 +116,7 @@ const PlayerUI = (props) => {
         }
       }
 
-      const cardStyle = {
+      const cardStyle: React.CSSProperties = {
         left:
           "calc( var(--card-margin) + ( var(--card-width) + var(--card-margin) ) * " +
           c.slot.x +
@@ -109,17 +127,16 @@ const PlayerUI = (props) => {
           " )",
       };
 
-      if (props.spectatorMode) {
+      if (spectatorMode) {
         isVisible = true;
       }
 
-      const clickFn = () => {
-        if (props.isEndingPlayer) {
+      const handleClickCard = () => {
+        if (isEndingPlayer) {
           console.log("sorry, this player is ending");
         } else {
-          const isEffect =
-            props.isHighlightDueToEffect && props.isHighlight ? true : false;
-          props.onClick(c, isEffect);
+          const isEffect = isHighlightDueToEffect && isHighlight ? true : false;
+          onClick(c, isEffect);
         }
       };
 
@@ -127,15 +144,12 @@ const PlayerUI = (props) => {
         <Card
           className={styles.CardGrid_Card.toString()}
           style={cardStyle}
-          symbol={c.color}
-          number={c.value}
+          card={c}
           key={"myCard-" + k}
           indicatorType={indicatorType}
-          isHighlight={props.isHighlight}
+          isHighlight={isHighlight}
           isSelected={isSelected}
-          onClick={() => {
-            clickFn();
-          }}
+          onClick={handleClickCard}
           isBack={!isVisible}
         />
       );
@@ -143,10 +157,21 @@ const PlayerUI = (props) => {
   }
 
   return (
-    <div className={classes.join(" ")}>
+    <div
+      className={clsx(
+        styles.PlayerUI,
+        isCurrent && styles.isCurrent,
+        isEndingPlayer && styles.isEndingPlayer,
+        isMainPlayer && styles.isMainPlayer,
+        position === "top" && styles.posTop,
+        position === "right" && styles.posRight,
+        position === "bottom" && styles.posBottom,
+        position === "left" && styles.posLeft,
+      )}
+    >
       <div className={styles.CardGrid}>{cards}</div>
 
-      <div className={styles.Name}>{props.player.name}</div>
+      <div className={styles.Name}>{player.name}</div>
     </div>
   );
 };

@@ -19,7 +19,7 @@
   font-weight: bold;
 }
 .isSelf:before {
-  content: '→';
+  content: "→";
   position: absolute;
   left: -1em;
   margin-top: 1px;
@@ -38,7 +38,7 @@
   display: block;
   resize: none;
   padding: 0;
-  width: calc( 100% - 3em);
+  width: calc(100% - 3em);
 }
 
 .Toggle {
