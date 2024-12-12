@@ -50,9 +50,18 @@
 // };
 
 const nextConfig = {
-  output: "export",
+  // output: "export",
+  // onDemandEntries: {
+  //   websocketPort: 3000,
+  // },
   reactStrictMode: true,
   trailingSlash: true,
+  exportPathMap: function () {
+    return {
+      "/": { page: "/" },
+      "/rules": { page: "/rules" },
+    };
+  },
   images: {
     unoptimized: true,
   },
@@ -66,4 +75,5 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+// module.exports = nextConfig;
+export default nextConfig;
