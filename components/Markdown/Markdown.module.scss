@@ -1,0 +1,92 @@
+.Markdown {
+}
+
+.Markdown * {
+  user-select: text;
+}
+
+.Markdown p + p {
+  margin-top: 10px;
+}
+
+.Markdown ::selection {
+  background-color: var(--color-highlight);
+}
+
+.Markdown h1 {
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+.Markdown h2 {
+  font-size: 18px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+.Markdown h3 {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.Markdown img {
+  zoom: 0.5;
+  margin: 20px 0;
+  max-width: 100%;
+}
+@media (prefers-color-scheme: dark) {
+  .Markdown img {
+    filter: invert(100%) contrast(0.6);
+  }
+}
+
+.Markdown table {
+  border: solid 1px var(--color-black);
+  width: 100%;
+  margin: 10px 0;
+}
+.Markdown tr:nth-child(2n) {
+  background: var(--color-white);
+}
+.Markdown th,
+.Markdown td {
+  text-align: left;
+  border: solid 1px var(--color-black);
+  padding: 4px;
+}
+.Markdown th {
+  background: var(--color-white);
+}
+
+.Markdown hr {
+  border: none;
+  width: 100%;
+  height: 1px;
+  margin: 40px 0;
+  background: var(--color-black);
+}
+
+.MarkdownLegend li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.MarkdownLegend span {
+  width: 20px;
+  height: 14px;
+  margin-top: 1px;
+  margin-right: 10px;
+  display: inline-block;
+  border: solid 1px var(--color-black);
+}
+
+.MarkdownLegendInfo {
+}
+
+.MarkdownLegendInfo h6 {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

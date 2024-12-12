@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import clsx from "clsx";
 
 import styles from "./RoundUI.module.scss";
 
-const RoundUI = (props) => {
-  const classes = [styles.RoundUI];
+interface RoundUIProps {}
 
-  return <div className={classes.join(" ")}></div>;
+const RoundUI = ({}: RoundUIProps) => {
+  return <div className={clsx(styles.RoundUI)}></div>;
 };
 
 export default RoundUI;

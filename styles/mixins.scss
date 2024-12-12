@@ -1,0 +1,44 @@
+$mobile_threshold: 640px;
+$tablet_threshold: 960px;
+$laptop_threshold: 1600px;
+
+// Other Mixins ————————————————————————————————————————
+@mixin center-children {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin button-reset {
+  font-family: inherit;
+  letter-spacing: inherit;
+  padding: 0;
+  white-space: normal;
+  text-align: left;
+  border: none;
+  background-color: transparent;
+  color: inherit;
+  outline: none;
+  cursor: default;
+}
+
+@mixin nth-variable() {
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) {
+      --nth-child: #{$i};
+    }
+  }
+}
+
+@mixin keyboard-focus($position: "outside") {
+  --focus-color: var(--color-highlight);
+
+  z-index: 2;
+
+  @if $position == "outside" {
+    outline: var(--focus-outline-width) solid var(--focus-color);
+  }
+
+  @if $position == "inside" {
+  }
+}

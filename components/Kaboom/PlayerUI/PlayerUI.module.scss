@@ -4,15 +4,15 @@
 
 .Name {
   position: absolute;
-  top: calc( 100% + 10px);
+  top: calc(100% + 10px);
   left: 0%;
   text-align: center;
   width: 100%;
 }
 
 .CardGrid {
-  width: calc( var(--card-width) * 4 + 8px + 5 * var(--card-margin));
-  height: calc( var(--card-height) * 2 + 8px + 3 * var(--card-margin));
+  width: calc(var(--card-width) * 4 + 8px + 5 * var(--card-margin));
+  height: calc(var(--card-height) * 2 + 8px + 3 * var(--card-margin));
 
   border-radius: 8px;
   border: solid 4px var(--color-gray);
@@ -43,7 +43,6 @@
 .isEnding .Name {
   color: var(--color-red) !important;
 }
-
 
 .posTop {
   left: 50%;

@@ -1,101 +1,85 @@
-import React from "react";
+import clsx from "clsx";
+
+import type { Card as CardType } from "../../../types";
 
 import styles from "./Card.module.scss";
 
-const Card = (props) => {
-  const classes = [styles.Card];
-  classes.push(props.className);
+interface CardProps {
+  card: CardType;
+  isBack?: boolean;
+  isHighlight?: boolean;
+  isSelected?: boolean;
+  onClick: () => void;
+  indicatorType?: "lookAt" | "swop" | "drew";
+  className?: string;
+  style?: React.CSSProperties;
+}
 
-  let symbol: string | null = null;
+const Card = ({
+  card,
+  className,
+  indicatorType,
+  isBack,
+  isHighlight,
+  isSelected,
+  onClick,
+  style,
+}: CardProps) => {
+  let printSymbol: string;
   let color = "black";
-  switch (props.symbol) {
+  switch (card.color) {
     case 0:
-      symbol = "♦";
+      printSymbol = "♦";
       color = "red";
       break;
     case 1:
-      symbol = "♥";
+      printSymbol = "♥";
       color = "red";
       break;
     case 2:
-      symbol = "♠";
+      printSymbol = "♠";
       break;
     case 3:
-      symbol = "♣";
+      printSymbol = "♣";
       break;
   }
 
-  if (color === "red") {
-    classes.push(styles.isRed);
-  }
+  let cardInner: React.JSX.Element;
 
-  if (props.isHighlight) {
-    classes.push(styles.isHighlight);
-  }
-
-  if (props.isSelected) {
-    classes.push(styles.isSelected);
-  }
-
-  if (props.indicatorType) {
-    switch (props.indicatorType) {
-      case "lookAt":
-        classes.push(styles.isLookedAt);
-        break;
-      case "swop":
-        classes.push(styles.isSwopped);
-        break;
-      case "drew":
-        classes.push(styles.isDrawn);
-        break;
-      default:
-        break;
-    }
-  }
-
-  const clickHandler = () => {
-    if (props.onClick) {
-      props.onClick();
-    }
-  };
-
-  if (props.isBack) {
-    classes.push(styles.isBack);
-
-    return (
-      <div
-        onClick={clickHandler}
-        className={classes.join(" ")}
-        style={props.style}
-      >
-        <div className={styles.BackArtwork}></div>
-      </div>
-    );
+  if (isBack) {
+    cardInner = <div className={styles.BackArtwork} />;
   } else {
-    if (props.number === "X") {
-      return (
-        <div
-          onClick={clickHandler}
-          className={classes.join(" ")}
-          style={props.style}
-        >
-          <div className={styles.Joker}>⍟</div>
-        </div>
-      );
+    if (card.value === "X") {
+      cardInner = <div className={styles.Joker}>⍟</div>;
     } else {
-      return (
-        <div
-          onClick={clickHandler}
-          className={classes.join(" ")}
-          style={props.style}
-        >
-          <div className={styles.Number}>{props.number}</div>
-
-          <div className={styles.Symbol}>{symbol}</div>
-        </div>
-      );
+      return (cardInner = (
+        <>
+          <div className={styles.Number}>{card.value}</div>
+          <div className={styles.Symbol}>{printSymbol}</div>
+        </>
+      ));
     }
   }
+
+  return (
+    <div
+      onClick={onClick}
+      className={clsx(
+        styles.Card,
+        isBack && styles.isBack,
+        isSelected && styles.isSelected,
+        isHighlight && styles.isHighlight,
+        color === "red" && styles.isRed,
+        indicatorType === "drew" && styles.isDrawn,
+        indicatorType === "swop" && styles.isSwopped,
+        indicatorType === "lookAt" && styles.isLookedAt,
+        className,
+      )}
+      style={style}
+    >
+      {cardInner}
+    </div>
+  );
 };
 
 export default Card;

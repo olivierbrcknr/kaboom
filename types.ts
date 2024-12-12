@@ -14,9 +14,11 @@ type CardValue =
   | "A"
   | "X";
 
+type CardActions = "lookAt";
+
 type CardPosition = "deck" | "swop" | "graveyard" | null;
 
-type CardColor = 0 | 1 | 2 | 3 | null;
+type CardColor = 0 | 1 | 2 | 3;
 
 type CardSlot = { x: number; y: number };
 
@@ -63,4 +65,5 @@ export type {
   CardColor,
   CardSlot,
   PlayerID,
+  CardActions,
 };

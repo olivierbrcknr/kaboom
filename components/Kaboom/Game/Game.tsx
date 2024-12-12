@@ -1,22 +1,29 @@
 import React, { useState, useEffect } from "react";
 
-import styles from "./Game.module.scss";
-
+import type {
+  Player,
+  FocusCard,
+  Deck as DeckType,
+  Card,
+  PlayerID,
+} from "../../../types";
 import Deck from "../Deck";
 import DisplayPlayers from "../DisplayPlayers";
-import PlayerUI from "../PlayerUI";
-
 import PlayerSelection from "../PlayerSelection";
-
+import PlayerUI from "../PlayerUI";
 import socket from "../socket";
 
-import type { Player, FocusCard, Deck as DeckType, Card } from "../../../types";
+import styles from "./Game.module.scss";
 
 const isDev = process.env.NODE_ENV !== "production";
 
-const Game = (props) => {
+interface GameProps {
+  className?: string;
+}
+
+const Game = ({ className }: GameProps) => {
   const [myState, setMyState] = useState<{
-    id?: string;
+    id: PlayerID;
     name?: string;
   }>({
     id: undefined,
@@ -34,24 +41,24 @@ const Game = (props) => {
     timer: number;
     needsInteraction: boolean;
   }>({
-    effect: "",
     cards: [],
-    timer: 2000,
+    effect: "",
     needsInteraction: false,
+    timer: 2000,
   });
 
-  const [currentPlayer, setCurrentPlayer] = useState<string | undefined>(
+  const [currentPlayer, setCurrentPlayer] = useState<PlayerID | undefined>(
     undefined,
   );
   const [currentDeck, setCurrentDeck] = useState<DeckType | undefined>(
     undefined,
   );
   const [highlight, setHighlight] = useState({
-    ownCards: false,
-    otherCards: false,
-    graveyard: false,
     deck: false,
     dueToEffect: false,
+    graveyard: false,
+    otherCards: false,
+    ownCards: false,
   });
 
   const [focusCard, setFocusCard] = useState<FocusCard | undefined>(undefined);
@@ -69,7 +76,7 @@ const Game = (props) => {
   });
 
   const classes = [styles.Game];
-  classes.push(props.className);
+  className && classes.push(className);
 
   let iAmPlaying = true;
   for (let i = 0; i < players.length; i++) {
@@ -201,10 +208,10 @@ const Game = (props) => {
     if (roundState.isRunning) {
       setTimeout(() => {
         setEffectContainer({
-          effect: "initialBottomRow",
           cards: [],
-          timer: 5000,
+          effect: "initialBottomRow",
           needsInteraction: false,
+          timer: 5000,
         });
       }, 500);
     }
@@ -239,20 +246,20 @@ const Game = (props) => {
   useEffect(() => {
     if (currentPlayer === myState.id) {
       setHighlight({
-        ownCards: false,
-        otherCards: false,
-        graveyard: true,
         deck: true,
         dueToEffect: false,
+        graveyard: true,
+        otherCards: false,
+        ownCards: false,
       });
     } else {
       // empty highlights
       setHighlight({
-        ownCards: false,
-        otherCards: false,
-        graveyard: false,
         deck: false,
         dueToEffect: false,
+        graveyard: false,
+        otherCards: false,
+        ownCards: false,
       });
 
       // empty focus card, just in case...
@@ -271,10 +278,10 @@ const Game = (props) => {
 
       // empty effectContainer, just in case...
       setEffectContainer({
-        effect: "",
         cards: [],
-        timer: 2000,
+        effect: "",
         needsInteraction: false,
+        timer: 2000,
       });
     }
   }, [currentPlayer, myState.id, roundState.isRunning]);
@@ -289,29 +296,29 @@ const Game = (props) => {
       case "deck":
         setHighlight({
           ...highlight,
-          ownCards: true,
-          otherCards: false,
-          graveyard: true,
           deck: false,
+          graveyard: true,
+          otherCards: false,
+          ownCards: true,
         });
         break;
       case "swop":
       case "graveyard":
         setHighlight({
           ...highlight,
-          ownCards: true,
-          otherCards: false,
-          graveyard: false,
           deck: false,
+          graveyard: false,
+          otherCards: false,
+          ownCards: true,
         });
         break;
       default:
         setHighlight({
           ...highlight,
-          ownCards: false,
-          otherCards: false,
-          graveyard: false,
           deck: false,
+          graveyard: false,
+          otherCards: false,
+          ownCards: false,
         });
         break;
     }
@@ -326,10 +333,10 @@ const Game = (props) => {
       setTimeout(() => {
         if (effectContainer.effect === "lookAtKing") {
           setEffectContainer({
-            effect: "swop",
             cards: [],
-            timer: 500,
+            effect: "swop",
             needsInteraction: true,
+            timer: 500,
           });
         } else {
           if (effectContainer.effect === "swop") {
@@ -339,10 +346,10 @@ const Game = (props) => {
           // empty effect container again
           // show card only for x seconds
           setEffectContainer({
-            effect: "",
             cards: [],
-            timer: 2000,
+            effect: "",
             needsInteraction: false,
+            timer: 2000,
           });
 
           if (effectContainer.effect !== "initialBottomRow") {
@@ -373,10 +380,10 @@ const Game = (props) => {
           if (effectContainer.cards.length < 1) {
             var cards = [card];
             setEffectContainer({
-              effect: "lookAt",
               cards: cards,
-              timer: 2000,
+              effect: "lookAt",
               needsInteraction: false,
+              timer: 2000,
             });
             socket.emit("highlightCard", cards, "lookAt");
           }
@@ -387,10 +394,10 @@ const Game = (props) => {
           var cards = effectContainer.cards;
           cards.push(card);
           setEffectContainer({
-            effect: "swop",
             cards: cards,
-            timer: 500,
+            effect: "swop",
             needsInteraction: cards.length < 2 ? true : false,
+            timer: 500,
           });
           break;
 
@@ -399,18 +406,18 @@ const Game = (props) => {
           cards.push(card);
           if (effectContainer.effect !== "swop" && cards.length <= 1) {
             setEffectContainer({
-              effect: "lookAtKing",
               cards: cards,
-              timer: 2000,
+              effect: "lookAtKing",
               needsInteraction: false,
+              timer: 2000,
             });
             socket.emit("highlightCard", cards, "lookAt");
           } else {
             setEffectContainer({
-              effect: "swop",
               cards: cards,
-              timer: 500,
+              effect: "swop",
               needsInteraction: cards.length < 2 ? true : false,
+              timer: 500,
             });
           }
           break;
@@ -521,11 +528,11 @@ const Game = (props) => {
       case "8":
         console.log("Look at own card");
         setHighlight({
-          ownCards: true,
-          otherCards: false,
-          graveyard: false,
           deck: false,
           dueToEffect: true,
+          graveyard: false,
+          otherCards: false,
+          ownCards: true,
         });
         break;
 
@@ -533,11 +540,11 @@ const Game = (props) => {
       case "10":
         console.log("Look at opponent‘s card");
         setHighlight({
-          ownCards: false,
-          otherCards: true,
-          graveyard: false,
           deck: false,
           dueToEffect: true,
+          graveyard: false,
+          otherCards: true,
+          ownCards: false,
         });
         break;
 
@@ -545,21 +552,21 @@ const Game = (props) => {
       case "Q":
         console.log("Swop 2 cards");
         setHighlight({
-          ownCards: true,
-          otherCards: true,
-          graveyard: false,
           deck: false,
           dueToEffect: true,
+          graveyard: false,
+          otherCards: true,
+          ownCards: true,
         });
         break;
 
       case "K":
         setHighlight({
-          ownCards: true,
-          otherCards: true,
-          graveyard: false,
           deck: false,
           dueToEffect: true,
+          graveyard: false,
+          otherCards: true,
+          ownCards: true,
         });
         console.log("Look at 1 card and swop 2 cards");
         break;
@@ -804,8 +811,8 @@ const Game = (props) => {
         ) : null}
 
         <DisplayPlayers
-          isID={myState.id}
-          currentPlayer={currentPlayer}
+          id={myState.id}
+          currentPlayerId={currentPlayer}
           gameIsRunning={roundState.isRunning}
           players={players}
         />
@@ -855,9 +862,9 @@ const Game = (props) => {
         <h1>Kaboom</h1>
 
         <PlayerSelection
-          onNameChange={(name) => changeName(name)}
+          onNameChange={changeName}
           onPlayerToggle={(pID) => playerToggle(pID)}
-          isID={myState.id}
+          id={myState.id}
           players={players}
         />
 

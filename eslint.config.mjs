@@ -62,36 +62,36 @@ export default [
       perfectionist,
     },
     rules: {
-      // "perfectionist/sort-imports": [
-      //   "warn",
-      //   {
-      //     type: "alphabetical",
-      //     order: "asc",
-      //     ignoreCase: false,
-      //     internalPattern: ["~/**"],
-      //     newlinesBetween: "always",
-      //     maxLineLength: undefined,
-      //     groups: [
-      //       "react",
-      //       ["builtin", "external"],
-      //       "internal",
-      //       "parent",
-      //       "sibling",
-      //       "unknown",
-      //       "style",
-      //     ],
-      //     customGroups: {
-      //       value: {
-      //         react: ["react", "react-*"],
-      //         lodash: "lodash",
-      //       },
-      //       type: {
-      //         react: ["react", "react-*"],
-      //       },
-      //     },
-      //     environment: "node",
-      //   },
-      // ],
+      "perfectionist/sort-imports": [
+        "warn",
+        {
+          type: "alphabetical",
+          order: "asc",
+          ignoreCase: false,
+          // internalPattern: ["components/**", "pages/**", "server/**"],
+          newlinesBetween: "always",
+          maxLineLength: undefined,
+          groups: [
+            "react",
+            ["builtin", "external"],
+            "internal",
+            "parent",
+            "sibling",
+            "unknown",
+            "style",
+          ],
+          customGroups: {
+            value: {
+              react: ["react", "react-*"],
+              lodash: "lodash",
+            },
+            type: {
+              react: ["react", "react-*"],
+            },
+          },
+          environment: "node",
+        },
+      ],
       // "perfectionist/sort-objects": [
       //   "warn",
       //   {

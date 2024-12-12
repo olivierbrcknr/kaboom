@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 3000;
 
 // let socketURL = "https://kaboom-game.herokuapp.com/";
 // if (dev) {
-let socketURL = "http://localhost:" + PORT;
+const socketURL = "http://localhost:" + PORT;
 // }
 
 const socket = io(socketURL);
