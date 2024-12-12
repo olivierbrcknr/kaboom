@@ -1,24 +1,33 @@
-type CardValue = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | "J" | "Q" | "K" | "A";
+type CardValue =
+  | 2
+  | 3
+  | 4
+  | 5
+  | 6
+  | 7
+  | 8
+  | 9
+  | 10
+  | "J"
+  | "Q"
+  | "K"
+  | "A"
+  | "X";
 
 type CardPosition = "deck" | "swop" | "graveyard" | null;
 
-type CardColor = 1 | 2 | 3 | 4;
+type CardColor = 0 | 1 | 2 | 3 | null;
 
 type CardSlot = { x: number; y: number };
 
+type PlayerID = string;
+
 type Player = {
-  id: string;
+  id: PlayerID;
   name: string;
   points: number;
   roundPoints: number[];
   isPlaying: boolean;
-};
-
-type FocusCard = {
-  value: CardValue;
-  color: CardColor;
-  position: CardPosition;
-  slot: CardSlot;
 };
 
 type Card = {
@@ -27,16 +36,31 @@ type Card = {
   value: CardValue;
 };
 
+interface FocusCard extends Card {
+  position: CardPosition;
+  slot: CardSlot;
+}
+
+interface HandCard extends Card {
+  player: PlayerID;
+  slot: CardSlot;
+}
+
 type Deck = {
-  hand: {
-    id: number;
-    color: CardColor;
-    value: CardValue;
-    player: string | number;
-    slot: CardSlot;
-  }[];
+  hand: HandCard[];
   deck: Card[];
   graveyard: Card[];
 };
 
-export type { Player, Card, FocusCard, CardPosition, CardValue, Deck };
+export type {
+  Player,
+  Card,
+  HandCard,
+  FocusCard,
+  CardPosition,
+  CardValue,
+  Deck,
+  CardColor,
+  CardSlot,
+  PlayerID,
+};

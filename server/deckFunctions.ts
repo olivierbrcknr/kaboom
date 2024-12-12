@@ -1,7 +1,12 @@
-let positionCard = (id, handCards = false) => {
+import type { CardSlot, CardValue, Deck, HandCard, CardColor } from "../types";
+
+const positionCard = (
+  id: number,
+  handCards: undefined | HandCard[] = undefined,
+): CardSlot => {
   const upperRow = [2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23];
 
-  let slotsTaken = [];
+  const slotsTaken: CardSlot[] = [];
 
   let k = id;
 
@@ -28,10 +33,10 @@ let positionCard = (id, handCards = false) => {
 
     // even --> left
     if (k % 2 == 0) {
-      posX -= parseInt(k / 4);
+      posX -= Math.floor(k / 4);
       // odd --> right
     } else {
-      posX += parseInt(k / 4) + 1;
+      posX += Math.floor(k / 4) + 1;
     }
 
     fits = true;
@@ -57,10 +62,10 @@ let positionCard = (id, handCards = false) => {
   };
 };
 
-let shuffleDeck = (array) => {
-  var currentIndex = array.length,
-    temporaryValue,
-    randomIndex;
+const shuffleDeck = (array: any[]) => {
+  let currentIndex: number = array.length,
+    temporaryValue: any,
+    randomIndex: number;
 
   while (0 !== currentIndex) {
     randomIndex = Math.floor(Math.random() * currentIndex);
@@ -74,10 +79,24 @@ let shuffleDeck = (array) => {
   return array;
 };
 
-let createDefaultCardSet = () => {
-  let defaultCardSet = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"];
+const createDefaultCardSet = (): Deck => {
+  const defaultCardSet: CardValue[] = [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    "J",
+    "Q",
+    "K",
+    "A",
+  ];
 
-  let cards = {
+  const cards: Deck = {
     graveyard: [],
     deck: [],
     hand: [],
@@ -91,7 +110,7 @@ let createDefaultCardSet = () => {
     for (let i = 0; i < defaultCardSet.length; i++) {
       cards.deck.push({
         id: cID,
-        color: c,
+        color: c as CardColor,
         value: defaultCardSet[i],
         // position: 'deck'
       });
@@ -99,6 +118,7 @@ let createDefaultCardSet = () => {
     }
   }
 
+  // add three jokers
   for (let j = 0; j < 3; j++) {
     cards.deck.push({
       id: cID,
@@ -114,16 +134,16 @@ let createDefaultCardSet = () => {
   return cards;
 };
 
-let distributeCards = (deck, players) => {
-  let newDeck = deck;
+const distributeCards = (deck, players) => {
+  const newDeck = deck;
 
-  let lastOnTopID = 1;
+  // let lastOnTopID = 1;
 
   // for each player
   for (let i = 0; i < players.length; i++) {
     // four cards
     for (let k = 0; k < 4; k++) {
-      let card = newDeck.deck[0];
+      const card = newDeck.deck[0];
       newDeck.hand.push({
         ...card,
         player: players[i].id,
@@ -131,11 +151,11 @@ let distributeCards = (deck, players) => {
       });
       newDeck.deck.shift();
 
-      lastOnTopID++;
+      // lastOnTopID++;
     }
   }
 
-  let card = newDeck.deck[0];
+  const card = newDeck.deck[0];
   newDeck.graveyard.push(card);
   newDeck.deck.shift();
 
@@ -143,8 +163,8 @@ let distributeCards = (deck, players) => {
 };
 
 // check if deck is empty and reshuffle
-let checkDeck = (deck) => {
-  let pseudoDeck = deck;
+const checkDeck = (deck) => {
+  const pseudoDeck = deck;
 
   // if deck has less than 5 cards, reshuffle and add graveyard
   if (pseudoDeck.deck.length < 5) {
@@ -164,7 +184,7 @@ let checkDeck = (deck) => {
   return pseudoDeck;
 };
 
-let checkNextPlayer = (players, currentPlayer) => {
+const checkNextPlayer = (players, currentPlayer) => {
   let nextPlayer = currentPlayer;
 
   let foundNextPlayer = false;
@@ -182,9 +202,11 @@ let checkNextPlayer = (players, currentPlayer) => {
   return nextPlayer;
 };
 
-exports.createDefault = createDefaultCardSet;
-exports.shuffle = shuffleDeck;
-exports.distribute = distributeCards;
-exports.positionCard = positionCard;
-exports.checkDeck = checkDeck;
-exports.checkNextPlayer = checkNextPlayer;
+export {
+  createDefaultCardSet as createDefault,
+  shuffleDeck as shuffle,
+  distributeCards as distribute,
+  positionCard,
+  checkDeck,
+  checkNextPlayer,
+};
