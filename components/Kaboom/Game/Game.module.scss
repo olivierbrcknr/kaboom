@@ -16,7 +16,7 @@
 
 .EffectDisplay {
   position: absolute;
-  top: calc( 50% + var(--card-height) / 2 + 26px);
+  top: calc(50% + var(--card-height) / 2 + 26px);
   left: 50%;
   transform: translateX(-50%);
   padding: 4px 8px;
@@ -27,13 +27,13 @@
 
 .LastRoundIndicator {
   position: absolute;
-  bottom: calc( 50% + var(--card-height) / 2 + 14px);
+  bottom: calc(50% + var(--card-height) / 2 + 14px);
   left: 50%;
   transform: translateX(-50%);
   padding: 4px 8px;
   border-radius: 4px;
   background: var(--color-red);
-  color: #FFF;
+  color: #fff;
 }
 
 .IEndButton {
@@ -65,7 +65,7 @@
 }
 .ForceEndBtn:hover {
   background: var(--color-red);
-  color: #FFF;
+  color: #fff;
 }
 
 .isStartScreen {
@@ -119,7 +119,7 @@
   right: 0;
   bottom: 0;
   z-index: 2;
-  background-color: rgba(255,255,255,0.3);
+  background-color: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(2px);
   display: flex;
   justify-content: center;
@@ -127,15 +127,15 @@
   flex-direction: column;
 }
 .EndGameContainer {
-  background-color: rgba(255,255,255,0.7);
+  background-color: rgba(255, 255, 255, 0.7);
 }
 
 @media (prefers-color-scheme: dark) {
   .StartRoundContainer {
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
   }
   .EndGameContainer {
-    background-color: rgba(0,0,0,0.7);
+    background-color: rgba(0, 0, 0, 0.7);
   }
 }
 
@@ -153,12 +153,10 @@
   font-weight: bold;
 }
 .Podium li.isCurrent:before {
-  content: '→';
+  content: "→";
   position: absolute;
   left: -60px;
 }
-.Podium li:nth-child( n+2 ) {
+.Podium li:nth-child(n + 2) {
   opacity: 0.5;
 }
-
-

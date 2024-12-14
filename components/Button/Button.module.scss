@@ -1,0 +1,36 @@
+@import "../../styles/mixins";
+
+.Button {
+  cursor: pointer;
+  border-radius: var(--border-radius-button);
+  padding: 0.5em 0.7em;
+
+  display: block;
+  width: max-content;
+
+  transition: background 0.2s;
+
+  &:focus,
+  &:hover {
+    outline: none;
+    background: var(--btn-hover-bg-color);
+  }
+  &:active {
+    background: var(--btn-active-bg-color);
+  }
+
+  &.isDisabled {
+  }
+
+  :global(.keyboard-focus) &:focus {
+    @include keyboard-focus();
+  }
+
+  :global(.keyboard-focus) :global(.background--highlight) &:focus {
+    --focus-color: var(--highlight-color-font);
+  }
+
+  :global(.keyboard-focus) &:focus {
+    @include keyboard-focus;
+  }
+}

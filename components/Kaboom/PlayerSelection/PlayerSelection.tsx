@@ -7,12 +7,12 @@ import styles from "./PlayerSelection.module.scss";
 interface PlayerSelectionProps {
   onNameChange: (v: string) => void;
   onPlayerToggle: (v: PlayerID) => void;
-  id: PlayerID;
+  myPlayerID: PlayerID;
   players: Player[];
 }
 
 const PlayerSelection = ({
-  id,
+  myPlayerID,
   onNameChange,
   onPlayerToggle,
   players,
@@ -22,8 +22,11 @@ const PlayerSelection = ({
       <ul>
         {players.map((p) => {
           return (
-            <li className={clsx(p.id === id && styles.isSelf)} key={p.id}>
-              {p.id === id ? (
+            <li
+              className={clsx(p.id === myPlayerID && styles.isSelf)}
+              key={p.id}
+            >
+              {p.id === myPlayerID ? (
                 <input
                   type="text"
                   onChange={(v) => onNameChange(v.target.value)}
