@@ -15,14 +15,12 @@ interface CardProps {
   isSelected?: boolean;
   onClick: () => void;
   indicatorType?: "lookAt" | "swop" | "drew";
-  className?: string;
   isDeck?: boolean;
   deckCardCount?: number;
 }
 
 const Card = ({
   card,
-  className,
   indicatorType,
   isBack,
   isHighlight,

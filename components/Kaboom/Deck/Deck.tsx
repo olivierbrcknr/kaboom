@@ -50,28 +50,30 @@ const Deck = ({
   return (
     <div className={clsx(styles.Deck)}>
       {deck.graveyard.length > 0 && (
-        <Card
-          card={deck.graveyard[deck.graveyard.length - 1]}
-          isHighlight={isCurrent && isHighlight.graveyard ? true : false}
-          indicatorType={swopHighlight === "graveyard" ? "lookAt" : undefined}
-          className={styles.OpenDeck.toString()}
-          onClick={handleGraveyardClick}
-          isDeck
-          deckCardCount={deck.graveyard.length}
-        />
+        <div className={styles.OpenDeck}>
+          <Card
+            card={deck.graveyard[deck.graveyard.length - 1]}
+            isHighlight={isCurrent && isHighlight.graveyard ? true : false}
+            indicatorType={swopHighlight === "graveyard" ? "lookAt" : undefined}
+            onClick={handleGraveyardClick}
+            isDeck
+            deckCardCount={deck.graveyard.length}
+          />
+        </div>
       )}
 
       {nextCard && (
-        <Card
-          isBack={!showNext}
-          card={nextCard}
-          isHighlight={isCurrent && isHighlight.deck}
-          indicatorType={swopHighlight === "deck" ? "lookAt" : undefined}
-          className={styles.ClosedDeck.toString()}
-          onClick={handleDeckClick}
-          isDeck
-          deckCardCount={deck.deck.length}
-        />
+        <div className={styles.ClosedDeck}>
+          <Card
+            isBack={!showNext}
+            card={nextCard}
+            isHighlight={isCurrent && isHighlight.deck}
+            indicatorType={swopHighlight === "deck" ? "lookAt" : undefined}
+            onClick={handleDeckClick}
+            isDeck
+            deckCardCount={deck.deck.length}
+          />
+        </div>
       )}
     </div>
   );

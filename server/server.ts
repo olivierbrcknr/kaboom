@@ -5,7 +5,14 @@ import { createServer } from "http";
 import next from "next";
 import { Server } from "socket.io";
 
-import type { PlayerID, Player, Card, HandCard, CardPosition } from "../types";
+import type {
+  PlayerID,
+  Player,
+  Card,
+  HandCard,
+  CardPosition,
+  CardHighlightType,
+} from "../types";
 
 import { createDefault, distribute, checkNextPlayer } from "./deckFunctions";
 import {
@@ -71,9 +78,8 @@ io.on("connection", (socket) => {
   socket.broadcast.emit("playersUpdated", players);
 
   socket.on("disconnect", () => {
-    const closedSocketIndex = players.findIndex(
-      (element) => element.id === socket.id,
-    );
+    const closedSocketIndex = players.findIndex((p) => p.id === socket.id);
+
     const closedPlayer = players[closedSocketIndex];
 
     console.log(color.red(`⭕️ ${closedPlayer.name} disconnected`));
@@ -97,16 +103,16 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("playersUpdated", players);
   });
 
-  socket.on("nameChange", (newName) => {
-    const relID = players.findIndex((element) => element.id === socket.id);
+  socket.on("nameChange", (newName: string) => {
+    const relID = players.findIndex((p) => p.id === socket.id);
     players[relID].name = newName;
 
     socket.emit("playersUpdated", players);
     socket.broadcast.emit("playersUpdated", players);
   });
 
-  socket.on("playerToggle", (pID) => {
-    const pIndex = players.findIndex((element) => element.id === pID);
+  socket.on("playerToggle", (pID: PlayerID) => {
+    const pIndex = players.findIndex((p) => p.id === pID);
 
     let arePlaying = 0;
 
@@ -137,7 +143,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("initialSetup", () => {
-    const thisSIndex = players.findIndex((element) => element.id === socket.id);
+    const thisSIndex = players.findIndex((p) => p.id === socket.id);
     const playerName = players[thisSIndex].name;
 
     console.log("inital setup sent to " + playerName);
@@ -179,7 +185,7 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("getDeck", deck);
   });
 
-  socket.on("cardSwoppedFromDeck", (card) => {
+  socket.on("cardSwoppedFromDeck", (card: HandCard) => {
     const nextCard = deck.deck[0];
     deck = swopCardFromDeck(deck, card);
 
@@ -189,7 +195,7 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("getDeck", deck);
   });
 
-  socket.on("cardSwoppedFromGraveyard", (card) => {
+  socket.on("cardSwoppedFromGraveyard", (card: Card) => {
     const currentCard = deck.graveyard[deck.graveyard.length - 1];
     deck = swopCardFromGraveyard(deck, card);
 
@@ -199,7 +205,7 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("getDeck", deck);
   });
 
-  socket.on("cardSwoppedBetweenPlayers", (cards) => {
+  socket.on("cardSwoppedBetweenPlayers", (cards: HandCard[]) => {
     deck = cardSwoppedBetweenPlayers(deck, cards);
 
     socket.broadcast.emit("highlightSwop", cards, "swop");
@@ -208,7 +214,7 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("getDeck", deck);
   });
 
-  socket.on("cardShiftedToPlayer", (card, oldCard) => {
+  socket.on("cardShiftedToPlayer", (card: Card, oldCard: HandCard) => {
     deck = cardShiftedToPlayer(deck, card, oldCard);
 
     socket.broadcast.emit("highlightSwop", [card], "swop");
@@ -227,7 +233,7 @@ io.on("connection", (socket) => {
     // socket.broadcast.emit('playEffect');
   });
 
-  socket.on("highlightCard", (cards: Card[], type) => {
+  socket.on("highlightCard", (cards: Card[], type: CardHighlightType) => {
     socket.broadcast.emit("highlightSwop", cards, type);
   });
 

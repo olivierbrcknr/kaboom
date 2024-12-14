@@ -149,7 +149,7 @@ const PlayerUI = ({
 
             return (
               <Card
-                className={styles.CardGrid_Card.toString()}
+                // className={styles.CardGrid_Card.toString()}
                 card={c}
                 key={"myCard-" + k}
                 indicatorType={indicatorType}

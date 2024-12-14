@@ -31,7 +31,7 @@ type CardSlot = { x: number; y: number };
 
 type CardEffect = {
   action: CardActions | undefined;
-  cards: Card[];
+  cards: HandCard[];
   timer: number;
   needsInteraction: boolean;
 };
