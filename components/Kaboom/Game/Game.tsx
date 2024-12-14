@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 
+import clsx from "clsx";
+
 import type {
   Player,
   FocusCard,
   Deck as DeckType,
   Card,
   PlayerID,
+  CardEffect,
+  CardPosition,
 } from "../../../types";
 import Deck from "../Deck";
 import DisplayPlayers from "../DisplayPlayers";
@@ -17,13 +21,11 @@ import styles from "./Game.module.scss";
 
 const isDev = process.env.NODE_ENV !== "production";
 
-interface GameProps {
-  className?: string;
-}
+interface GameProps {}
 
-const Game = ({ className }: GameProps) => {
+const Game = ({}: GameProps) => {
   const [myState, setMyState] = useState<{
-    id: PlayerID;
+    id?: PlayerID;
     name?: string;
   }>({
     id: undefined,
@@ -35,14 +37,9 @@ const Game = ({ className }: GameProps) => {
   const [playEffect, setPlayEffect] = useState(false);
   const [lastRound, setLastRound] = useState<string | false>(false);
 
-  const [effectContainer, setEffectContainer] = useState<{
-    effect: string;
-    cards: Card[];
-    timer: number;
-    needsInteraction: boolean;
-  }>({
+  const [effectContainer, setEffectContainer] = useState<CardEffect>({
     cards: [],
-    effect: "",
+    action: undefined,
     needsInteraction: false,
     timer: 2000,
   });
@@ -74,9 +71,6 @@ const Game = ({ className }: GameProps) => {
     count: 0,
     isRunning: false,
   });
-
-  const classes = [styles.Game];
-  className && classes.push(className);
 
   let iAmPlaying = true;
   for (let i = 0; i < players.length; i++) {
@@ -142,16 +136,16 @@ const Game = ({ className }: GameProps) => {
       });
     });
 
-    socket.on("highlightDeck", (type) => {
+    socket.on("highlightDeck", (type: CardPosition) => {
       setHighlightDeck(type);
     });
 
-    socket.on("gameHasEnded", (type) => {
+    socket.on("gameHasEnded", () => {
       console.log("game has ended");
       setGameHasEnded(true);
     });
 
-    socket.on("endingPlayerID", (pID) => {
+    socket.on("endingPlayerID", (pID: PlayerID) => {
       setLastRound(pID);
     });
 
@@ -209,7 +203,7 @@ const Game = ({ className }: GameProps) => {
       setTimeout(() => {
         setEffectContainer({
           cards: [],
-          effect: "initialBottomRow",
+          action: "initialBottomRow",
           needsInteraction: false,
           timer: 5000,
         });
@@ -279,7 +273,7 @@ const Game = ({ className }: GameProps) => {
       // empty effectContainer, just in case...
       setEffectContainer({
         cards: [],
-        effect: "",
+        action: undefined,
         needsInteraction: false,
         timer: 2000,
       });
@@ -325,21 +319,17 @@ const Game = ({ className }: GameProps) => {
   }, [focusCard]);
 
   useEffect(() => {
-    if (
-      effectContainer.effect &&
-      effectContainer.effect !== "" &&
-      !effectContainer.needsInteraction
-    ) {
+    if (effectContainer.action && !effectContainer.needsInteraction) {
       setTimeout(() => {
-        if (effectContainer.effect === "lookAtKing") {
+        if (effectContainer.action === "lookAtKing") {
           setEffectContainer({
             cards: [],
-            effect: "swop",
+            action: "swop",
             needsInteraction: true,
             timer: 500,
           });
         } else {
-          if (effectContainer.effect === "swop") {
+          if (effectContainer.action === "swop") {
             socket.emit("cardSwoppedBetweenPlayers", effectContainer.cards);
           }
 
@@ -347,12 +337,12 @@ const Game = ({ className }: GameProps) => {
           // show card only for x seconds
           setEffectContainer({
             cards: [],
-            effect: "",
+            action: undefined,
             needsInteraction: false,
             timer: 2000,
           });
 
-          if (effectContainer.effect !== "initialBottomRow") {
+          if (effectContainer.action !== "initialBottomRow") {
             socket.emit("nextTurn");
           }
         }
@@ -381,7 +371,7 @@ const Game = ({ className }: GameProps) => {
             var cards = [card];
             setEffectContainer({
               cards: cards,
-              effect: "lookAt",
+              action: "lookAt",
               needsInteraction: false,
               timer: 2000,
             });
@@ -395,7 +385,7 @@ const Game = ({ className }: GameProps) => {
           cards.push(card);
           setEffectContainer({
             cards: cards,
-            effect: "swop",
+            action: "swop",
             needsInteraction: cards.length < 2 ? true : false,
             timer: 500,
           });
@@ -404,10 +394,10 @@ const Game = ({ className }: GameProps) => {
         case "K":
           var cards = effectContainer.cards;
           cards.push(card);
-          if (effectContainer.effect !== "swop" && cards.length <= 1) {
+          if (effectContainer.action !== "swop" && cards.length <= 1) {
             setEffectContainer({
               cards: cards,
-              effect: "lookAtKing",
+              action: "lookAtKing",
               needsInteraction: false,
               timer: 2000,
             });
@@ -415,7 +405,7 @@ const Game = ({ className }: GameProps) => {
           } else {
             setEffectContainer({
               cards: cards,
-              effect: "swop",
+              action: "swop",
               needsInteraction: cards.length < 2 ? true : false,
               timer: 500,
             });
@@ -465,7 +455,7 @@ const Game = ({ className }: GameProps) => {
     }
   };
 
-  const drawCardFn = () => {
+  const handleDrawCard = () => {
     if (!iAmPlaying || !roundState.isRunning) {
       console.log("nenenenenenenene..");
       return;
@@ -485,7 +475,7 @@ const Game = ({ className }: GameProps) => {
     socket.emit("drawCard", "deck");
   };
 
-  const graveyardClick = () => {
+  const handleGraveyardClick = () => {
     if (!iAmPlaying || !roundState.isRunning) {
       console.log("nenenenenenenene..");
       return;
@@ -621,7 +611,7 @@ const Game = ({ className }: GameProps) => {
 
       return (
         <PlayerUI
-          effects={effectContainer}
+          effect={effectContainer}
           swopHighlight={swopHighlightCards}
           startingPos={myPos}
           key={"player-no_" + k}
@@ -786,20 +776,14 @@ const Game = ({ className }: GameProps) => {
     );
 
     return (
-      <div className={classes.join(" ")}>
+      <div className={clsx(styles.Game)}>
         <div className={styles.PlayerUIsContainer}>{playerUIs}</div>
 
         <Deck
           deck={currentDeck}
-          drawCard={() => {
-            drawCardFn();
-          }}
-          clickGraveyard={() => {
-            graveyardClick();
-          }}
-          isCurrent={
-            myState.id === currentPlayer && roundState.isRunning ? true : false
-          }
+          drawCard={handleDrawCard}
+          clickGraveyard={handleGraveyardClick}
+          isCurrent={myState.id === currentPlayer && roundState.isRunning}
           isHighlight={highlight}
           swopHighlight={highlightDeck}
         />
@@ -832,9 +816,7 @@ const Game = ({ className }: GameProps) => {
 
         <div
           style={{ zIndex: 10 }}
-          onClick={() => {
-            socket.emit("endGame");
-          }}
+          onClick={() => socket.emit("endGame")}
           className={styles.ForceEndBtn}
         >
           Force End Game
@@ -842,9 +824,6 @@ const Game = ({ className }: GameProps) => {
       </div>
     );
   } else {
-    classes.push(styles.isStartScreen);
-
-    const startBtnStyles = [styles.StartButton];
     let playingPlayers = 0;
 
     for (let i = 0; i < players.length; i++) {
@@ -853,12 +832,8 @@ const Game = ({ className }: GameProps) => {
       }
     }
 
-    if (playingPlayers < 2) {
-      startBtnStyles.push(styles.StartButtonIsDisabled);
-    }
-
     return (
-      <div className={classes.join(" ")}>
+      <div className={clsx(styles.Game, styles.isStartScreen)}>
         <h1>Kaboom</h1>
 
         <PlayerSelection
@@ -869,10 +844,11 @@ const Game = ({ className }: GameProps) => {
         />
 
         <div
-          className={startBtnStyles.join(" ")}
-          onClick={() => {
-            socket.emit("startGame");
-          }}
+          className={clsx(
+            styles.StartButton,
+            playingPlayers < 2 && styles.StartButtonIsDisabled,
+          )}
+          onClick={() => socket.emit("startGame")}
         >
           Start Game
         </div>

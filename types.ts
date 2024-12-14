@@ -14,13 +14,27 @@ type CardValue =
   | "A"
   | "X";
 
-type CardActions = "lookAt";
+type CardActions =
+  | "lookAt"
+  | "swop"
+  | "lookAtKing"
+  | "initialBottomRow"
+  | "endRound";
 
 type CardPosition = "deck" | "swop" | "graveyard" | null;
+
+type CardHighlightType = "swop" | "drew";
 
 type CardColor = 0 | 1 | 2 | 3;
 
 type CardSlot = { x: number; y: number };
+
+type CardEffect = {
+  action: CardActions | undefined;
+  cards: Card[];
+  timer: number;
+  needsInteraction: boolean;
+};
 
 type PlayerID = string;
 
@@ -54,6 +68,17 @@ type Deck = {
   graveyard: Card[];
 };
 
+const isHandCard = (value: any): value is HandCard => {
+  return (
+    value &&
+    typeof value === "object" &&
+    typeof value.color === "number" &&
+    typeof value.player === "string"
+  );
+};
+
+export { isHandCard };
+
 export type {
   Player,
   Card,
@@ -66,4 +91,6 @@ export type {
   CardSlot,
   PlayerID,
   CardActions,
+  CardEffect,
+  CardHighlightType,
 };

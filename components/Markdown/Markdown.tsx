@@ -8,7 +8,7 @@ interface MarkdownProps {
   content: string;
 }
 
-const transformObjectArray = (val) => {
+const transformObjectArray = (val: string) => {
   const objectString = val.replace(/(\r\n|\n|\r)/gm, "");
   let newJson = objectString.replace(/([a-zA-Z0-9]+?):/g, '"$1":');
   newJson = newJson.replace(/'/g, '"');
@@ -18,34 +18,31 @@ const transformObjectArray = (val) => {
 };
 
 const Markdown = ({ content }: MarkdownProps) => {
-  const ImgRenderer = (props) => {
-    // console.log(props)
-    return <img alt={props.alt} src={"/rulesImages/" + props.src} />;
+  const ImgRenderer = ({ src, alt }: { src: string; alt: string }) => {
+    return <img alt={alt} src={"/rulesImages/" + src} />;
   };
 
   const codeRenderer = (props) => {
-    switch (props.language) {
-      case "colors":
-        const colors = transformObjectArray(props.value);
+    const isColorBlock = props.className === "language-colors";
 
-        const colorLegend = colors.map((c, k) => {
-          return (
-            <li key={"colorLegend-" + k}>
-              <span style={{ background: c.color }}></span>
-              <div className={styles.RulesLegendInfo}>
-                <h6>{c.type}</h6>
-              </div>
-            </li>
-          );
-        });
+    if (isColorBlock) {
+      const colors = transformObjectArray(props.children);
 
-        return <ul className={styles.RulesLegend}>{colorLegend}</ul>;
+      const colorLegend = colors.map((c, k: number) => {
+        return (
+          <li key={"colorLegend-" + k}>
+            <span style={{ background: c.color }}></span>
+            <div className={styles.MarkdownLegendInfo}>
+              <h6>{c.type}</h6>
+            </div>
+          </li>
+        );
+      });
 
-        break;
-      default:
-        return null;
-        break;
+      return <ul className={styles.MarkdownLegend}>{colorLegend}</ul>;
     }
+
+    return <code {...props} />;
   };
 
   return (
@@ -54,7 +51,7 @@ const Markdown = ({ content }: MarkdownProps) => {
       className={styles.Markdown}
       components={{
         code: codeRenderer,
-        image: ImgRenderer,
+        img: ImgRenderer,
       }}
     >
       {content}

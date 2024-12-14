@@ -239,7 +239,7 @@ io.on("connection", (socket) => {
     endingPlayer = false;
     endingByChoice = false;
 
-    players = players.map((p, k) => {
+    players = players.map((p) => {
       return {
         ...p,
         points: 0,

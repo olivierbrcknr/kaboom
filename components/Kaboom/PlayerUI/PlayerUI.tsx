@@ -1,29 +1,35 @@
 import clsx from "clsx";
 
-import type { Player, Card as CardType } from "../../../types";
+import type {
+  Player,
+  Card as CardType,
+  HandCard,
+  CardHighlightType,
+  CardEffect,
+} from "../../../types";
 import Card from "../Card";
 
 import styles from "./PlayerUI.module.scss";
 
 interface PlayerUIProps {
-  effects: {};
-  swopHighlight: { cards: CardType[] };
+  effect: CardEffect;
+  swopHighlight: { cards: CardType[]; type?: CardHighlightType };
   startingPos: number;
   playerNo: number;
   player: Player;
   isMainPlayer: boolean;
   isEndingPlayer: boolean;
   isCurrent: boolean;
-  cards: CardType[];
+  cards: HandCard[];
   spectatorMode: boolean;
-  onClick: (card: CardType, effect: boolean) => void;
+  onClick: (card: CardType, triggeringEffect: boolean) => void;
   isHighlight: boolean;
   isHighlightDueToEffect: boolean;
 }
 
 const PlayerUI = ({
   cards,
-  effects,
+  effect,
   isCurrent,
   isEndingPlayer,
   isHighlight,
@@ -36,9 +42,6 @@ const PlayerUI = ({
   startingPos,
   swopHighlight,
 }: PlayerUIProps) => {
-  // map
-  let cards = null;
-
   let position: "top" | "right" | "bottom" | "left" = "bottom";
 
   if (!isMainPlayer) {
@@ -62,100 +65,6 @@ const PlayerUI = ({
     }
   }
 
-  if (props.cards && props.cards.length > 0) {
-    cards = props.cards.map((c, k) => {
-      let isVisible = false;
-      let isSelected = false;
-      // const isSwopped = false;
-
-      let indicatorType = undefined;
-
-      // see effects
-      if (props.effects.effect && props.effects.effect !== "") {
-        // initial effect
-        if (
-          props.effects.effect === "initialBottomRow" &&
-          c.slot.y === 1 &&
-          props.isMainPlayer
-        ) {
-          isVisible = true;
-        }
-
-        // regular effect
-        for (let i = 0; i < props.effects.cards.length; i++) {
-          if (c.id === props.effects.cards[i].id) {
-            switch (props.effects.effect) {
-              case "lookAt":
-              case "lookAtKing":
-                isVisible = true;
-                break;
-
-              case "swop":
-                isSelected = true;
-                break;
-
-              default:
-                // do nothing
-                break;
-            }
-          }
-        }
-
-        // endround effect
-        if (props.effects.effect === "endRound") {
-          isVisible = true;
-        }
-      }
-
-      // see swop
-      if (props.swopHighlight.cards.length > 0) {
-        for (let i = 0; i < props.swopHighlight.cards.length; i++) {
-          if (c.id === props.swopHighlight.cards[i].id) {
-            indicatorType = props.swopHighlight.type;
-          }
-        }
-      }
-
-      const cardStyle: React.CSSProperties = {
-        left:
-          "calc( var(--card-margin) + ( var(--card-width) + var(--card-margin) ) * " +
-          c.slot.x +
-          " )",
-        top:
-          "calc( var(--card-margin) + ( var(--card-height) + var(--card-margin) ) * " +
-          c.slot.y +
-          " )",
-      };
-
-      if (spectatorMode) {
-        isVisible = true;
-      }
-
-      const handleClickCard = () => {
-        if (isEndingPlayer) {
-          console.log("sorry, this player is ending");
-        } else {
-          const isEffect = isHighlightDueToEffect && isHighlight ? true : false;
-          onClick(c, isEffect);
-        }
-      };
-
-      return (
-        <Card
-          className={styles.CardGrid_Card.toString()}
-          style={cardStyle}
-          card={c}
-          key={"myCard-" + k}
-          indicatorType={indicatorType}
-          isHighlight={isHighlight}
-          isSelected={isSelected}
-          onClick={handleClickCard}
-          isBack={!isVisible}
-        />
-      );
-    });
-  }
-
   return (
     <div
       className={clsx(
@@ -169,7 +78,89 @@ const PlayerUI = ({
         position === "left" && styles.posLeft,
       )}
     >
-      <div className={styles.CardGrid}>{cards}</div>
+      <div className={styles.CardGrid}>
+        {cards &&
+          cards.length > 0 &&
+          cards.map((c, k) => {
+            let isVisible = false;
+            let isSelected = false;
+            // const isSwopped = false;
+
+            let indicatorType: CardHighlightType | undefined = undefined;
+
+            // see effect
+            if (effect.action) {
+              // initial effect
+              if (
+                effect.action === "initialBottomRow" &&
+                c.slot.y === 1 &&
+                isMainPlayer
+              ) {
+                isVisible = true;
+              }
+
+              // regular effect
+              for (let i = 0; i < effect.cards.length; i++) {
+                if (c.id === effect.cards[i].id) {
+                  switch (effect.action) {
+                    case "lookAt":
+                    case "lookAtKing":
+                      isVisible = true;
+                      break;
+
+                    case "swop":
+                      isSelected = true;
+                      break;
+
+                    default:
+                      // do nothing
+                      break;
+                  }
+                }
+              }
+
+              // endround effect
+              if (effect.action === "endRound") {
+                isVisible = true;
+              }
+            }
+
+            // see swop
+            if (swopHighlight.cards.length > 0) {
+              for (let i = 0; i < swopHighlight.cards.length; i++) {
+                if (c.id === swopHighlight.cards[i].id) {
+                  indicatorType = swopHighlight.type;
+                }
+              }
+            }
+
+            if (spectatorMode) {
+              isVisible = true;
+            }
+
+            const handleClickCard = () => {
+              if (isEndingPlayer) {
+                console.log("sorry, this player is ending");
+              } else {
+                const isEffect = isHighlightDueToEffect && isHighlight;
+                onClick(c, isEffect);
+              }
+            };
+
+            return (
+              <Card
+                className={styles.CardGrid_Card.toString()}
+                card={c}
+                key={"myCard-" + k}
+                indicatorType={indicatorType}
+                isHighlight={isHighlight}
+                isSelected={isSelected}
+                onClick={handleClickCard}
+                isBack={!isVisible}
+              />
+            );
+          })}
+      </div>
 
       <div className={styles.Name}>{player.name}</div>
     </div>

@@ -1,18 +1,23 @@
 import clsx from "clsx";
 
-import type { Card as CardType } from "../../../types";
+import {
+  isHandCard,
+  type HandCard,
+  type Card as CardType,
+} from "../../../types";
 
 import styles from "./Card.module.scss";
 
 interface CardProps {
-  card: CardType;
+  card: HandCard | CardType;
   isBack?: boolean;
   isHighlight?: boolean;
   isSelected?: boolean;
   onClick: () => void;
   indicatorType?: "lookAt" | "swop" | "drew";
   className?: string;
-  style?: React.CSSProperties;
+  isDeck?: boolean;
+  deckCardCount?: number;
 }
 
 const Card = ({
@@ -23,7 +28,8 @@ const Card = ({
   isHighlight,
   isSelected,
   onClick,
-  style,
+  isDeck,
+  deckCardCount,
 }: CardProps) => {
   let printSymbol: string;
   let color = "black";
@@ -61,6 +67,19 @@ const Card = ({
     }
   }
 
+  let style: React.CSSProperties = {};
+
+  if (isHandCard(card)) {
+    style = {
+      "--card-pos-x": card.slot.x,
+      "--card-pos-y": card.slot.y,
+    } as React.CSSProperties;
+  } else if (isDeck) {
+    style = {
+      "--card-count": deckCardCount + "px",
+    } as React.CSSProperties;
+  }
+
   return (
     <div
       onClick={onClick}
@@ -73,7 +92,7 @@ const Card = ({
         indicatorType === "drew" && styles.isDrawn,
         indicatorType === "swop" && styles.isSwopped,
         indicatorType === "lookAt" && styles.isLookedAt,
-        className,
+        isDeck && styles.isDeck,
       )}
       style={style}
     >
