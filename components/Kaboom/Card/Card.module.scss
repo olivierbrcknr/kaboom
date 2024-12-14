@@ -12,6 +12,16 @@
   font-size: 30px;
 
   padding: 10px;
+
+  // getting the pos variables from the object
+  left: calc(
+    var(--card-margin) + (var(--card-width) + var(--card-margin)) *
+      var(--card-pos-x)
+  );
+  top: calc(
+    var(--card-margin) + (var(--card-height) + var(--card-margin)) *
+      var(--card-pos-y)
+  );
 }
 
 /*.Card:hover {
@@ -30,13 +40,18 @@
   background-color: var(--color-draw);
 }
 
-
 .isRed {
   color: var(--color-red);
 }
 
 .isBack {
+}
 
+.isDeck {
+  // --card-count
+
+  height: calc(var(--card-height) + var(--card-count) / 3);
+  border-bottom-width: calc(2px + var(--card-count) / 3);
 }
 
 .isSelected {
@@ -58,7 +73,7 @@
   left: 2px;
   bottom: 2px;
   right: 2px;
-  background-image: url('/CardBack.png');
+  background-image: url("/CardBack.png");
   background-size: 30px 30px;
 }
 @media (prefers-color-scheme: dark) {
@@ -67,12 +82,10 @@
   }
 }
 
-
 .Number {
   font-weight: bold;
 }
 .Symbol {
-
 }
 
 .Joker {

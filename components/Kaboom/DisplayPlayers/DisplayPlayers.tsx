@@ -21,6 +21,7 @@ const DisplayPlayers = ({
     <div className={clsx(styles.DisplayPlayers)}>
       <ul>
         {players.map((p) => {
+          // Hide players that are not playing
           if (!p.isPlaying) {
             return null;
           }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 
-import type { Deck as DeckType, Card as CardType } from "../../../types";
+import clsx from "clsx";
+
+import type { Deck as DeckType } from "../../../types";
 import Card from "../Card";
 
 import styles from "./Deck.module.scss";
@@ -8,7 +10,6 @@ import styles from "./Deck.module.scss";
 interface DeckProps {
   isCurrent: boolean;
   deck: DeckType;
-  className?: string;
   drawCard: () => void;
   clickGraveyard: () => void;
   swopHighlight: "graveyard" | "lookAt" | "deck";
@@ -19,7 +20,6 @@ interface DeckProps {
 }
 
 const Deck = ({
-  className,
   clickGraveyard,
   deck,
   drawCard,
@@ -33,71 +33,44 @@ const Deck = ({
     setShowNext(false);
   }, [isCurrent]);
 
-  const classes = [styles.Deck];
-  className && classes.push(className);
-
-  let currentCard: CardType | null;
-  let nextCard: CardType | null = null;
-
-  const countInDeck = deck.deck ? deck.deck.length : 0;
-  const countInGraveyard = deck.graveyard ? deck.graveyard.length : 0;
-
-  const closedDeckStyle: React.CSSProperties = {
-    borderBottomWidth: 2 + countInDeck / 3 + "px",
-    height: "calc( var(--card-height) + " + countInDeck / 3 + "px )",
-  };
-
-  const openDeckStyle: React.CSSProperties = {
-    borderBottomWidth: 2 + countInGraveyard / 3 + "px",
-    height: "calc( var(--card-height) + " + countInGraveyard / 3 + "px )",
-  };
-
-  const deckClickFn = () => {
+  const handleDeckClick = () => {
     if (isCurrent) {
       setShowNext(true);
       drawCard();
     }
   };
 
-  const graveyardClickFn = () => {
+  const handleGraveyardClick = () => {
     setShowNext(false);
     clickGraveyard();
   };
 
-  let openDeck: React.JSX.Element | null = null;
-
-  if (countInGraveyard > 0) {
-    currentCard = deck.graveyard[countInGraveyard - 1];
-
-    openDeck = (
-      <Card
-        card={currentCard}
-        style={openDeckStyle}
-        isHighlight={isCurrent && isHighlight.graveyard ? true : false}
-        indicatorType={swopHighlight === "graveyard" ? "lookAt" : undefined}
-        className={styles.OpenDeck.toString()}
-        onClick={graveyardClickFn}
-      />
-    );
-  }
-
-  if (countInDeck > 0) {
-    nextCard = deck.deck[0];
-  }
+  const nextCard = deck.deck.length > 0 ? deck.deck[0] : undefined;
 
   return (
-    <div className={classes.join(" ")}>
-      {openDeck}
+    <div className={clsx(styles.Deck)}>
+      {deck.graveyard.length > 0 && (
+        <Card
+          card={deck.graveyard[deck.graveyard.length - 1]}
+          isHighlight={isCurrent && isHighlight.graveyard ? true : false}
+          indicatorType={swopHighlight === "graveyard" ? "lookAt" : undefined}
+          className={styles.OpenDeck.toString()}
+          onClick={handleGraveyardClick}
+          isDeck
+          deckCardCount={deck.graveyard.length}
+        />
+      )}
 
       {nextCard && (
         <Card
           isBack={!showNext}
           card={nextCard}
-          style={closedDeckStyle}
           isHighlight={isCurrent && isHighlight.deck}
           indicatorType={swopHighlight === "deck" ? "lookAt" : undefined}
           className={styles.ClosedDeck.toString()}
-          onClick={deckClickFn}
+          onClick={handleDeckClick}
+          isDeck
+          deckCardCount={deck.deck.length}
         />
       )}
     </div>
