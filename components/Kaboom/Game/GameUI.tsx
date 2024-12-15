@@ -556,7 +556,9 @@ const GameUI = ({
       )}
 
       <div style={{ zIndex: 10 }} className={styles.ForceEndBtn}>
-        <Button onClick={onEndGame}>Force End Game</Button>
+        <Button onClick={onEndGame} theme="red">
+          Force End Game
+        </Button>
       </div>
     </div>
   );

@@ -24,7 +24,7 @@ const Toggle = ({
     <RadixToggle.Root
       className={clsx(
         styles.Toggle,
-        value && styles.isPresed,
+        value && styles.isPressed,
         disabled && styles.isDisabled,
       )}
       name={name}
