@@ -51,15 +51,15 @@ interface GameUIProps {
     type?: CardHighlightType;
   };
   focusCard?: FocusCard;
-  onSetFocusCard: (c: FocusCard) => void;
+  onSetFocusCard: (c: FocusCard | undefined) => void;
 }
 
 interface HighlightObject {
   deck: boolean;
-  dueToEffect: boolean;
   graveyard: boolean;
   otherCards: boolean;
   ownCards: boolean;
+  dueToEffect: boolean;
 }
 
 const emptyHighlight: HighlightObject = {
@@ -140,15 +140,7 @@ const GameUI = ({
       });
 
       // empty focus card, just in case...
-      // onSetFocusCard({
-      //   value: null,
-      //   color: null,
-      //   position: null,
-      //   slot: {
-      //     x: null,
-      //     y: null,
-      //   },
-      // });
+      onSetFocusCard(undefined);
 
       // turn off effect, just in case...
       // setPlayEffect(false);
@@ -406,10 +398,10 @@ const GameUI = ({
         break;
 
       case "K":
+        console.log("Look at 1 card and swop 2 cards");
         newHighlight.dueToEffect = true;
         newHighlight.otherCards = true;
         newHighlight.ownCards = true;
-        console.log("Look at 1 card and swop 2 cards");
         break;
 
       default:
@@ -468,6 +460,8 @@ const GameUI = ({
             return null;
           }
 
+          console.log(highlight);
+
           let isHighlight = highlight.otherCards;
           let cards: HandCard[] = [];
           let isSelf = false;
@@ -495,7 +489,9 @@ const GameUI = ({
               player={p}
               isMainPlayer={isSelf}
               isEndingPlayer={roundState.isLastRound === p.id}
-              isCurrent={isCurrentPlayer && roundState.isRunning}
+              isCurrent={
+                p.id === roundState.currentPlayer && roundState.isRunning
+              }
               cards={cards}
               spectatorMode={
                 /*!isCurrentPlayer || isDev || */ !roundState.isRunning

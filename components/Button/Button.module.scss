@@ -1,4 +1,4 @@
-@import "../../styles/mixins";
+@use "../../styles/mixins" as *;
 
 .Button {
   @include button-reset;
@@ -18,11 +18,32 @@
   transition: background 0.2s;
   font-size: 18px;
 
+  // &:before {
+  //   content: "";
+  //   display: block;
+  //   position: absolute;
+  //   top: 0;
+  //   left: 0;
+  //   right: 0;
+  //   bottom: 0;
+  //   // background: #ff0;
+  //   border-radius: 8px;
+  //   box-shadow: 0 3px 20px -6px var(--color-highlight);
+  //   opacity: 0;
+  //   pointer-events: none;
+
+  //   transition: opacity 0.2s;
+  // }
+
   &:focus,
   &:hover {
     outline: none;
     color: var(--color-white);
     background: var(--color-highlight);
+
+    // &:before {
+    //   opacity: 0.7;
+    // }
   }
   &:active {
     background: var(--btn-active-bg-color);
@@ -40,7 +61,7 @@
     &:focus,
     &:hover {
       background: var(--color-red);
-      color: var(--color-white-STAY);
+      color: #fff;
     }
   }
 }

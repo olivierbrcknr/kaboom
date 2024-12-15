@@ -1,4 +1,6 @@
-import io from "socket.io-client";
+import { useState, useEffect } from "react";
+
+import { io, Socket } from "socket.io-client";
 
 const dev = process.env.NODE_ENV !== "production";
 const PORT = process.env.PORT || 3000;
@@ -8,9 +10,28 @@ const PORT = process.env.PORT || 3000;
 const socketURL = "http://localhost:" + PORT;
 // }
 
-const socket = io(socketURL);
-socket.on("connect", () => {
-  console.log("connected to the Kaboom Server", socketURL);
-});
+export const useSocket = () => {
+  const [socket, setSocket] = useState<Socket | null>(null);
 
-export default socket;
+  useEffect(() => {
+    const socketIo = io(socketURL);
+
+    setSocket(socketIo);
+
+    socketIo.on("connect", () => {
+      console.log("connected to the Kaboom Server", socketURL);
+    });
+
+    const cleanup = () => {
+      // socketIo.off("connect");
+      socketIo.disconnect();
+    };
+    return cleanup;
+  }, []);
+
+  return socket;
+};
+
+export const isSocket = (v: any): v is Socket => {
+  return v !== null;
+};

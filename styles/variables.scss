@@ -1,4 +1,4 @@
-@import "./mixins";
+@use "./mixins" as *;
 
 :root {
   /* Typography */
@@ -9,8 +9,10 @@
   --color-black: #000;
   --color-gray: #ddd;
   --color-gray-lighter: #e3e3e3;
+  --color-gray-very-light: #f3f3f3;
 
-  --color-white-STAY: #fff;
+  --color-white-STAY: var(--color-white);
+  --color-black-STAY: var(--color-black);
 
   --color-red: #f00;
 
@@ -24,12 +26,27 @@
   --color-select: var(--color-highlight);
 
   /* Sizes */
+  /*
   --grid-unit: 10px;
   --max-width: 1200px;
 
   --card-width: 80px;
   --card-height: 112px;
   --card-margin: 10px;
+
+  --rules-width: 320px;
+  --card-border-radius: 3px;
+
+  */
+
+  --grid-unit: 1vw;
+  --max-width: 1200px;
+
+  --card-width: clamp(20px, 8.5vw, 80px);
+  --card-height: calc(var(--card-width) * 1.4);
+  --card-margin: calc(var(--card-width) * 0.2);
+
+  --card-border-radius: calc(var(--card-width) * 0.03);
 
   --rules-width: 320px;
 }
@@ -40,6 +57,10 @@
     --color-black: #aaa;
     --color-gray: #333;
     --color-gray-lighter: #444;
+    --color-gray-very-light: #1a1a1a;
+
+    --color-white-STAY: var(--color-black);
+    --color-black-STAY: var(--color-white);
 
     --color-red: #f00;
 

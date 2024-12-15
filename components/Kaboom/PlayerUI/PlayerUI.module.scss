@@ -1,5 +1,12 @@
 .PlayerUI {
   position: absolute;
+  z-index: 1;
+
+  &.isMainPlayer {
+    z-index: 2;
+  }
+
+  pointer-events: none;
 }
 
 .Name {
@@ -11,11 +18,11 @@
 }
 
 .CardGrid {
-  width: calc(var(--card-width) * 4 + 8px + 5 * var(--card-margin));
-  height: calc(var(--card-height) * 2 + 8px + 3 * var(--card-margin));
+  width: calc(var(--card-width) * 4 + 5 * var(--card-margin));
+  height: calc(var(--card-height) * 2 + 3 * var(--card-margin));
 
   border-radius: 8px;
-  border: solid 4px var(--color-gray);
+  border: solid 4px var(--color-gray-very-light);
 }
 
 .CardGrid_Card {
@@ -37,7 +44,7 @@
   transform: translate(-50%, 50%);
 }
 .isMainPlayer .CardGrid {
-  background: var(--color-gray);
+  background: var(--color-gray-very-light);
 }
 
 .isEnding .Name {

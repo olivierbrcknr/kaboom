@@ -1,5 +1,6 @@
 import eslintPluginNext from "@next/eslint-plugin-next";
 import tsParser from "@typescript-eslint/parser";
+import eslintPluginReact from "eslint-plugin-react";
 import perfectionist from "eslint-plugin-perfectionist";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
@@ -7,6 +8,7 @@ export default [
   {
     plugins: {
       eslintPluginNext,
+      eslintPluginReact,
     },
     rules: {
       "@next/next/google-font-display": ["off"],

@@ -59,12 +59,12 @@ const Card = ({
     if (card.value === "X") {
       cardInner = <div className={styles.Joker}>⍟</div>;
     } else {
-      return (cardInner = (
+      cardInner = (
         <>
           <div className={styles.Number}>{card.value}</div>
           <div className={styles.Symbol}>{printSymbol}</div>
         </>
-      ));
+      );
     }
   }
 
@@ -89,11 +89,12 @@ const Card = ({
         isBack && styles.isBack,
         isSelected && styles.isSelected,
         isHighlight && styles.isHighlight,
-        color === "red" && styles.isRed,
+        color === "red" ? styles.isRed : styles.isBlack,
         indicatorType === "drew" && styles.isDrawn,
         indicatorType === "swop" && styles.isSwopped,
         indicatorType === "lookAt" && styles.isLookedAt,
         isDeck && styles.isDeck,
+        isHandCard(card) && styles.isHandCard,
       )}
       style={style}
     >
