@@ -13,7 +13,7 @@ import styles from "./PlayerUI.module.scss";
 
 interface PlayerUIProps {
   effect: CardEffect;
-  swopHighlight: { cards: HandCard[]; type?: CardHighlightType };
+  highlightCards: { cards: HandCard[]; type?: CardHighlightType };
   startingPos: number;
   playerNo: number;
   player: Player;
@@ -23,7 +23,7 @@ interface PlayerUIProps {
   cards: HandCard[];
   spectatorMode: boolean;
   onClick: (card: HandCard, triggeringEffect: boolean) => void;
-  isHighlight: boolean;
+  isClickable: boolean;
   isHighlightDueToEffect: boolean;
 }
 
@@ -32,7 +32,7 @@ const PlayerUI = ({
   effect,
   isCurrent,
   isEndingPlayer,
-  isHighlight,
+  isClickable,
   isHighlightDueToEffect,
   isMainPlayer,
   onClick,
@@ -40,7 +40,7 @@ const PlayerUI = ({
   playerNo,
   spectatorMode,
   startingPos,
-  swopHighlight,
+  highlightCards,
 }: PlayerUIProps) => {
   let position: "top" | "right" | "bottom" | "left" = "bottom";
 
@@ -126,23 +126,19 @@ const PlayerUI = ({
             }
 
             // see swop
-            if (swopHighlight.cards.length > 0) {
-              for (let i = 0; i < swopHighlight.cards.length; i++) {
-                if (c.id === swopHighlight.cards[i].id) {
-                  indicatorType = swopHighlight.type;
+            if (highlightCards.cards.length > 0) {
+              for (let i = 0; i < highlightCards.cards.length; i++) {
+                if (c.id === highlightCards.cards[i].id) {
+                  indicatorType = highlightCards.type;
                 }
               }
-            }
-
-            if (spectatorMode) {
-              isVisible = true;
             }
 
             const handleClickCard = () => {
               if (isEndingPlayer) {
                 console.log("sorry, this player is ending");
               } else {
-                const isEffect = isHighlightDueToEffect && isHighlight;
+                const isEffect = isHighlightDueToEffect && isClickable;
                 onClick(c, isEffect);
               }
             };
@@ -153,10 +149,11 @@ const PlayerUI = ({
                 card={c}
                 key={"myCard-" + k}
                 indicatorType={indicatorType}
-                isHighlight={isHighlight}
+                isClickable={isClickable}
                 isSelected={isSelected}
                 onClick={handleClickCard}
                 isBack={!isVisible}
+                isSpecator={spectatorMode}
               />
             );
           })}
