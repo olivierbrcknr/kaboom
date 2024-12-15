@@ -55,7 +55,7 @@ const Deck = ({
             card={deck.graveyard[deck.graveyard.length - 1]}
             isHighlight={isCurrent && isHighlight.graveyard ? true : false}
             // indicatorType={swopHighlight === "graveyard" ? "lookAt" : undefined}
-            indicatorType={isHighlight.graveyard ? "lookAt" : undefined}
+            // indicatorType={isHighlight.graveyard ? "lookAt" : undefined}
             onClick={handleGraveyardClick}
             isDeck
             deckCardCount={deck.graveyard.length}
@@ -69,7 +69,7 @@ const Deck = ({
             isBack={!showNext}
             card={nextCard}
             isHighlight={isCurrent && isHighlight.deck}
-            indicatorType={isHighlight.deck ? "lookAt" : undefined}
+            // indicatorType={isHighlight.deck ? "lookAt" : undefined}
             // indicatorType={swopHighlight === "deck" ? "lookAt" : undefined}
             onClick={handleDeckClick}
             isDeck

@@ -3,23 +3,28 @@
   height: var(--card-height);
   border: solid 2px var(--color-black);
   background-color: var(--color-white);
-  border-radius: 3px;
+  border-radius: var(--card-border-radius);
 
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  font-size: 30px;
+  font-size: calc(var(--card-width) * 0.4);
 
-  padding: 10px;
+  padding: 10% 0;
 
+  pointer-events: initial !important;
+}
+
+.isHandCard {
   // getting the pos variables from the object
+  position: absolute;
   left: calc(
     var(--card-margin) + (var(--card-width) + var(--card-margin)) *
       var(--card-pos-x)
   );
   top: calc(
-    var(--card-margin) + (var(--card-height) + var(--card-margin)) *
+    var(--card-margin) * (0.75) + (var(--card-height) + var(--card-margin)) *
       var(--card-pos-y)
   );
 }
@@ -34,6 +39,10 @@
 
 .isLookedAt {
   background-color: var(--color-lookAt);
+
+  &.isBlack {
+    color: var(--color-black-STAY);
+  }
 }
 
 .isDrawn {
@@ -89,5 +98,5 @@
 }
 
 .Joker {
-  font-size: 60px;
+  font-size: calc(var(--card-width) * 0.75);
 }

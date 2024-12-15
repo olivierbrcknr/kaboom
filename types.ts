@@ -72,7 +72,7 @@ const isHandCard = (value: any): value is HandCard => {
   return (
     value &&
     typeof value === "object" &&
-    typeof value.color === "number" &&
+    (typeof value.color === "number" || value.color === null) &&
     typeof value.player === "string"
   );
 };

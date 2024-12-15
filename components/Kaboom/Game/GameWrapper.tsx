@@ -23,7 +23,7 @@ import GameDevUI from "./GameDevUI";
 import GameEndUI from "./GameEndUI";
 import GameSetupUI from "./GameSetupUI";
 import GameUI from "./GameUI";
-import socket from "./socket";
+import { useSocket, isSocket } from "./socket";
 import { type GameStateType, type RoundStateType } from "./utils";
 
 import styles from "./Game.module.scss";
@@ -34,7 +34,7 @@ interface GameWrapperProps {}
 
 const GameWrapper = ({}: GameWrapperProps) => {
   const [myState, setMyState] = useState<{
-    id: PlayerID;
+    id?: PlayerID;
     name: string;
   }>({
     id: "",
@@ -74,18 +74,20 @@ const GameWrapper = ({}: GameWrapperProps) => {
 
   const [focusCard, setFocusCard] = useState<FocusCard | undefined>(undefined);
 
+  const socket = useSocket();
+
   // socket ———————————————————————————————————————————————
 
   useEffect(() => {
-    if (!socket.id) {
-      console.error("No socket.id found, socket not set up properly");
+    if (socket === null) {
+      console.log("socket not set up");
       return;
     }
 
-    setMyState({
-      ...myState,
+    setMyState((ms) => ({
+      ...ms,
       id: socket.id,
-    });
+    }));
 
     socket.emit("initialSetup");
 
@@ -106,32 +108,32 @@ const GameWrapper = ({}: GameWrapperProps) => {
         name: myPlayerData.name,
       });
 
-      setGameState({
-        ...gameState,
+      setGameState((gs) => ({
+        ...gs,
         players: data,
-      });
+      }));
     });
 
     socket.on("gameIsRunningUpdate", (data: boolean) => {
-      setGameState({
-        ...gameState,
+      setGameState((gs) => ({
+        ...gs,
         isRunning: data,
-      });
+      }));
     });
 
     socket.on("roundUpdate", (roundCount: number, roundIsRunning: boolean) => {
-      setRoundState({
-        ...roundState,
+      setRoundState((rs) => ({
+        ...rs,
         count: roundCount,
         isRunning: roundIsRunning,
-      });
+      }));
     });
 
     socket.on("currentPlayer", (pID: PlayerID) => {
-      setRoundState({
-        ...roundState,
+      setRoundState((rs) => ({
+        ...rs,
         currentPlayer: pID,
-      });
+      }));
     });
 
     socket.on("playEffect", () => {
@@ -161,18 +163,18 @@ const GameWrapper = ({}: GameWrapperProps) => {
 
     socket.on("gameHasEnded", () => {
       console.log("game has ended");
-      setGameState({
-        ...gameState,
+      setGameState((gs) => ({
+        ...gs,
         isRunning: false,
         hasEnded: true,
-      });
+      }));
     });
 
     socket.on("endingPlayerID", (pID: PlayerID) => {
-      setRoundState({
-        ...roundState,
+      setRoundState((rs) => ({
+        ...rs,
         isLastRound: pID,
-      });
+      }));
     });
 
     return () => {
@@ -189,7 +191,7 @@ const GameWrapper = ({}: GameWrapperProps) => {
       socket.off("gameHasEnded");
       socket.off("endingPlayerID");
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     // hide highlight after 2sec
@@ -206,40 +208,59 @@ const GameWrapper = ({}: GameWrapperProps) => {
   }, [highlightCards]);
 
   const handleChangeName = (v: string) => {
-    socket.emit("nameChange", v);
+    if (isSocket(socket)) {
+      socket.emit("nameChange", v);
+    }
   };
 
   const handlePlayerToggle = (v: PlayerID) => {
-    socket.emit("playerToggle", v);
+    if (isSocket(socket)) {
+      socket.emit("playerToggle", v);
+    }
   };
 
   const handleStartGame = () => {
-    socket.emit("startGame");
+    console.log("Start Game");
+    if (isSocket(socket)) {
+      socket.emit("startGame");
+    }
   };
 
   const handleEndGame = () => {
-    socket.emit("endGame");
+    if (isSocket(socket)) {
+      socket.emit("endGame");
+    }
   };
 
   // not needed anymore?
   const handlePlayerIsEnding = () => {
-    socket.emit("playerIsEnding", myState.id);
+    if (isSocket(socket)) {
+      socket.emit("playerIsEnding", myState.id);
+    }
   };
 
   const handleEndRound = () => {
-    socket.emit("endRound", myState.id);
+    if (isSocket(socket)) {
+      socket.emit("endRound", myState.id);
+    }
   };
 
   const handleStartRound = () => {
-    socket.emit("startRound");
+    if (isSocket(socket)) {
+      socket.emit("startRound");
+    }
   };
 
   const handleDrawCard = (position: CardPosition) => {
-    socket.emit("drawCard", position);
+    if (isSocket(socket)) {
+      socket.emit("drawCard", position);
+    }
   };
 
   const handleNextTurn = () => {
-    socket.emit("nextTurn");
+    if (isSocket(socket)) {
+      socket.emit("nextTurn");
+    }
   };
 
   const handleEffect = (action: CardActions) => {
@@ -269,11 +290,15 @@ const GameWrapper = ({}: GameWrapperProps) => {
     cards: HandCard[],
     highlight: CardHighlightType,
   ) => {
-    socket.emit("highlightCard", cards, highlight);
+    if (isSocket(socket)) {
+      socket.emit("highlightCard", cards, highlight);
+    }
   };
 
   const handleCardPlayed = (card: HandCard) => {
-    socket.emit("cardPlayed", card);
+    if (isSocket(socket)) {
+      socket.emit("cardPlayed", card);
+    }
   };
 
   const handleCardSwop = (
@@ -281,28 +306,34 @@ const GameWrapper = ({}: GameWrapperProps) => {
     card: HandCard,
     secondCard?: HandCard | CardType,
   ) => {
-    switch (position) {
-      // swopped with deck
-      case "deck":
-        socket.emit("cardSwoppedFromDeck", card);
-        break;
-      // swopped with graveyard
-      case "graveyard":
-        socket.emit("cardSwoppedFromGraveyard", card);
-        break;
-      // select to swop
-      case "swop":
-        socket.emit("cardShiftedToPlayer", card, secondCard);
-        break;
+    if (isSocket(socket)) {
+      switch (position) {
+        // swopped with deck
+        case "deck":
+          socket.emit("cardSwoppedFromDeck", card);
+          break;
+        // swopped with graveyard
+        case "graveyard":
+          socket.emit("cardSwoppedFromGraveyard", card);
+          break;
+        // select to swop
+        case "swop":
+          socket.emit("cardShiftedToPlayer", card, secondCard);
+          break;
+      }
     }
   };
 
   const handleSwopCardsBetweenPlayers = (card1: HandCard, card2: HandCard) => {
-    socket.emit("cardSwoppedBetweenPlayers", [card1, card2]);
+    if (isSocket(socket)) {
+      socket.emit("cardSwoppedBetweenPlayers", [card1, card2]);
+    }
   };
 
   const handleCardFromDeckToGraveyard = () => {
-    socket.emit("cardFromDeckToGraveyard");
+    if (isSocket(socket)) {
+      socket.emit("cardFromDeckToGraveyard");
+    }
   };
 
   // rules ————————————————————————————————————————————————
@@ -329,6 +360,11 @@ const GameWrapper = ({}: GameWrapperProps) => {
   // UI ———————————————————————————————————————————————————
 
   console.log(gameState);
+
+  if (!myState.id) {
+    console.log("no player id yet");
+    return null;
+  }
 
   // Overarching for a game ———————————————————————————————
   if (gameState.hasEnded) {

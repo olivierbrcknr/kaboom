@@ -12,14 +12,14 @@
   top: 0;
   left: 0;
   bottom: 0;
-  transition: width 0.4s;
+  // transition: width 0.4s;
 }
 
 .RulesContainer {
   width: var(--rules-width);
   padding: 15px;
 
-  background: var(--color-gray);
+  background: var(--color-gray-very-light);
 
   overflow-y: scroll;
 
@@ -52,23 +52,23 @@
   z-index: 10;
 }
 
-.button {
-  border-radius: 8px;
-  padding: 10px;
-  text-align: center;
-  cursor: pointer;
-  background: var(--color-gray);
-  transition: background 0.2s;
-  margin-bottom: 1rem;
-  color: var(--color-black);
-  display: block;
-  text-decoration: none;
-}
+// .button {
+//   border-radius: 8px;
+//   padding: 10px;
+//   text-align: center;
+//   cursor: pointer;
+//   background: var(--color-gray);
+//   transition: background 0.2s;
+//   margin-bottom: 1rem;
+//   color: var(--color-black);
+//   display: block;
+//   text-decoration: none;
+// }
 
-.button:hover {
-  color: var(--color-white);
-  background: var(--color-highlight);
-}
+// .button:hover {
+//   color: var(--color-white);
+//   background: var(--color-highlight);
+// }
 
 /* Rules Page */
 
