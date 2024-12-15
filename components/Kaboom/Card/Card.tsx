@@ -11,23 +11,25 @@ import styles from "./Card.module.scss";
 interface CardProps {
   card: HandCard | CardType;
   isBack?: boolean;
-  isHighlight?: boolean;
+  isClickable: boolean;
   isSelected?: boolean;
   onClick: () => void;
   indicatorType?: "lookAt" | "swop" | "drew";
   isDeck?: boolean;
   deckCardCount?: number;
+  isSpecator?: boolean;
 }
 
 const Card = ({
   card,
   indicatorType,
   isBack,
-  isHighlight,
+  isClickable,
   isSelected,
   onClick,
   isDeck,
   deckCardCount,
+  isSpecator,
 }: CardProps) => {
   let printSymbol: string;
   let color = "black";
@@ -53,20 +55,20 @@ const Card = ({
 
   let cardInner: React.JSX.Element;
 
-  if (isBack) {
-    cardInner = <div className={styles.BackArtwork} />;
-  } else {
-    if (card.value === "X") {
-      cardInner = <div className={styles.Joker}>⍟</div>;
-    } else {
-      cardInner = (
-        <>
-          <div className={styles.Number}>{card.value}</div>
-          <div className={styles.Symbol}>{printSymbol}</div>
-        </>
-      );
-    }
-  }
+  //      if (isBack && !isSpecator) {
+  //   cardInner = <div className={styles.BackArtwork} />;
+  // } else {
+  //   if (card.value === "X") {
+  //     cardInner = <div className={styles.Joker}>⍟</div>;
+  //   } else {
+  //     cardInner = (
+  //       <>
+  //         <div className={styles.Number}>{card.value}</div>
+  //         <div className={styles.Symbol}>{printSymbol}</div>
+  //       </>
+  //     );
+  //   }
+  // }
 
   let style: React.CSSProperties = {};
 
@@ -82,13 +84,14 @@ const Card = ({
   }
 
   return (
-    <div
+    <button
       onClick={onClick}
       className={clsx(
         styles.Card,
         isBack && styles.isBack,
         isSelected && styles.isSelected,
-        isHighlight && styles.isHighlight,
+        isClickable && styles.isClickable,
+        isSpecator && styles.isSpecator,
         color === "red" ? styles.isRed : styles.isBlack,
         indicatorType === "drew" && styles.isDrawn,
         indicatorType === "swop" && styles.isSwopped,
@@ -98,8 +101,17 @@ const Card = ({
       )}
       style={style}
     >
-      {cardInner}
-    </div>
+      {isBack && <div className={styles.BackArtwork} />}
+
+      {(!isBack || isSpecator) && (
+        <div className={styles.Inner}>
+          {card.value !== "X" && (
+            <div className={styles.Number}>{card.value}</div>
+          )}
+          <div className={styles.Symbol}>{printSymbol}</div>
+        </div>
+      )}
+    </button>
   );
 };
 

@@ -1,23 +1,15 @@
 import React, { useState, useEffect } from "react";
 
-import clsx from "clsx";
-
 import type {
   Player,
   FocusCard,
-  CardActions,
   Deck as DeckType,
   Card as CardType,
   HandCard,
   PlayerID,
-  CardEffect,
   CardPosition,
   CardHighlightType,
 } from "../../../types";
-import Deck from "../Deck";
-import DisplayPlayers from "../DisplayPlayers";
-import PlayerSelection from "../PlayerSelection";
-import PlayerUI from "../PlayerUI";
 
 import GameDevUI from "./GameDevUI";
 import GameEndUI from "./GameEndUI";
@@ -26,7 +18,7 @@ import GameUI from "./GameUI";
 import { useSocket, isSocket } from "./socket";
 import { type GameStateType, type RoundStateType } from "./utils";
 
-import styles from "./Game.module.scss";
+// import styles from "./Game.module.scss";
 
 const isDev = process.env.NODE_ENV !== "production";
 
@@ -72,7 +64,9 @@ const GameWrapper = ({}: GameWrapperProps) => {
     type: undefined,
   });
 
-  const [focusCard, setFocusCard] = useState<FocusCard | undefined>(undefined);
+  const [selectedCard, setSelectedCard] = useState<FocusCard | undefined>(
+    undefined,
+  );
 
   const socket = useSocket();
 
@@ -141,7 +135,7 @@ const GameWrapper = ({}: GameWrapperProps) => {
     });
 
     socket.on("selectCardToSwop", (targetCard: HandCard) => {
-      setFocusCard({
+      setSelectedCard({
         ...targetCard,
         position: "swop",
       });
@@ -234,7 +228,7 @@ const GameWrapper = ({}: GameWrapperProps) => {
 
   // not needed anymore?
   const handlePlayerIsEnding = () => {
-    if (isSocket(socket)) {
+    if (isSocket(socket) && myState.id) {
       socket.emit("playerIsEnding", myState.id);
     }
   };
@@ -263,24 +257,24 @@ const GameWrapper = ({}: GameWrapperProps) => {
     }
   };
 
-  const handleEffect = (action: CardActions) => {
-    switch (action) {
-      case "lookAt":
-        break;
-      case "swop":
-        break;
-      case "lookAtKing":
-        break;
-      case "initialBottomRow":
-        break;
-      case "endRound":
-        break;
-      default:
-        const exhaustiveCheck: never = action;
-        throw new Error(`Board has no firmata: ${exhaustiveCheck}`);
-        break;
-    }
-  };
+  // const handleEffect = (action: CardActions) => {
+  //   switch (action) {
+  //     case "lookAt":
+  //       break;
+  //     case "swop":
+  //       break;
+  //     case "lookAtKing":
+  //       break;
+  //     case "initialBottomRow":
+  //       break;
+  //     case "endRound":
+  //       break;
+  //     default:
+  //       const exhaustiveCheck: never = action;
+  //       throw new Error(`Board has no firmata: ${exhaustiveCheck}`);
+  //       break;
+  //   }
+  // };
 
   const handleEndEffect = () => {
     setPlayEffect(false);
@@ -418,8 +412,8 @@ const GameWrapper = ({}: GameWrapperProps) => {
         onCardFromDeckToGraveyard={handleCardFromDeckToGraveyard}
         highlightDeck={highlightDeck}
         highlightCards={highlightCards}
-        focusCard={focusCard}
-        onSetFocusCard={setFocusCard}
+        selectedCard={selectedCard}
+        onSetSelectedCard={setSelectedCard}
       />
       {isDev && <GameDevUI socket={socket} />}
     </>

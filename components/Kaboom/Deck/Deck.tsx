@@ -2,21 +2,24 @@ import React, { useState, useEffect } from "react";
 
 import clsx from "clsx";
 
-import type { Deck as DeckType } from "../../../types";
+import type { Deck as DeckType, CardPosition } from "../../../types";
 import Card from "../Card";
 
 import styles from "./Deck.module.scss";
+
+const isDev = process.env.NODE_ENV !== "production";
 
 interface DeckProps {
   isCurrent: boolean;
   deck: DeckType;
   drawCard: () => void;
   clickGraveyard: () => void;
-  // swopHighlight: "graveyard" | "lookAt" | "deck";
-  isHighlight: {
+  swopHighlight?: CardPosition;
+  isClickable: {
     graveyard: boolean;
     deck: boolean;
   };
+  spectatorMode: boolean;
 }
 
 const Deck = ({
@@ -24,8 +27,9 @@ const Deck = ({
   deck,
   drawCard,
   isCurrent,
-  isHighlight,
-  // swopHighlight,
+  isClickable,
+  swopHighlight,
+  spectatorMode,
 }: DeckProps) => {
   const [showNext, setShowNext] = useState(false);
 
@@ -53,9 +57,9 @@ const Deck = ({
         <div className={styles.OpenDeck}>
           <Card
             card={deck.graveyard[deck.graveyard.length - 1]}
-            isHighlight={isCurrent && isHighlight.graveyard ? true : false}
-            // indicatorType={swopHighlight === "graveyard" ? "lookAt" : undefined}
-            // indicatorType={isHighlight.graveyard ? "lookAt" : undefined}
+            isClickable={isCurrent && isClickable.graveyard ? true : false}
+            indicatorType={swopHighlight === "graveyard" ? "lookAt" : undefined}
+            // indicatorType={isClickable.graveyard ? "lookAt" : undefined}
             onClick={handleGraveyardClick}
             isDeck
             deckCardCount={deck.graveyard.length}
@@ -65,15 +69,18 @@ const Deck = ({
 
       {nextCard && (
         <div className={styles.ClosedDeck}>
+          {isDev && <div>{deck.deck.length}/55</div>}
+
           <Card
             isBack={!showNext}
             card={nextCard}
-            isHighlight={isCurrent && isHighlight.deck}
-            // indicatorType={isHighlight.deck ? "lookAt" : undefined}
-            // indicatorType={swopHighlight === "deck" ? "lookAt" : undefined}
+            isClickable={isCurrent && isClickable.deck}
+            // indicatorType={isClickable.deck ? "lookAt" : undefined}
+            indicatorType={swopHighlight === "deck" ? "lookAt" : undefined}
             onClick={handleDeckClick}
             isDeck
             deckCardCount={deck.deck.length}
+            isSpecator={spectatorMode}
           />
         </div>
       )}

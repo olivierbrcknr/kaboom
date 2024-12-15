@@ -21,7 +21,7 @@
   transform: translateX(-50%);
   padding: 4px 8px;
   border-radius: 4px;
-  background: var(--color-black);
+  background: var(--color-highlight); // var(--color-black);
   color: var(--color-white);
 }
 
@@ -36,19 +36,11 @@
   color: #fff;
 }
 
-.IEndButton {
+.IWantToEndButton {
   position: absolute;
-  bottom: 30px;
-  left: 30px;
-
-  border-radius: 8px;
-  min-width: 200px;
-  padding: 10px;
-  text-align: center;
-  cursor: pointer;
-  background: var(--color-gray);
-  transition: background 0.2s;
-  font-size: 18px;
+  bottom: 10px;
+  left: 10px;
+  z-index: 10;
 }
 
 .ForceEndBtn {

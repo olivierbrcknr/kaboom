@@ -19,6 +19,7 @@ import DisplayPlayers from "../DisplayPlayers";
 import PlayerUI from "../PlayerUI";
 
 import { type RoundStateType, type GameStateType } from "./utils";
+import { type HighlightObject, cardRules, emptyHighlight } from "./ruleHelpers";
 
 import styles from "./Game.module.scss";
 
@@ -50,25 +51,11 @@ interface GameUIProps {
     cards: HandCard[];
     type?: CardHighlightType;
   };
-  focusCard?: FocusCard;
-  onSetFocusCard: (c: FocusCard | undefined) => void;
+  selectedCard?: FocusCard;
+  onSetSelectedCard: (c: FocusCard | undefined) => void;
 }
 
-interface HighlightObject {
-  deck: boolean;
-  graveyard: boolean;
-  otherCards: boolean;
-  ownCards: boolean;
-  dueToEffect: boolean;
-}
-
-const emptyHighlight: HighlightObject = {
-  deck: false,
-  dueToEffect: false,
-  graveyard: false,
-  otherCards: false,
-  ownCards: false,
-};
+const emptyClickableAreas: HighlightObject = { ...emptyHighlight };
 
 const GameUI = ({
   gameState,
@@ -89,8 +76,8 @@ const GameUI = ({
   onCardFromDeckToGraveyard,
   highlightDeck,
   highlightCards,
-  focusCard,
-  onSetFocusCard,
+  selectedCard,
+  onSetSelectedCard,
 }: GameUIProps) => {
   const [effectContainer, setEffectContainer] = useState<CardEffect>({
     cards: [],
@@ -99,8 +86,12 @@ const GameUI = ({
     timer: 2000,
   });
 
-  const [highlight, setHighlight] = useState<HighlightObject>({
-    ...emptyHighlight,
+  // const [highlight, setHighlight] = useState<HighlightObject>({
+  //   ...emptyHighlight,
+  // });
+
+  const [clickableAreas, setClickableAreas] = useState<HighlightObject>({
+    ...emptyClickableAreas,
   });
 
   const isCurrentPlayer = roundState.currentPlayer === myPlayerID;
@@ -119,7 +110,7 @@ const GameUI = ({
   }, [roundState.isRunning]);
 
   useEffect(() => {
-    if (isDev) console.log(deck);
+    if (isDev) console.log(deck, playEffect);
 
     if (playEffect) {
       executeEffect(deck.graveyard[deck.graveyard.length - 1]);
@@ -128,19 +119,19 @@ const GameUI = ({
 
   useEffect(() => {
     if (isCurrentPlayer) {
-      setHighlight({
-        ...emptyHighlight,
+      setClickableAreas({
+        ...emptyClickableAreas,
         deck: true,
         graveyard: true,
       });
     } else {
       // empty highlights
-      setHighlight({
-        ...emptyHighlight,
+      setClickableAreas({
+        ...emptyClickableAreas,
       });
 
       // empty focus card, just in case...
-      onSetFocusCard(undefined);
+      onSetSelectedCard(undefined);
 
       // turn off effect, just in case...
       // setPlayEffect(false);
@@ -157,29 +148,29 @@ const GameUI = ({
   }, [roundState.isRunning, onEndEffect]);
 
   useEffect(() => {
-    if (!focusCard) {
+    if (!selectedCard) {
       console.log("No card in focus");
       return;
     }
 
-    const newHighlight: HighlightObject = { ...emptyHighlight };
+    const newClickableAreas: HighlightObject = { ...emptyClickableAreas };
 
-    switch (focusCard.position) {
+    switch (selectedCard.position) {
       case "deck":
-        newHighlight.graveyard = true;
-        newHighlight.ownCards = true;
+        newClickableAreas.graveyard = true;
+        newClickableAreas.ownCards = true;
         break;
       case "swop":
       case "graveyard":
-        newHighlight.ownCards = true;
+        newClickableAreas.ownCards = true;
         break;
       default:
         // do nothing
         break;
     }
 
-    setHighlight(newHighlight);
-  }, [focusCard]);
+    setClickableAreas(newClickableAreas);
+  }, [selectedCard]);
 
   useEffect(() => {
     if (effectContainer.action && !effectContainer.needsInteraction) {
@@ -222,7 +213,7 @@ const GameUI = ({
       return;
     }
 
-    if (!focusCard) {
+    if (!selectedCard) {
       console.log("no card in focus");
       return;
     }
@@ -230,7 +221,7 @@ const GameUI = ({
     if (playEffect && isEffect) {
       let newCards: HandCard[];
 
-      switch (focusCard.value) {
+      switch (selectedCard.value) {
         case 7:
         case 8:
         case 9:
@@ -286,7 +277,7 @@ const GameUI = ({
     } else if (playEffect && !isEffect) {
       onCardPlayed(card);
     } else {
-      switch (focusCard.position) {
+      switch (selectedCard.position) {
         // swopped with deck
         case "deck":
           onCardSwop("deck", card);
@@ -301,9 +292,9 @@ const GameUI = ({
 
         // select to swop
         case "swop":
-          onCardSwop("swop", card, focusCard as CardType);
-          onSetFocusCard({
-            ...focusCard,
+          onCardSwop("swop", card, selectedCard as CardType);
+          onSetSelectedCard({
+            ...selectedCard,
             position: undefined,
           });
 
@@ -319,7 +310,7 @@ const GameUI = ({
 
   const handleDrawCard = () => {
     if (!isCurrentPlayer || !roundState.isRunning) {
-      console.log("nenenenenenenene..");
+      console.log("nenenenenenenene.. not your turn");
       return;
     }
 
@@ -328,8 +319,7 @@ const GameUI = ({
       return;
     }
 
-    // @ts-ignore
-    onSetFocusCard({
+    onSetSelectedCard({
       ...deck.deck[0],
       position: "deck",
     });
@@ -343,7 +333,7 @@ const GameUI = ({
       return;
     }
 
-    if (!focusCard) {
+    if (!selectedCard) {
       console.log("FocusCard is not defined");
       return;
     }
@@ -352,16 +342,16 @@ const GameUI = ({
       return;
     }
 
-    if (focusCard.position === "deck") {
+    if (selectedCard.position === "deck") {
       onDrawCard("deck"); // onDrawCard(false);
       onCardFromDeckToGraveyard();
 
       // regular getting rid of card
-    } else if (isCurrentPlayer && roundState.isRunning && !focusCard.value) {
+    } else if (isCurrentPlayer && roundState.isRunning && !selectedCard.value) {
       onDrawCard("graveyard");
 
       // @ts-ignore
-      onSetFocusCard({
+      onSetSelectedCard({
         ...deck.graveyard[deck.graveyard.length - 1],
         position: "graveyard",
       });
@@ -371,48 +361,14 @@ const GameUI = ({
   };
 
   const executeEffect = (card) => {
-    let highlightChanged = true;
-    const newHighlight: HighlightObject = { ...emptyHighlight };
+    const cardRule = cardRules.find((cR) => cR.cardValue.includes(card.value));
 
-    switch (card.value) {
-      case 7:
-      case 8:
-        console.log("Look at own card");
-        newHighlight.dueToEffect = true;
-        newHighlight.ownCards = true;
-        break;
-
-      case 9:
-      case 10:
-        console.log("Look at opponent‘s card");
-        newHighlight.dueToEffect = true;
-        newHighlight.otherCards = true;
-        break;
-
-      case "J":
-      case "Q":
-        console.log("Swop 2 cards");
-        newHighlight.dueToEffect = true;
-        newHighlight.otherCards = true;
-        newHighlight.ownCards = true;
-        break;
-
-      case "K":
-        console.log("Look at 1 card and swop 2 cards");
-        newHighlight.dueToEffect = true;
-        newHighlight.otherCards = true;
-        newHighlight.ownCards = true;
-        break;
-
-      default:
-        // nothing, end turn
-        highlightChanged = false;
-        onNextTurn();
-        break;
-    }
-
-    if (highlightChanged) {
-      setHighlight(newHighlight);
+    if (cardRule) {
+      // if area is clickable set it
+      setClickableAreas(cardRule.clickableAreas);
+    } else {
+      // else continue
+      onNextTurn();
     }
   };
 
@@ -421,48 +377,28 @@ const GameUI = ({
   let effectDisplayText = "";
 
   if (playEffect) {
-    switch (deck.graveyard[deck.graveyard.length - 1].value) {
-      case 7:
-      case 8:
-        effectDisplayText = "Look at an own card";
-        break;
-
-      case 9:
-      case 10:
-        effectDisplayText = "Look at an opponent‘s card";
-        break;
-
-      case "J":
-      case "Q":
-        effectDisplayText = "Swop 2 cards";
-        break;
-
-      case "K":
-        effectDisplayText = "Look at 1 card and swop 2 cards";
-        break;
-
-      default:
-        // display nothing
-        break;
+    const currentCardRule = cardRules.find((cR) =>
+      cR.cardValue.includes(deck.graveyard[deck.graveyard.length - 1].value),
+    );
+    if (currentCardRule) {
+      effectDisplayText = currentCardRule.label;
     }
   }
+
+  const spectatorMode = /*!isCurrentPlayer ||*/ isDev || !roundState.isRunning;
 
   return (
     <div className={clsx(styles.Game)}>
       <div className={styles.PlayerUIsContainer}>
         {gameState.players.map((p, k) => {
-          if (p.isPlaying === false) {
-            return null;
-          }
+          if (p.isPlaying === false) return null;
 
           if (!deck) {
             console.log("Deck is not defined");
             return null;
           }
 
-          console.log(highlight);
-
-          let isHighlight = highlight.otherCards;
+          let isClickable = clickableAreas.otherCards;
           let cards: HandCard[] = [];
           let isSelf = false;
 
@@ -471,7 +407,7 @@ const GameUI = ({
           }
 
           if (p.id == myPlayerID) {
-            isHighlight = highlight.ownCards;
+            isClickable = clickableAreas.ownCards;
             isSelf = true;
           }
 
@@ -483,8 +419,8 @@ const GameUI = ({
             <PlayerUI
               key={"player-no_" + k}
               effect={effectContainer}
-              swopHighlight={highlightCards}
               startingPos={myPos}
+              highlightCards={highlightCards}
               playerNo={playerNo - 1}
               player={p}
               isMainPlayer={isSelf}
@@ -493,14 +429,10 @@ const GameUI = ({
                 p.id === roundState.currentPlayer && roundState.isRunning
               }
               cards={cards}
-              spectatorMode={
-                /*!isCurrentPlayer || isDev || */ !roundState.isRunning
-                  ? true
-                  : false
-              }
+              spectatorMode={spectatorMode}
               onClick={handleCardClick}
-              isHighlight={isHighlight}
-              isHighlightDueToEffect={highlight.dueToEffect}
+              isClickable={isClickable}
+              isHighlightDueToEffect={clickableAreas.dueToEffect}
             />
           );
         })}
@@ -511,8 +443,9 @@ const GameUI = ({
         drawCard={handleDrawCard}
         clickGraveyard={handleGraveyardClick}
         isCurrent={isCurrentPlayer && roundState.isRunning}
-        isHighlight={highlight}
-        // swopHighlight={highlightDeck}
+        isClickable={clickableAreas}
+        swopHighlight={highlightDeck}
+        spectatorMode={spectatorMode}
       />
 
       {playEffect && (
@@ -533,19 +466,15 @@ const GameUI = ({
       {isCurrentPlayer &&
         !roundState.isLastRound &&
         !playEffect &&
-        highlight.deck && (
-          <Button
-            /*className={styles.IEndButton}*/ onClick={onPlayerIsEndingRound}
-          >
-            I Want To End
-          </Button>
+        clickableAreas.deck && (
+          <div className={styles.IWantToEndButton}>
+            <Button onClick={onPlayerIsEndingRound}>I want to end</Button>
+          </div>
         )}
 
       {!roundState.isRunning && (
         <div className={styles.StartRoundContainer}>
-          <Button
-            /*className={styles.StartRoundButton}*/ onClick={onStartRound}
-          >
+          <Button theme="primary" onClick={onStartRound}>
             Start {roundState.count > 0 ? "Next" : ""} Round
           </Button>
         </div>
