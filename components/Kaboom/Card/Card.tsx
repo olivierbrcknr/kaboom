@@ -46,6 +46,9 @@ const Card = ({
     case 3:
       printSymbol = "♣";
       break;
+    case null:
+      printSymbol = "⍟";
+      break;
   }
 
   let cardInner: React.JSX.Element;

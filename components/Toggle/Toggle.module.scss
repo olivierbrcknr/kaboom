@@ -1,0 +1,54 @@
+@import "../../styles/mixins";
+
+.Toggle {
+  @include button-reset;
+
+  display: inline-block;
+  height: 14px;
+  width: 24px;
+
+  border-radius: 100px;
+  transition: all 0.1s;
+
+  background: var(--color-gray-7);
+  border: solid 2px var(--color-gray-7);
+}
+
+.keyboard-focus .toggle:focus {
+  @include keyboard-focus;
+}
+
+.Knob {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+
+  width: 10px;
+  height: 10px;
+  border-radius: 100px;
+
+  background: var(--color-white);
+  transform: translateX(0);
+
+  transition: all 0.1s;
+}
+
+.isDisabled {
+  opacity: 0.3;
+}
+
+.isPressed {
+  background: var(--color-green) !important;
+  border: solid 2px var(--color-green) !important;
+}
+
+.isPressed .Knob {
+  transform: translateX(10px);
+}
+
+.dark {
+  .toggle {
+    background: var(--color-gray-6);
+    border-color: var(--color-gray-6);
+  }
+}
