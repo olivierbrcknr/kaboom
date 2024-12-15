@@ -55,17 +55,6 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  border-radius: 3px;
-  padding: 3px 5px;
-  text-align: center;
-  cursor: pointer;
-  background: var(--color-gray);
-  transition: all 0.2s;
-  font-size: 11px;
-}
-.ForceEndBtn:hover {
-  background: var(--color-red);
-  color: #fff;
 }
 
 .isStartScreen {
@@ -78,37 +67,6 @@
 .isStartScreen h1 {
   font-size: 64px;
   text-transform: uppercase;
-}
-
-.EndGameButton,
-.StartRoundButton,
-.StartButton {
-  border-radius: 8px;
-  min-width: 200px;
-  padding: 10px;
-  text-align: center;
-  cursor: pointer;
-  background: var(--color-gray);
-  transition: background 0.2s;
-  font-size: 18px;
-}
-
-.IEndButton:hover,
-.EndGameButton:hover,
-.StartRoundButton:hover,
-.StartButton:hover {
-  color: var(--color-white);
-  background: var(--color-highlight);
-}
-
-.StartButtonIsDisabled {
-  opacity: 0.4;
-}
-
-.StartButtonIsDisabled:hover {
-  cursor: default;
-  color: var(--color-black);
-  background: var(--color-gray);
 }
 
 .EndGameContainer,

@@ -328,23 +328,29 @@ const GameWrapper = ({}: GameWrapperProps) => {
 
   // UI ———————————————————————————————————————————————————
 
+  console.log(gameState);
+
   // Overarching for a game ———————————————————————————————
   if (gameState.hasEnded) {
-    <GameEndUI
-      players={gameState.players}
-      myPlayerID={myState.id}
-      onEndGame={handleEndGame}
-    />;
+    return (
+      <GameEndUI
+        players={gameState.players}
+        myPlayerID={myState.id}
+        onEndGame={handleEndGame}
+      />
+    );
   }
 
   if (!gameState.isRunning) {
-    <GameSetupUI
-      onNameChange={handleChangeName}
-      onPlayerToggle={handlePlayerToggle}
-      onStartGame={handleStartGame}
-      myPlayerID={myState.id}
-      players={gameState.players}
-    />;
+    return (
+      <GameSetupUI
+        onNameChange={handleChangeName}
+        onPlayerToggle={handlePlayerToggle}
+        onStartGame={handleStartGame}
+        myPlayerID={myState.id}
+        players={gameState.players}
+      />
+    );
   }
 
   // Overarching for a round ———————————————————————————————

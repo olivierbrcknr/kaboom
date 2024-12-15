@@ -31,12 +31,13 @@ $laptop_threshold: 1600px;
 }
 
 @mixin keyboard-focus($position: "outside") {
-  --focus-color: var(--color-highlight);
+  --focus-color: var(--color-select);
 
   z-index: 2;
 
   @if $position == "outside" {
-    outline: var(--focus-outline-width) solid var(--focus-color);
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
   }
 
   @if $position == "inside" {

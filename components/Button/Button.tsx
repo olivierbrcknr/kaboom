@@ -4,7 +4,7 @@ import clsx from "clsx";
 
 import styles from "./Button.module.scss";
 
-type ButtonTheme = "default" | "primary" | "alert";
+type ButtonTheme = "default" | "primary" | "red";
 
 interface ButtonProps {
   children?: string | string[] | React.JSX.Element;
@@ -27,7 +27,7 @@ const Button = ({
         styles.Button,
         disabled && styles.isDisabled,
         theme === "primary" && styles.themePrimary,
-        theme === "alert" && styles.themeAlert,
+        theme === "red" && styles.themeRed,
       )}
     >
       {children}

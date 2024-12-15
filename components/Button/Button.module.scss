@@ -1,36 +1,46 @@
 @import "../../styles/mixins";
 
 .Button {
+  @include button-reset;
   cursor: pointer;
-  border-radius: var(--border-radius-button);
+
   padding: 0.5em 0.7em;
 
   display: block;
   width: max-content;
 
+  border-radius: 8px;
+  min-width: 200px;
+
+  text-align: center;
+
+  background: var(--color-gray);
   transition: background 0.2s;
+  font-size: 18px;
 
   &:focus,
   &:hover {
     outline: none;
-    background: var(--btn-hover-bg-color);
+    color: var(--color-white);
+    background: var(--color-highlight);
   }
   &:active {
     background: var(--btn-active-bg-color);
   }
 
-  &.isDisabled {
-  }
-
-  :global(.keyboard-focus) &:focus {
-    @include keyboard-focus();
-  }
-
-  :global(.keyboard-focus) :global(.background--highlight) &:focus {
-    --focus-color: var(--highlight-color-font);
-  }
-
   :global(.keyboard-focus) &:focus {
     @include keyboard-focus;
+  }
+
+  &.isDisabled {
+    opacity: 0.4;
+  }
+
+  &.themeRed {
+    &:focus,
+    &:hover {
+      background: var(--color-red);
+      color: var(--color-white-STAY);
+    }
   }
 }
