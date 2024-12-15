@@ -6,7 +6,7 @@ import type {
   Player,
   FocusCard,
   Deck as DeckType,
-  Card,
+  Card as CardType,
   HandCard,
   PlayerID,
   CardEffect,
@@ -32,6 +32,26 @@ interface GameUIProps {
   onPlayerIsEndingRound: () => void;
   onStartRound: () => void;
   onEndGame: () => void;
+  onNextTurn: () => void;
+  playEffect: boolean;
+  onEndEffect: () => void;
+  onDrawCard: (v: CardPosition) => void;
+  onHighlightCard: (cards: HandCard[], action: CardHighlightType) => void;
+  onCardPlayed: (card: HandCard) => void;
+  onCardSwop: (
+    position: CardPosition,
+    card: HandCard,
+    secondCard?: HandCard | CardType,
+  ) => void;
+  onSwopCardsBetweenPlayers: (card1: HandCard, card2: HandCard) => void;
+  onCardFromDeckToGraveyard: () => void;
+  highlightDeck?: CardPosition;
+  highlightCards: {
+    cards: HandCard[];
+    type?: CardHighlightType;
+  };
+  focusCard?: FocusCard;
+  onSetFocusCard: (c: FocusCard) => void;
 }
 
 interface HighlightObject {
@@ -58,6 +78,19 @@ const GameUI = ({
   onPlayerIsEndingRound,
   onStartRound,
   onEndGame,
+  onNextTurn,
+  playEffect,
+  onEndEffect,
+  onDrawCard,
+  onHighlightCard,
+  onCardPlayed,
+  onCardSwop,
+  onSwopCardsBetweenPlayers,
+  onCardFromDeckToGraveyard,
+  highlightDeck,
+  highlightCards,
+  focusCard,
+  onSetFocusCard,
 }: GameUIProps) => {
   const [effectContainer, setEffectContainer] = useState<CardEffect>({
     cards: [],
@@ -69,18 +102,6 @@ const GameUI = ({
   const [highlight, setHighlight] = useState<HighlightObject>({
     ...emptyHighlight,
   });
-
-  const [focusCard, setFocusCard] = useState<FocusCard | undefined>(undefined);
-
-  const [swopHighlightCards, setSwopHighlightCards] = useState<{
-    cards: HandCard[];
-    type?: CardHighlightType;
-  }>({
-    cards: [],
-    type: undefined,
-  });
-
-  const [highlightDeck, setHighlightDeck] = useState(false);
 
   const isCurrentPlayer = roundState.currentPlayer === myPlayerID;
 
@@ -96,20 +117,6 @@ const GameUI = ({
       }, 500);
     }
   }, [roundState.isRunning]);
-
-  useEffect(() => {
-    // hide highlight after 2sec
-    if (swopHighlightCards.cards.length > 0) {
-      setTimeout(() => {
-        setSwopHighlightCards({
-          cards: [],
-          type: undefined,
-        });
-
-        setHighlightDeck(false);
-      }, 2000);
-    }
-  }, [swopHighlightCards]);
 
   useEffect(() => {
     if (isDev) console.log(deck);
@@ -133,7 +140,7 @@ const GameUI = ({
       });
 
       // empty focus card, just in case...
-      // setFocusCard({
+      // onSetFocusCard({
       //   value: null,
       //   color: null,
       //   position: null,
@@ -144,7 +151,8 @@ const GameUI = ({
       // });
 
       // turn off effect, just in case...
-      setPlayEffect(false);
+      // setPlayEffect(false);
+      onEndEffect();
 
       // empty effectContainer, just in case...
       setEffectContainer({
@@ -154,7 +162,7 @@ const GameUI = ({
         timer: 2000,
       });
     }
-  }, [roundState.isRunning]);
+  }, [roundState.isRunning, onEndEffect]);
 
   useEffect(() => {
     if (!focusCard) {
@@ -193,7 +201,10 @@ const GameUI = ({
           });
         } else {
           if (effectContainer.action === "swop") {
-            socket.emit("cardSwoppedBetweenPlayers", effectContainer.cards);
+            onSwopCardsBetweenPlayers(
+              effectContainer.cards[0],
+              effectContainer.cards[1],
+            );
           }
 
           // empty effect container again
@@ -206,14 +217,14 @@ const GameUI = ({
           });
 
           if (effectContainer.action !== "initialBottomRow") {
-            socket.emit("nextTurn");
+            onNextTurn();
           }
         }
       }, effectContainer.timer);
     }
   }, [effectContainer]);
 
-  const handleCardClick = (card: Card, isEffect = false) => {
+  const handleCardClick = (card: HandCard, isEffect = false) => {
     if (!isCurrentPlayer || !roundState.isRunning) {
       console.log("nenenenenenenene..");
       return;
@@ -225,51 +236,52 @@ const GameUI = ({
     }
 
     if (playEffect && isEffect) {
+      let newCards: HandCard[];
+
       switch (focusCard.value) {
         case 7:
         case 8:
         case 9:
         case 10:
           if (effectContainer.cards.length < 1) {
-            var cards = [card];
+            newCards = [card];
             setEffectContainer({
-              cards: cards,
+              cards: newCards,
               action: "lookAt",
               needsInteraction: false,
               timer: 2000,
             });
-            socket.emit("highlightCard", cards, "lookAt");
+            onHighlightCard(newCards, "lookAt");
           }
           break;
 
         case "J":
         case "Q":
-          var cards = effectContainer.cards;
-          cards.push(card);
+          newCards = [...effectContainer.cards, card];
           setEffectContainer({
-            cards: cards,
+            cards: newCards,
             action: "swop",
-            needsInteraction: cards.length < 2 ? true : false,
+            needsInteraction: newCards.length < 2 ? true : false,
             timer: 500,
           });
           break;
 
         case "K":
-          var cards = effectContainer.cards;
-          cards.push(card);
-          if (effectContainer.action !== "swop" && cards.length <= 1) {
+          newCards = effectContainer.cards;
+          newCards.push(card);
+          if (effectContainer.action !== "swop" && newCards.length <= 1) {
             setEffectContainer({
-              cards: cards,
+              cards: newCards,
               action: "lookAtKing",
               needsInteraction: false,
               timer: 2000,
             });
-            socket.emit("highlightCard", cards, "lookAt");
+            onHighlightCard(newCards, "lookAt");
           } else {
             setEffectContainer({
-              cards: cards,
+              cards: newCards,
               action: "swop",
-              needsInteraction: cards.length < 2 ? true : false,
+              needsInteraction: newCards.length < 2,
               timer: 500,
             });
           }
@@ -280,34 +292,34 @@ const GameUI = ({
           break;
       }
     } else if (playEffect && !isEffect) {
-      socket.emit("cardPlayed", card);
+      onCardPlayed(card);
     } else {
       switch (focusCard.position) {
         // swopped with deck
         case "deck":
-          socket.emit("cardSwoppedFromDeck", card);
-          socket.emit("nextTurn");
+          onCardSwop("deck", card);
+          onNextTurn();
           break;
 
         // swopped with graveyard
         case "graveyard":
-          socket.emit("cardSwoppedFromGraveyard", card);
-          socket.emit("nextTurn");
+          onCardSwop("graveyard", card);
+          onNextTurn();
           break;
 
         // select to swop
         case "swop":
-          socket.emit("cardShiftedToPlayer", card, focusCard);
-          setFocusCard({
+          onCardSwop("swop", card, focusCard as CardType);
+          onSetFocusCard({
             ...focusCard,
-            position: null,
+            position: undefined,
           });
 
           break;
 
         // regular getting rid of card
         default:
-          socket.emit("cardPlayed", card);
+          onCardPlayed(card);
           break;
       }
     }
@@ -325,12 +337,12 @@ const GameUI = ({
     }
 
     // @ts-ignore
-    setFocusCard({
+    onSetFocusCard({
       ...deck.deck[0],
       position: "deck",
     });
 
-    socket.emit("drawCard", "deck");
+    onDrawCard("deck");
   };
 
   const handleGraveyardClick = () => {
@@ -349,19 +361,15 @@ const GameUI = ({
     }
 
     if (focusCard.position === "deck") {
-      socket.emit("drawCard", false);
-      socket.emit("cardFromDeckToGraveyard");
+      onDrawCard("deck"); // onDrawCard(false);
+      onCardFromDeckToGraveyard();
 
       // regular getting rid of card
-    } else if (
-      myPlayerID === currentPlayer &&
-      roundState.isRunning &&
-      !focusCard.value
-    ) {
-      socket.emit("drawCard", "graveyard");
+    } else if (isCurrentPlayer && roundState.isRunning && !focusCard.value) {
+      onDrawCard("graveyard");
 
       // @ts-ignore
-      setFocusCard({
+      onSetFocusCard({
         ...deck.graveyard[deck.graveyard.length - 1],
         position: "graveyard",
       });
@@ -407,7 +415,7 @@ const GameUI = ({
       default:
         // nothing, end turn
         highlightChanged = false;
-        socket.emit("nextTurn");
+        onNextTurn();
         break;
     }
 
@@ -416,65 +424,11 @@ const GameUI = ({
     }
   };
 
-  let playerUIs: (React.JSX.Element | null)[] | null = null;
   const myPos = gameState.players.findIndex((p) => p.id === myPlayerID);
-
   let playerNo = 0;
-
-  playerUIs = gameState.players.map((p, k) => {
-    if (p.isPlaying === false) {
-      return null;
-    }
-
-    if (!deck) {
-      console.log("Deck is not defined");
-      return null;
-    }
-
-    let isHighlight = highlight.otherCards;
-    let cards: Card[] = [];
-    let isSelf = false;
-
-    if (deck.hand) {
-      cards = deck.hand.filter((c) => c.player === p.id);
-    }
-
-    if (p.id == myPlayerID) {
-      isHighlight = highlight.ownCards;
-      isSelf = true;
-    }
-
-    if (p.isPlaying) {
-      playerNo++;
-    }
-
-    return (
-      <PlayerUI
-        key={"player-no_" + k}
-        effect={effectContainer}
-        swopHighlight={swopHighlightCards}
-        startingPos={myPos}
-        playerNo={playerNo - 1}
-        player={p}
-        isMainPlayer={isSelf}
-        isEndingPlayer={roundState.isLastRound === p.id}
-        isCurrent={isCurrentPlayer && roundState.isRunning}
-        cards={cards}
-        spectatorMode={
-          /*!isCurrentPlayer || isDev || */ !roundState.isRunning ? true : false
-        }
-        onClick={handleCardClick}
-        isHighlight={isHighlight}
-        isHighlightDueToEffect={highlight.dueToEffect}
-      />
-    );
-  });
-
-  let effectDisplay: React.JSX.Element | null = null;
+  let effectDisplayText = "";
 
   if (playEffect) {
-    let effectDisplayText: string | null = null;
-
     switch (deck.graveyard[deck.graveyard.length - 1].value) {
       case 7:
       case 8:
@@ -499,15 +453,62 @@ const GameUI = ({
         // display nothing
         break;
     }
-
-    effectDisplay = (
-      <div className={styles.EffectDisplay}>{effectDisplayText}</div>
-    );
   }
 
   return (
     <div className={clsx(styles.Game)}>
-      <div className={styles.PlayerUIsContainer}>{playerUIs}</div>
+      <div className={styles.PlayerUIsContainer}>
+        {gameState.players.map((p, k) => {
+          if (p.isPlaying === false) {
+            return null;
+          }
+
+          if (!deck) {
+            console.log("Deck is not defined");
+            return null;
+          }
+
+          let isHighlight = highlight.otherCards;
+          let cards: HandCard[] = [];
+          let isSelf = false;
+
+          if (deck.hand) {
+            cards = deck.hand.filter((c) => c.player === p.id);
+          }
+
+          if (p.id == myPlayerID) {
+            isHighlight = highlight.ownCards;
+            isSelf = true;
+          }
+
+          if (p.isPlaying) {
+            playerNo++;
+          }
+
+          return (
+            <PlayerUI
+              key={"player-no_" + k}
+              effect={effectContainer}
+              swopHighlight={highlightCards}
+              startingPos={myPos}
+              playerNo={playerNo - 1}
+              player={p}
+              isMainPlayer={isSelf}
+              isEndingPlayer={roundState.isLastRound === p.id}
+              isCurrent={isCurrentPlayer && roundState.isRunning}
+              cards={cards}
+              spectatorMode={
+                /*!isCurrentPlayer || isDev || */ !roundState.isRunning
+                  ? true
+                  : false
+              }
+              onClick={handleCardClick}
+              isHighlight={isHighlight}
+              isHighlightDueToEffect={highlight.dueToEffect}
+            />
+          );
+        })}
+      </div>
 
       <Deck
         deck={deck}
@@ -515,10 +516,12 @@ const GameUI = ({
         clickGraveyard={handleGraveyardClick}
         isCurrent={isCurrentPlayer && roundState.isRunning}
         isHighlight={highlight}
-        swopHighlight={highlightDeck}
+        // swopHighlight={highlightDeck}
       />
 
-      {effectDisplay}
+      {playEffect && (
+        <div className={styles.EffectDisplay}>{effectDisplayText}</div>
+      )}
 
       {roundState.isLastRound ? (
         <div className={styles.LastRoundIndicator}>Last Round</div>

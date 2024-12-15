@@ -21,11 +21,11 @@ type CardActions =
   | "initialBottomRow"
   | "endRound";
 
-type CardPosition = "deck" | "swop" | "graveyard" | null;
+type CardPosition = "deck" | "swop" | "graveyard"; // | null;
 
-type CardHighlightType = "swop" | "drew";
+type CardHighlightType = "swop" | "drew" | "lookAt";
 
-type CardColor = 0 | 1 | 2 | 3;
+type CardColor = 0 | 1 | 2 | 3 | null; // Color null = joker
 
 type CardSlot = { x: number; y: number };
 
@@ -53,8 +53,8 @@ type Card = {
 };
 
 interface FocusCard extends Card {
-  position: CardPosition;
-  slot: CardSlot;
+  position?: CardPosition;
+  slot?: CardSlot;
 }
 
 interface HandCard extends Card {

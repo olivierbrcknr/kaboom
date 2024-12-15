@@ -9,12 +9,12 @@
     "start": "NODE_ENV=production npx tsx server/server.ts",
     "dev:next": "next dev",
     "build": "next build",
-    "predev": "next build",
     "prettier": "prettier --write './**/*.{t,j}s{,x}'",
     "lint": "npx eslint './**/*.{t,j}s{,x}'",
     "lint-fix": "npx eslint './**/*.{j,t}s{,x}' --fix"
   },
   "dependencies": {
+    "@radix-ui/react-toggle": "^1.1.1",
     "@svgr/webpack": "^8.1.0",
     "clsx": "^2.1.1",
     "console-log-colors": "^0.5.0",

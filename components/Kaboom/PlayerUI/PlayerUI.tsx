@@ -13,7 +13,7 @@ import styles from "./PlayerUI.module.scss";
 
 interface PlayerUIProps {
   effect: CardEffect;
-  swopHighlight: { cards: CardType[]; type?: CardHighlightType };
+  swopHighlight: { cards: HandCard[]; type?: CardHighlightType };
   startingPos: number;
   playerNo: number;
   player: Player;
@@ -22,7 +22,7 @@ interface PlayerUIProps {
   isCurrent: boolean;
   cards: HandCard[];
   spectatorMode: boolean;
-  onClick: (card: CardType, triggeringEffect: boolean) => void;
+  onClick: (card: HandCard, triggeringEffect: boolean) => void;
   isHighlight: boolean;
   isHighlightDueToEffect: boolean;
 }

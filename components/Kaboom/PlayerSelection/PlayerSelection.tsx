@@ -1,6 +1,7 @@
 import clsx from "clsx";
 
 import type { Player, PlayerID } from "../../../types";
+import Toggle from "../../Toggle";
 
 import styles from "./PlayerSelection.module.scss";
 
@@ -37,12 +38,16 @@ const PlayerSelection = ({
               ) : (
                 <div className={styles.PlayerName}>{p.name}</div>
               )}
-              <div
+              <Toggle
+                value={p.isPlaying}
+                onChange={() => onPlayerToggle(p.id)}
+              />
+              {/* <div
                 onClick={() => onPlayerToggle(p.id)}
                 className={clsx(styles.Toggle, p.isPlaying && styles.ToggleOn)}
               >
                 <div className={styles.ToggleKnob}></div>
-              </div>
+              </div>*/}
             </li>
           );
         })}
