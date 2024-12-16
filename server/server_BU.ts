@@ -5,6 +5,17 @@ import { createServer } from "http";
 import next from "next";
 import { Server } from "socket.io";
 
+import type {
+  PlayerID,
+  Player,
+  Card,
+  HandCard,
+  CardPosition,
+  CardHighlightType,
+} from "../types";
+import { isDev } from "../utils";
+
+import { createDefault, distribute, checkNextPlayer } from "./deckFunctions";
 import {
   checkIfPlayable,
   swopCardFromDeck,
@@ -15,21 +26,7 @@ import {
   cardSwoppedBetweenPlayers,
   calcIfEnded,
   checkIfPlayerHasZeroCards,
-} from "../kaboom/kaboomRules";
-import type {
-  PlayerID,
-  Player,
-  Card,
-  HandCard,
-  CardPosition,
-  CardHighlightType,
-  GameStateType,
-  RoundStateType,
-  TurnStateType,
-} from "../kaboom/types";
-import { isDev } from "../utils";
-
-import { createDefault, distribute, checkNextPlayer } from "./deckFunctions";
+} from "./kaboomRules";
 
 const app: Express = express();
 app.use(cors());
@@ -147,8 +144,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("initialSetup", () => {
-    const thisIndex = players.findIndex((p) => p.id === socket.id);
-    const playerName = players[thisIndex].name;
+    const thisSIndex = players.findIndex((p) => p.id === socket.id);
+    const playerName = players[thisSIndex].name;
 
     console.log("inital setup sent to " + playerName);
 

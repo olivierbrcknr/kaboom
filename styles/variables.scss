@@ -43,11 +43,12 @@
   --grid-unit: 1vw;
   --max-width: 1200px;
 
-  --card-width: clamp(20px, 8.5vw, 80px);
+  --card-width: clamp(20px, 7.8vw, 80px);
   --card-height: calc(var(--card-width) * 1.4);
   --card-margin: calc(var(--card-width) * 0.2);
 
-  --card-border-radius: calc(var(--card-width) * 0.03);
+  --card-border-width: 2px;
+  --card-border-radius: 4px;
 
   --rules-width: 320px;
 }

@@ -5,4 +5,5 @@ export {
   useIsMobile,
   useIsMaxScreen,
   useIsWindows,
+  isDev,
 } from "./hooks";

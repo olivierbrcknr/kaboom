@@ -1,10 +1,12 @@
+import eslintPluginReact from "eslint-plugin-react";
+
 import eslintPluginNext from "@next/eslint-plugin-next";
 import tsParser from "@typescript-eslint/parser";
-import eslintPluginReact from "eslint-plugin-react";
 import perfectionist from "eslint-plugin-perfectionist";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
 export default [
+  { ignores: ["node_modules/*", ".next/*"] },
   {
     plugins: {
       eslintPluginNext,
@@ -25,6 +27,7 @@ export default [
           caughtErrors: "all",
           ignoreRestSiblings: false,
           reportUsedIgnorePattern: false,
+          varsIgnorePattern: "exhaustiveCheck",
         },
       ],
       "prefer-const": ["warn"],

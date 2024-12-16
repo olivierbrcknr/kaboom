@@ -5,8 +5,7 @@ import type {
   HandCard,
   CardColor,
   Player,
-  PlayerID,
-} from "../kaboom/types";
+} from "../types";
 
 const positionCard = (
   id: number,
@@ -210,21 +209,6 @@ const checkNextPlayer = (players: Player[], currentPlayer: number) => {
   return nextPlayer;
 };
 
-const getNextPlayer = (
-  players: Player[],
-  currentPlayer: PlayerID,
-): PlayerID => {
-  const playingPlayers = players.filter((p) => p.isPlaying);
-  const lastIndex = playingPlayers.findIndex((p) => p.id === currentPlayer);
-
-  // get to first if not last
-  if (lastIndex < playingPlayers.length - 1) {
-    return playingPlayers[lastIndex + 1].id;
-  } else {
-    return playingPlayers[0].id;
-  }
-};
-
 export {
   createDefaultCardSet as createDefault,
   shuffleDeck as shuffle,
@@ -232,5 +216,4 @@ export {
   positionCard,
   checkDeck,
   checkNextPlayer,
-  getNextPlayer,
 };

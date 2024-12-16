@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 
 import clsx from "clsx";
 
+import {
+  type HighlightObject,
+  cardRules,
+  emptyHighlight,
+} from "../../../kaboom/ruleHelpers";
 import type {
   Player,
   FocusCard,
@@ -12,14 +17,14 @@ import type {
   CardEffect,
   CardPosition,
   CardHighlightType,
-} from "../../../types";
+  GameStateType,
+  RoundStateType,
+  TurnStateType,
+} from "../../../kaboom/types";
 import Button from "../../Button";
 import Deck from "../Deck";
 import DisplayPlayers from "../DisplayPlayers";
 import PlayerUI from "../PlayerUI";
-
-import { type RoundStateType, type GameStateType } from "./utils";
-import { type HighlightObject, cardRules, emptyHighlight } from "./ruleHelpers";
 
 import styles from "./Game.module.scss";
 
@@ -53,6 +58,8 @@ interface GameUIProps {
   };
   selectedCard?: FocusCard;
   onSetSelectedCard: (c: FocusCard | undefined) => void;
+  players: Player[];
+  turnState: TurnStateType;
 }
 
 const emptyClickableAreas: HighlightObject = { ...emptyHighlight };
@@ -78,6 +85,8 @@ const GameUI = ({
   highlightCards,
   selectedCard,
   onSetSelectedCard,
+  players,
+  turnState,
 }: GameUIProps) => {
   const [effectContainer, setEffectContainer] = useState<CardEffect>({
     cards: [],
@@ -94,7 +103,7 @@ const GameUI = ({
     ...emptyClickableAreas,
   });
 
-  const isCurrentPlayer = roundState.currentPlayer === myPlayerID;
+  const isCurrentPlayer = turnState.currentPlayer === myPlayerID;
 
   useEffect(() => {
     if (roundState.isRunning) {
@@ -372,7 +381,7 @@ const GameUI = ({
     }
   };
 
-  const myPos = gameState.players.findIndex((p) => p.id === myPlayerID);
+  const myPos = players.findIndex((p) => p.id === myPlayerID);
   let playerNo = 0;
   let effectDisplayText = "";
 
@@ -390,7 +399,7 @@ const GameUI = ({
   return (
     <div className={clsx(styles.Game)}>
       <div className={styles.PlayerUIsContainer}>
-        {gameState.players.map((p, k) => {
+        {players.map((p, k) => {
           if (p.isPlaying === false) return null;
 
           if (!deck) {
@@ -424,9 +433,9 @@ const GameUI = ({
               playerNo={playerNo - 1}
               player={p}
               isMainPlayer={isSelf}
-              isEndingPlayer={roundState.isLastRound === p.id}
+              isEndingPlayer={roundState.lastRoundStartedByPlayer === p.id}
               isCurrent={
-                p.id === roundState.currentPlayer && roundState.isRunning
+                p.id === turnState.currentPlayer && roundState.isRunning
               }
               cards={cards}
               spectatorMode={spectatorMode}
@@ -458,9 +467,9 @@ const GameUI = ({
 
       <DisplayPlayers
         id={myPlayerID}
-        currentPlayerId={roundState.currentPlayer}
+        currentPlayerId={turnState.currentPlayer}
         gameIsRunning={roundState.isRunning}
-        players={gameState.players}
+        players={players}
       />
 
       {isCurrentPlayer &&

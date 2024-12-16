@@ -5,7 +5,7 @@
 
   width: var(--card-width);
   height: var(--card-height);
-  border: solid 2px var(--color-black);
+  border: solid var(--card-border-width) var(--color-black);
   background-color: var(--color-white);
   border-radius: var(--card-border-radius);
 
@@ -26,8 +26,8 @@
       var(--card-pos-x)
   );
   top: calc(
-    var(--card-margin) * (0.75) + (var(--card-height) + var(--card-margin)) *
-      var(--card-pos-y)
+    var(--card-margin) - var(--card-border-width) * 2 +
+      (var(--card-height) + var(--card-margin)) * var(--card-pos-y)
   );
 }
 
@@ -70,12 +70,12 @@
 }
 
 .isClickable {
-  box-shadow: var(--color-highlight) 0px 0px 0px 2px;
+  box-shadow: var(--color-highlight) 0px 0px 0px 3px;
   cursor: pointer;
 }
 
 .Card.isClickable:hover {
-  box-shadow: var(--color-interaction) 0px 0px 0px 4px;
+  box-shadow: var(--color-interaction) 0px 0px 0px 6px;
 }
 
 .Inner {

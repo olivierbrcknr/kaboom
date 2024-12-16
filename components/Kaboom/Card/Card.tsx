@@ -4,7 +4,7 @@ import {
   isHandCard,
   type HandCard,
   type Card as CardType,
-} from "../../../types";
+} from "../../../kaboom/types";
 
 import styles from "./Card.module.scss";
 
