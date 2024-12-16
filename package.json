@@ -5,8 +5,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development npx tsx server/server.ts",
-    "start": "NODE_ENV=production npx tsx server/server.ts",
+    "dev": "NODE_ENV=development npx tsx server/kaboom.ts",
+    "start": "NODE_ENV=production npx tsx server/kaboom.ts",
     "dev:next": "next dev",
     "build": "next build",
     "prettier": "prettier --write './**/*.{t,j}s{,x}'",

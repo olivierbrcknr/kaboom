@@ -2,7 +2,7 @@ import React from "react";
 
 import clsx from "clsx";
 
-import type { Player, PlayerID } from "../../../types";
+import type { Player, PlayerID } from "../../../kaboom/types";
 import Button from "../../Button";
 import PlayerSelection from "../PlayerSelection";
 

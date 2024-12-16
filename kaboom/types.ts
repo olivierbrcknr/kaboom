@@ -77,6 +77,37 @@ const isHandCard = (value: any): value is HandCard => {
   );
 };
 
+// TODO: need to add round values
+type GameStateType = {
+  // players: Player[];
+  isRunning: boolean;
+  hasEnded: boolean;
+  roundCount: number;
+  // roundScores: {
+  //   player: PlayerID;
+  //   score: number;
+  // }[][];
+};
+
+type RoundStateType = {
+  turnCount: number;
+  startingPlayer: PlayerID;
+  isLastRound: boolean;
+  lastRoundStartedByPlayer?: PlayerID;
+  isRunning: boolean;
+};
+
+const roundPhases = ["draw", "effect", "end"] as const;
+type RoundPhase = (typeof roundPhases)[number];
+
+// type RoundPhase = "draw" | "effect" | "end";
+
+type TurnStateType = {
+  currentPlayer: PlayerID;
+  phase: RoundPhase;
+  playedCard?: Card;
+};
+
 export { isHandCard };
 
 export type {
@@ -93,4 +124,9 @@ export type {
   CardActions,
   CardEffect,
   CardHighlightType,
+  GameStateType,
+  RoundStateType,
+  roundPhases,
+  RoundPhase,
+  TurnStateType,
 };

@@ -10,7 +10,7 @@ import type {
   CardHighlightType,
   CardValue,
   CardActions,
-} from "../../../types";
+} from "./types";
 
 export interface HighlightObject {
   deck: boolean;
