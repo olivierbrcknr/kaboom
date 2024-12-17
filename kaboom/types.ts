@@ -21,6 +21,8 @@ type CardActions =
   | "initialBottomRow"
   | "endRound";
 
+type DeckType = "deck" | "graveyard";
+
 type CardPosition = "deck" | "swop" | "graveyard"; // | null;
 
 type CardHighlightType = "swop" | "drew" | "lookAt";
@@ -68,6 +70,11 @@ type Deck = {
   graveyard: Card[];
 };
 
+type HighlightCard = {
+  id: number | DeckType;
+  type: CardHighlightType;
+};
+
 const isHandCard = (value: any): value is HandCard => {
   return (
     value &&
@@ -97,7 +104,7 @@ type RoundStateType = {
   isRunning: boolean;
 };
 
-const roundPhases = ["draw", "effect", "end"] as const;
+const roundPhases = ["draw", "card in hand", "effect", "end"] as const;
 type RoundPhase = (typeof roundPhases)[number];
 
 // type RoundPhase = "draw" | "effect" | "end";
@@ -129,4 +136,6 @@ export type {
   roundPhases,
   RoundPhase,
   TurnStateType,
+  DeckType,
+  HighlightCard,
 };

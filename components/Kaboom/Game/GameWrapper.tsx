@@ -40,6 +40,7 @@ const GameWrapper = ({}: GameWrapperProps) => {
     socket,
     turnState,
     players,
+    handleExitGame,
   } = useGame();
 
   // UI ———————————————————————————————————————————————————
@@ -62,7 +63,7 @@ const GameWrapper = ({}: GameWrapperProps) => {
       <GameEndUI
         players={players}
         myPlayerID={myState.id}
-        onEndGame={handleEndGame}
+        onExitGame={handleExitGame}
       />
     );
   }
