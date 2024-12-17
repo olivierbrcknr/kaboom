@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import type {
   Player,
   FocusCard,
-  Deck as DeckType,
-  Card as CardType,
+  Deck,
+  DeckType,
+  Card,
   HandCard,
   PlayerID,
   CardPosition,
@@ -12,6 +13,7 @@ import type {
   GameStateType,
   RoundStateType,
   TurnStateType,
+  HighlightCard,
 } from "../../../kaboom/types";
 
 import { useSocket, isSocket } from "./socket";
@@ -35,7 +37,7 @@ export const useGame = () => {
     roundCount: 0,
   });
 
-  // round state
+  // round state = multiple turns
   const [roundState, setRoundState] = useState<RoundStateType>({
     isRunning: false,
     turnCount: 0,
@@ -44,13 +46,14 @@ export const useGame = () => {
     lastRoundStartedByPlayer: undefined,
   });
 
+  // turn state
   const [turnState, setTurnState] = useState<TurnStateType>({
     currentPlayer: "",
     phase: "draw",
     playedCard: undefined,
   });
 
-  const [currentDeck, setCurrentDeck] = useState<DeckType>();
+  const [currentDeck, setCurrentDeck] = useState<Deck>();
 
   const [playEffect, setPlayEffect] = useState(false);
 
@@ -58,13 +61,7 @@ export const useGame = () => {
     undefined,
   );
 
-  const [highlightCards, setHighlightCards] = useState<{
-    cards: HandCard[];
-    type?: CardHighlightType;
-  }>({
-    cards: [],
-    type: undefined,
-  });
+  const [highlightCards, setHighlightCards] = useState<HighlightCard[]>([]);
 
   const [selectedCard, setSelectedCard] = useState<FocusCard | undefined>(
     undefined,
@@ -76,7 +73,7 @@ export const useGame = () => {
 
   useEffect(() => {
     if (socket === null) {
-      console.log("socket not set up");
+      console.log("socket not set up yet");
       return;
     }
 
@@ -100,18 +97,16 @@ export const useGame = () => {
         name: myPlayerData.name,
       });
 
-      // setGameState((gs) => ({
-      //   ...gs,
-      //   players: data,
-      // }));
-
       setPlayers(data);
     });
 
-    socket.on("getDeck", (data: DeckType) => setCurrentDeck(data));
+    socket.on("getDeck", (data: Deck) => setCurrentDeck(data));
     socket.on("getGameState", (data: GameStateType) => setGameState(data));
     socket.on("getRoundState", (data: RoundStateType) => setRoundState(data));
     socket.on("getTurnState", (data: TurnStateType) => setTurnState(data));
+    socket.on("getHighlightCards", (data: HighlightCard[]) =>
+      setHighlightCards(data),
+    );
 
     return () => {
       socket.off("getPlayers");
@@ -119,9 +114,11 @@ export const useGame = () => {
       socket.off("getGameState");
       socket.off("getRoundState");
       socket.off("getTurnState");
+      socket.off("getHighlightCards");
     };
   }, [socket]);
 
+  /*
   useEffect(() => {
     // hide highlight after 2sec
     if (highlightCards.cards.length > 0) {
@@ -135,6 +132,9 @@ export const useGame = () => {
       }, 2000);
     }
   }, [highlightCards]);
+  */
+
+  // Player Control —————————————————————————————————————————
 
   const handleChangeName = (v: string) => {
     if (isSocket(socket)) {
@@ -148,48 +148,38 @@ export const useGame = () => {
     }
   };
 
+  // Game and Round Controls ————————————————————————————————
+
+  // Game
   const handleStartGame = () => {
     console.log("Start Game");
-    if (isSocket(socket)) {
-      socket.emit("startGame");
-    }
+    isSocket(socket) && socket.emit("startGame");
   };
 
   const handleEndGame = () => {
-    if (isSocket(socket)) {
-      socket.emit("endGame");
-    }
+    isSocket(socket) && socket.emit("endGame");
   };
 
-  // not needed anymore?
+  const handleExitGame = () => {
+    isSocket(socket) && socket.emit("exitGame");
+  };
+
+  // Round
+  const handleStartRound = () => {
+    isSocket(socket) && socket.emit("startRound");
+  };
+
   const handlePlayerIsEnding = () => {
-    if (isSocket(socket) && myState.id) {
-      socket.emit("playerIsEnding", myState.id);
-    }
+    isSocket(socket) && myState.id && socket.emit("playerIsEnding", myState.id);
   };
 
   const handleEndRound = () => {
-    if (isSocket(socket)) {
-      socket.emit("endRound", myState.id);
-    }
+    isSocket(socket) && socket.emit("endRoundByPlayer", myState.id);
   };
 
-  const handleStartRound = () => {
-    if (isSocket(socket)) {
-      socket.emit("startRound");
-    }
-  };
-
-  const handleDrawCard = (position: CardPosition) => {
-    if (isSocket(socket)) {
-      socket.emit("drawCard", position);
-    }
-  };
-
+  // Turn
   const handleNextTurn = () => {
-    if (isSocket(socket)) {
-      socket.emit("nextTurn");
-    }
+    isSocket(socket) && socket.emit("nextTurn");
   };
 
   // const handleEffect = (action: CardActions) => {
@@ -210,6 +200,12 @@ export const useGame = () => {
   //       break;
   //   }
   // };
+
+  // Card Effects ———————————————————————————————————————————
+
+  const handleDrawCard = (position: CardPosition) => {
+    isSocket(socket) && socket.emit("drawCard", position);
+  };
 
   const handleEndEffect = () => {
     setPlayEffect(false);
@@ -233,7 +229,7 @@ export const useGame = () => {
   const handleCardSwop = (
     position: CardPosition,
     card: HandCard,
-    secondCard?: HandCard | CardType,
+    secondCard?: HandCard | Card,
   ) => {
     if (isSocket(socket)) {
       switch (position) {
@@ -265,26 +261,43 @@ export const useGame = () => {
     }
   };
 
-  // rules ————————————————————————————————————————————————
-  // end automatically if no more cards on hand
-  useEffect(() => {
-    if (!currentDeck) {
-      console.log("no deck yet");
-      return;
+  // card clicks ————————————————————————————————————————————————
+
+  const handlePlayerCardClick = (card: HandCard) => {
+    // if is "effect" phase and is selectable due to effect
+    // ################################
+    // if is not selectable
+    // --> is matching with graveyard --> start this
+    // --> is not matching with graveyard --> penalty
+    // ################################
+  };
+
+  const handleDeckClick = (type: DeckType) => {
+    if (type === "deck") {
+    } else {
+      // graveyard
     }
 
-    // TODO: Check if still relevant to do this complicated
-    let cardsOnHand = 0;
-    for (let i = 0; i < currentDeck.hand.length; i++) {
-      if (currentDeck.hand[i].player === myState.id) {
-        cardsOnHand++;
-      }
+    // if is "draw" phase
+    // ################################
+    switch (turnState.phase) {
+      case "draw":
+        break;
+
+      case "card in hand":
+        break;
+
+      default:
+        break;
     }
-    // console.log('I have '+cardsOnHand+' on my hand')
-    if (cardsOnHand === 0) {
-      handlePlayerIsEnding();
-    }
-  }, [myState.id, currentDeck?.hand]);
+
+    // if is "card in hand" phase
+    // ################################
+
+    // else --> do nothing
+    // ################################
+  };
+
   return {
     myState,
     gameState,
@@ -313,5 +326,8 @@ export const useGame = () => {
     socket,
     turnState,
     players,
+    handleExitGame,
+    handleDeckClick,
+    handlePlayerCardClick,
   };
 };

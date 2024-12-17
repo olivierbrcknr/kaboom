@@ -42,7 +42,11 @@ const GameSetupUI = ({
         players={players}
       />
 
-      <Button onClick={onStartGame} disabled={playingPlayers < 2}>
+      <Button
+        theme="primary"
+        onClick={onStartGame}
+        disabled={playingPlayers < 2}
+      >
         Start Game
       </Button>
 

@@ -1,24 +1,24 @@
 import clsx from "clsx";
 
-import type { Player, PlayerID } from "../../../types";
+import type { Player, PlayerID } from "../../../kaboom/types";
 
-import styles from "./DisplayPlayers.module.scss";
+import styles from "./ScoreDisplay.module.scss";
 
-interface DisplayPlayersProps {
+interface ScoreDisplayProps {
   id: PlayerID;
   currentPlayerId?: PlayerID;
   gameIsRunning: boolean;
   players: Player[];
 }
 
-const DisplayPlayers = ({
+const ScoreDisplay = ({
   currentPlayerId,
   gameIsRunning,
   id,
   players,
-}: DisplayPlayersProps) => {
+}: ScoreDisplayProps) => {
   return (
-    <div className={clsx(styles.DisplayPlayers)}>
+    <div className={clsx(styles.ScoreDisplay)}>
       <ul>
         {players.map((p) => {
           // Hide players that are not playing
@@ -49,4 +49,4 @@ const DisplayPlayers = ({
   );
 };
 
-export default DisplayPlayers;
+export default ScoreDisplay;

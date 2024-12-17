@@ -10,10 +10,10 @@ import styles from "./Game.module.scss";
 interface GameEndUIProps {
   players: Player[];
   myPlayerID: PlayerID;
-  onEndGame: () => void;
+  onExitGame: () => void;
 }
 
-const GameEndUI = ({ players, myPlayerID, onEndGame }: GameEndUIProps) => {
+const GameEndUI = ({ players, myPlayerID, onExitGame }: GameEndUIProps) => {
   const podiumPlayers = players.sort((p1, p2) => {
     let comparison = 0;
     if (p1.points > p2.points) {
@@ -38,9 +38,9 @@ const GameEndUI = ({ players, myPlayerID, onEndGame }: GameEndUIProps) => {
           );
         })}
       </ol>
-      <Button onClick={onEndGame}>End Game</Button>
+      <Button onClick={onExitGame}>Exit Game</Button>
 
-      {/* <div className={styles.EndGameButton} onClick={onEndGame}>
+      {/* <div className={styles.EndGameButton} onClick={onExitGame}>
         End Game
       </div>*/}
     </div>

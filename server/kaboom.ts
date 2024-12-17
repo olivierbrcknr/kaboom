@@ -17,6 +17,7 @@ import type {
   RoundStateType,
   TurnStateType,
   Deck,
+  HighlightCard,
 } from "../kaboom/types";
 
 import {
@@ -71,6 +72,9 @@ const turnStateInit: TurnStateType = {
 
 let turnState: TurnStateType = { ...turnStateInit };
 
+/** the cards that should be highlighted */
+let highlightCards: HighlightCard[] = [];
+
 /** The ID of the player who's card was played last */
 let lastFiredCardStack: PlayerID | false = false;
 
@@ -104,9 +108,16 @@ nextApp.prepare().then(() => {
 // socket.io server
 io.on("connection", (socket) => {
   // Turn Functions —————————————————————————————————————————
-  const initPhaseDrawCard = () => {
-    // const nextPlayer = getNextPlayer(players, turnState.currentPlayer);
-    // turnState = { ...turnStateInit, currentPlayer: nextPlayer };
+  // const initPhaseDrawCard = () => {
+  // const nextPlayer = getNextPlayer(players, turnState.currentPlayer);
+  // turnState = { ...turnStateInit, currentPlayer: nextPlayer };
+  // };
+
+  const initPhaseCardInHand = () => {
+    turnState.phase = "card in hand";
+    sendTurnState();
+
+    // wait for click
   };
 
   const initPhaseEffect = () => {
@@ -129,17 +140,20 @@ io.on("connection", (socket) => {
     turnState.phase = "end";
     sendTurnState();
 
+    // send highlight for cards where an effect has been applied
+    sendHighlightCards();
+
     // check if round is done
     const isEndRound = checkIfPlayerHasZeroCards(players, deck);
 
     if (isEndRound) {
-      endRound();
+      // end round because player has zero cards
+      endRound(false, turnState.currentPlayer);
       return;
     }
 
     // send round state
     roundState.turnCount += 1;
-    console.log(roundState.turnCount);
     sendRoundState();
 
     // next round
@@ -151,6 +165,9 @@ io.on("connection", (socket) => {
 
     switch (currentPhase) {
       case "draw":
+        initPhaseCardInHand();
+        break;
+      case "card in hand":
         initPhaseEffect();
         break;
       case "effect":
@@ -167,6 +184,7 @@ io.on("connection", (socket) => {
     }
   };
 
+  /** The beginning of a turn. Also the beginngin of the "draw" phase. */
   const initTurn = () => {
     // set turn to init
     let nextPlayer = getNextPlayer(players, turnState.currentPlayer);
@@ -174,6 +192,9 @@ io.on("connection", (socket) => {
       nextPlayer = roundState.startingPlayer;
     }
     turnState = { ...turnStateInit, currentPlayer: nextPlayer };
+
+    // empty highlight cards
+    highlightCards = [];
 
     sendTurnState();
 
@@ -251,8 +272,14 @@ io.on("connection", (socket) => {
   const endGame = () => {
     // get game results
     gameState.isRunning = false;
+    gameState.hasEnded = true;
 
     // send state to show final screen
+    sendGameState();
+  };
+
+  const exitGame = () => {
+    gameState = { ...gameStateInit };
     sendGameState();
   };
 
@@ -339,21 +366,29 @@ io.on("connection", (socket) => {
     !notToSelf && socket.emit("getTurnState", turnState);
     socket.broadcast.emit("getTurnState", turnState);
   };
+  const sendHighlightCards = (notToSelf = false) => {
+    !notToSelf && socket.emit("getHighlightCards", highlightCards);
+    socket.broadcast.emit("getHighlightCards", highlightCards);
+  };
 
   // Actual Event Listeners —————————————————————————————————
-  socket.on("startGame", initGame);
-
-  socket.on("nameChange", handlePlayerNameChange);
-
-  socket.on("playerToggle", handlePlayerToggle);
-
   socket.on("disconnect", handleDisconnect);
 
-  // dev
+  socket.on("nameChange", handlePlayerNameChange);
+  socket.on("playerToggle", handlePlayerToggle);
+
+  socket.on("startGame", initGame);
   socket.on("endGame", endGame);
-  socket.on("nextTurn", initPhaseEnd);
-  socket.on("endRound", endRound);
+  socket.on("exitGame", exitGame);
+
   socket.on("startRound", initRound);
+  socket.on("endRound", endRound);
+  socket.on("endRoundByPlayer", handlePlayerIsEnding);
+
+  // events
+
+  // only dev
+  socket.on("nextTurn", initPhaseEnd);
 
   // Socket setup ———————————————————————————————————————————
   console.log(color.green(`🔌 New client connected`));
