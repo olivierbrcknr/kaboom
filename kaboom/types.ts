@@ -14,18 +14,16 @@ type CardValue =
   | "A"
   | "X";
 
-type CardActions =
-  | "lookAt"
-  | "swop"
-  | "lookAtKing"
-  | "initialBottomRow"
-  | "endRound";
+type CardActions = "lookAt" | "swap";
+// | "lookAtKing"
+// | "initialBottomRow"
+// | "endRound";
 
 type DeckType = "deck" | "graveyard";
 
-type CardPosition = "deck" | "swop" | "graveyard"; // | null;
+type CardPosition = "deck" | "swap" | "graveyard"; // | null;
 
-type CardHighlightType = "swop" | "drew" | "lookAt";
+type CardHighlightType = "swap" | "drew_deck" | "drew_graveyard" | "lookAt";
 
 type CardColor = 0 | 1 | 2 | 3 | null; // Color null = joker
 
@@ -104,7 +102,13 @@ type RoundStateType = {
   isRunning: boolean;
 };
 
-const roundPhases = ["draw", "card in hand", "effect", "end"] as const;
+const roundPhases = [
+  "pre round",
+  "draw",
+  "card in hand",
+  "effect",
+  "end",
+] as const;
 type RoundPhase = (typeof roundPhases)[number];
 
 // type RoundPhase = "draw" | "effect" | "end";

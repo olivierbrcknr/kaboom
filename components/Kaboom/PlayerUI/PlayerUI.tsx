@@ -6,18 +6,24 @@ import type {
   HandCard,
   CardHighlightType,
   CardEffect,
-} from "../../../types";
+  HighlightCard,
+  TurnStateType,
+} from "../../../kaboom/types";
 import Card from "../Card";
+
+import { calcCardPoints } from "../../../kaboom/kaboomRules";
+
+import { isDev } from "../../../utils";
 
 import styles from "./PlayerUI.module.scss";
 
 interface PlayerUIProps {
-  effect: CardEffect;
-  highlightCards: { cards: HandCard[]; type?: CardHighlightType };
+  effect?: CardEffect;
+  highlightCards: HighlightCard[];
   startingPos: number;
   playerNo: number;
   player: Player;
-  isMainPlayer: boolean;
+  isSelf: boolean;
   isEndingPlayer: boolean;
   isCurrent: boolean;
   cards: HandCard[];
@@ -25,6 +31,7 @@ interface PlayerUIProps {
   onClick: (card: HandCard, triggeringEffect: boolean) => void;
   isClickable: boolean;
   isHighlightDueToEffect: boolean;
+  turnState: TurnStateType;
 }
 
 const PlayerUI = ({
@@ -34,35 +41,34 @@ const PlayerUI = ({
   isEndingPlayer,
   isClickable,
   isHighlightDueToEffect,
-  isMainPlayer,
+  isSelf,
   onClick,
   player,
   playerNo,
   spectatorMode,
   startingPos,
   highlightCards,
+  turnState,
 }: PlayerUIProps) => {
   let position: "top" | "right" | "bottom" | "left" = "bottom";
 
-  if (!isMainPlayer) {
-    switch (playerNo - startingPos) {
-      case -3:
-      case 1:
-        position = "left";
-        break;
-      case -2:
-      case 2:
-        position = "top";
-        break;
-      case -1:
-      case 3:
-        position = "right";
-        break;
-      // aka you are not playing
-      default:
-        position = "bottom";
-        break;
-    }
+  switch (playerNo - startingPos) {
+    case -3:
+    case 1:
+      position = "left";
+      break;
+    case -2:
+    case 2:
+      position = "top";
+      break;
+    case -1:
+    case 3:
+      position = "right";
+      break;
+    // aka yourself
+    default:
+      position = "bottom";
+      break;
   }
 
   return (
@@ -71,13 +77,17 @@ const PlayerUI = ({
         styles.PlayerUI,
         isCurrent && styles.isCurrent,
         isEndingPlayer && styles.isEndingPlayer,
-        isMainPlayer && styles.isMainPlayer,
+        isSelf && styles.isSelf,
         position === "top" && styles.posTop,
         position === "right" && styles.posRight,
         position === "bottom" && styles.posBottom,
         position === "left" && styles.posLeft,
       )}
     >
+      {(isDev() || spectatorMode) && (
+        <div className={styles.Score}>{calcCardPoints(cards)}</div>
+      )}
+
       <div className={styles.CardGrid}>
         {cards &&
           cards.length > 0 &&
@@ -88,27 +98,22 @@ const PlayerUI = ({
 
             let indicatorType: CardHighlightType | undefined = undefined;
 
-            // see effect
-            if (effect.action) {
-              // initial effect
-              if (
-                effect.action === "initialBottomRow" &&
-                c.slot.y === 1 &&
-                isMainPlayer
-              ) {
-                isVisible = true;
-              }
+            if (turnState.phase === "pre round" && c.slot.y === 1 && isSelf) {
+              isVisible = true;
+            }
 
+            // see effect
+            if (effect?.action) {
               // regular effect
               for (let i = 0; i < effect.cards.length; i++) {
                 if (c.id === effect.cards[i].id) {
                   switch (effect.action) {
                     case "lookAt":
-                    case "lookAtKing":
+                      // case "lookAtKing":
                       isVisible = true;
                       break;
 
-                    case "swop":
+                    case "swap":
                       isSelected = true;
                       break;
 
@@ -120,18 +125,15 @@ const PlayerUI = ({
               }
 
               // endround effect
-              if (effect.action === "endRound") {
-                isVisible = true;
-              }
+              // if (effect.action === "endRound") {
+              //   isVisible = true;
+              // }
             }
 
-            // see swop
-            if (highlightCards.cards.length > 0) {
-              for (let i = 0; i < highlightCards.cards.length; i++) {
-                if (c.id === highlightCards.cards[i].id) {
-                  indicatorType = highlightCards.type;
-                }
-              }
+            // see highlight
+            const isHighlightCard = highlightCards.find((hc) => hc.id === c.id);
+            if (isHighlightCard) {
+              indicatorType = isHighlightCard.type;
             }
 
             const handleClickCard = () => {
@@ -142,6 +144,11 @@ const PlayerUI = ({
                 onClick(c, isEffect);
               }
             };
+
+            // TODO: right thinkign, wrong execution
+            if (isHighlightCard && indicatorType === "lookAt" && isCurrent) {
+              isVisible = true;
+            }
 
             return (
               <Card

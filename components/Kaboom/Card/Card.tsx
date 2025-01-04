@@ -4,6 +4,7 @@ import {
   isHandCard,
   type HandCard,
   type Card as CardType,
+  type CardHighlightType,
 } from "../../../kaboom/types";
 
 import styles from "./Card.module.scss";
@@ -14,7 +15,7 @@ interface CardProps {
   isClickable: boolean;
   isSelected?: boolean;
   onClick: () => void;
-  indicatorType?: "lookAt" | "swop" | "drew";
+  indicatorType?: CardHighlightType;
   isDeck?: boolean;
   deckCardCount?: number;
   isSpecator?: boolean;
@@ -93,8 +94,9 @@ const Card = ({
         isClickable && styles.isClickable,
         isSpecator && styles.isSpecator,
         color === "red" ? styles.isRed : styles.isBlack,
-        indicatorType === "drew" && styles.isDrawn,
-        indicatorType === "swop" && styles.isSwopped,
+        (indicatorType === "drew_deck" || indicatorType === "drew_graveyard") &&
+          styles.isDrawn,
+        indicatorType === "swap" && styles.isSwopped,
         indicatorType === "lookAt" && styles.isLookedAt,
         isDeck && styles.isDeck,
         isHandCard(card) && styles.isHandCard,

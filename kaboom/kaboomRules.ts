@@ -62,7 +62,7 @@ const checkIfPlayable = (
   };
 };
 
-const swopCardFromDeck = (deck: Deck, card: HandCard) => {
+const swapCardFromDeck = (deck: Deck, card: HandCard): Deck => {
   const nextCard = deck.deck[0];
 
   let pseudoDeck = deck;
@@ -93,7 +93,7 @@ const swopCardFromDeck = (deck: Deck, card: HandCard) => {
   return pseudoDeck;
 };
 
-const swopCardFromGraveyard = (deck: Deck, card: Card) => {
+const swapCardFromGraveyard = (deck: Deck, card: Card): Deck => {
   const currentCard = deck.graveyard[deck.graveyard.length - 1];
 
   let pseudoDeck = deck;
@@ -124,7 +124,7 @@ const swopCardFromGraveyard = (deck: Deck, card: Card) => {
   return pseudoDeck;
 };
 
-const cardFromDeckToGraveyard = (deck: Deck) => {
+const cardFromDeckToGraveyard = (deck: Deck): Deck => {
   let pseudoDeck = deck;
 
   const transferCard = deck.deck[0];
@@ -187,6 +187,49 @@ const cardShiftedToPlayer = (deck: Deck, card: Card, oldCard: HandCard) => {
   return pseudoDeck;
 };
 
+const calcCardPoints = (cards: Card[]) => {
+  let points = 0;
+
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+
+    let cardVal = 0;
+
+    switch (card.value) {
+      case "Q":
+      case "J":
+        cardVal = 10;
+        break;
+
+      case "A":
+        cardVal = 1;
+        break;
+
+      case "X":
+        cardVal = 0;
+        break;
+
+      case "K":
+        // red king
+        if (card.color === 0 || card.color === 1) {
+          cardVal = -1;
+        } else {
+          cardVal = 10;
+        }
+
+        break;
+
+      default:
+        cardVal = card.value;
+        break;
+    }
+
+    points += cardVal;
+  }
+
+  return points;
+};
+
 const calcPlayerPoints = (
   players: Player[],
   deck: Deck,
@@ -203,48 +246,12 @@ const calcPlayerPoints = (
 
   const pseudoPlayers = players.map((p) => {
     const oldPoints = p.points;
-    let newPoints = 0;
 
     const wasFifty = oldPoints === 50 ? true : false;
 
-    for (let i = 0; i < deck.hand.length; i++) {
-      const card = deck.hand[i];
+    const playerCards = deck.hand.filter((c) => c.player === p.id);
 
-      if (card.player === p.id) {
-        let cardVal = 0;
-
-        switch (card.value) {
-          case "Q":
-          case "J":
-            cardVal = 10;
-            break;
-
-          case "A":
-            cardVal = 1;
-            break;
-
-          case "X":
-            cardVal = 0;
-            break;
-
-          case "K":
-            // red king
-            if (card.color === 0 || card.color === 1) {
-              cardVal = -1;
-            } else {
-              cardVal = 10;
-            }
-
-            break;
-
-          default:
-            cardVal = card.value;
-            break;
-        }
-
-        newPoints += cardVal;
-      }
-    }
+    const newPoints = calcCardPoints(playerCards);
 
     let updatedPoints = oldPoints + newPoints;
 
@@ -352,14 +359,20 @@ const checkIfPlayerHasZeroCards = (players: Player[], deck: Deck) => {
   return hasZeroCards;
 };
 
+const cardIsFromDeck = (deck: Deck, card: Card): boolean => {
+  return deck.deck.find((dc) => dc.id === card.id) ? true : false;
+};
+
 export {
   checkIfPlayable,
-  swopCardFromDeck,
-  swopCardFromGraveyard,
+  swapCardFromDeck,
+  swapCardFromGraveyard,
   cardFromDeckToGraveyard,
   cardShiftedToPlayer,
   calcPlayerPoints,
   cardSwoppedBetweenPlayers,
   calcIfEnded,
   checkIfPlayerHasZeroCards,
+  calcCardPoints,
+  cardIsFromDeck,
 };

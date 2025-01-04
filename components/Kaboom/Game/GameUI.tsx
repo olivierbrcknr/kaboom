@@ -6,6 +6,8 @@ import {
   type HighlightObject,
   cardRules,
   emptyHighlight,
+  getCardRule,
+  type CardRule,
 } from "../../../kaboom/ruleHelpers";
 import type {
   Player,
@@ -21,6 +23,7 @@ import type {
   GameStateType,
   RoundStateType,
   TurnStateType,
+  HighlightCard,
 } from "../../../kaboom/types";
 import Button from "../../Button";
 import DeckUI from "../Deck";
@@ -53,16 +56,14 @@ interface GameUIProps {
   onSwopCardsBetweenPlayers: (card1: HandCard, card2: HandCard) => void;
   onCardFromDeckToGraveyard: () => void;
   highlightDeck?: CardPosition;
-  highlightCards: {
-    cards: HandCard[];
-    type?: CardHighlightType;
-  };
+  highlightCards: HighlightCard[];
   selectedCard?: FocusCard;
   onSetSelectedCard: (c: FocusCard | undefined) => void;
   players: Player[];
   turnState: TurnStateType;
   handleDeckClick: (type: DeckType) => void;
   handlePlayerCardClick: (card: CardType) => void;
+  canMoveCard: boolean;
 }
 
 const emptyClickableAreas: HighlightObject = { ...emptyHighlight };
@@ -92,39 +93,61 @@ const GameUI = ({
   turnState,
   handleDeckClick,
   handlePlayerCardClick,
+  canMoveCard,
 }: GameUIProps) => {
-  const clickableAreas = { ...emptyClickableAreas };
+  let clickableAreas = { ...emptyClickableAreas };
+
+  console.log(highlightCards);
 
   const isCurrentPlayer = turnState.currentPlayer === myPlayerID;
 
-  const myPos = players.findIndex((p) => p.id === myPlayerID);
+  const myPos = players
+    .filter((p) => p.isPlaying)
+    .findIndex((p) => p.id === myPlayerID);
   let effectDisplayText = "";
+  let currentRule: CardRule | undefined | false = undefined;
 
-  if (playEffect) {
-    const currentCardRule = cardRules.find((cR) =>
-      cR.cardValue.includes(deck.graveyard[deck.graveyard.length - 1].value),
-    );
-    if (currentCardRule) {
-      effectDisplayText = currentCardRule.label;
-    }
+  if (turnState.phase === "pre round") {
+    effectDisplayText = "Look at your own cards before the round begins";
   }
 
-  // get clickable states if is current player
-  if (isCurrentPlayer) {
-    switch (turnState.phase) {
-      case "draw":
-        clickableAreas.deck = true;
-        clickableAreas.graveyard = true;
-        break;
-      case "card in hand":
-        clickableAreas.ownCards = true;
-        clickableAreas.graveyard = true;
-        break;
-      case "effect":
-        // if is "effect" phase and is current player
-        // --> cards accordingly (own and/or others)
-        // ################################
-        break;
+  if (canMoveCard) {
+    clickableAreas.ownCards = true;
+    effectDisplayText = "Move one of your card to the fired card's player";
+  } else {
+    if (turnState.phase === "effect") {
+      currentRule = turnState.playedCard && getCardRule(turnState.playedCard);
+
+      // effect display should be displayed for everyone
+      if (currentRule) {
+        effectDisplayText = currentRule.actions[0].label;
+      }
+    }
+
+    // get clickable states if is current player
+    if (isCurrentPlayer) {
+      switch (turnState.phase) {
+        case "draw":
+          clickableAreas.deck = true;
+          clickableAreas.graveyard = true;
+
+          break;
+        case "card in hand":
+          clickableAreas.ownCards = true;
+          // check if hand card is from deck or graveyard
+          if (deck.deck.find((dc) => dc.id === selectedCard?.id)) {
+            clickableAreas.graveyard = true;
+          }
+          break;
+        case "effect":
+          // if is "effect" phase and is current player
+          // --> cards accordingly (own and/or others)
+          // ################################
+          if (currentRule) {
+            clickableAreas = { ...currentRule.actions[0].clickableAreas };
+          }
+          break;
+      }
     }
   }
 
@@ -155,12 +178,12 @@ const GameUI = ({
             return (
               <PlayerUI
                 key={"player-no_" + k}
-                effect={effectContainer}
+                // effect={effectContainer}
                 startingPos={myPos}
                 highlightCards={highlightCards}
-                playerNo={k + 1}
+                playerNo={k}
                 player={p}
-                isMainPlayer={isSelf}
+                isSelf={isSelf}
                 isEndingPlayer={roundState.lastRoundStartedByPlayer === p.id}
                 isCurrent={
                   p.id === turnState.currentPlayer && roundState.isRunning
@@ -170,6 +193,7 @@ const GameUI = ({
                 onClick={handlePlayerCardClick}
                 isClickable={isClickable}
                 isHighlightDueToEffect={clickableAreas.dueToEffect}
+                turnState={turnState}
               />
             );
           })}
@@ -181,7 +205,7 @@ const GameUI = ({
         clickGraveyard={() => handleDeckClick("graveyard")}
         isCurrent={isCurrentPlayer && roundState.isRunning}
         isClickable={clickableAreas}
-        swopHighlight={highlightDeck}
+        highlightCards={highlightCards}
         spectatorMode={spectatorMode}
       />
 
