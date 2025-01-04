@@ -20,11 +20,15 @@ export interface HighlightObject {
   dueToEffect: boolean;
 }
 
-export type CardRule = {
-  cardValue: CardValue[];
+export type RuleAction = {
   label: string;
   clickableAreas: HighlightObject;
-  action: CardActions;
+  type: CardActions;
+};
+
+export type CardRule = {
+  cardValue: CardValue[];
+  actions: RuleAction[];
 };
 
 export const emptyHighlight: HighlightObject = {
@@ -38,40 +42,71 @@ export const emptyHighlight: HighlightObject = {
 export const cardRules: CardRule[] = [
   {
     cardValue: [7, 8],
-    label: "Look at one of your own cards",
-    clickableAreas: {
-      ...emptyHighlight,
-      ownCards: true,
-    },
-    action: "lookAt",
+    actions: [
+      {
+        label: "Look at one of your own cards",
+        clickableAreas: {
+          ...emptyHighlight,
+          ownCards: true,
+        },
+        type: "lookAt",
+      },
+    ],
   },
   {
     cardValue: [9, 10],
-    label: "Look at an opponent‘s card",
-    clickableAreas: {
-      ...emptyHighlight,
-      otherCards: true,
-    },
-    action: "lookAt",
+    actions: [
+      {
+        label: "Look at an opponent‘s card",
+        clickableAreas: {
+          ...emptyHighlight,
+          otherCards: true,
+        },
+        type: "lookAt",
+      },
+    ],
   },
   {
     cardValue: ["J", "Q"],
-    label: "Swop any two cards",
-    clickableAreas: {
-      ...emptyHighlight,
-      otherCards: true,
-      ownCards: true,
-    },
-    action: "swop",
+    actions: [
+      {
+        label: "Swop any two cards",
+        clickableAreas: {
+          ...emptyHighlight,
+          otherCards: true,
+          ownCards: true,
+        },
+        type: "swap",
+      },
+    ],
   },
   {
     cardValue: ["K"],
-    label: "Look at any one card, then swop any two cards",
-    clickableAreas: {
-      ...emptyHighlight,
-      ownCards: true,
-      otherCards: true,
-    },
-    action: "lookAtKing",
+    actions: [
+      {
+        label: "Look at any one card, then swap any two cards",
+        clickableAreas: {
+          ...emptyHighlight,
+          ownCards: true,
+          otherCards: true,
+        },
+        type: "lookAt",
+      },
+      {
+        label: "Swop any two cards",
+        clickableAreas: {
+          ...emptyHighlight,
+          otherCards: true,
+          ownCards: true,
+        },
+        type: "swap",
+      },
+    ],
   },
 ];
+
+// Helper Functions ———————————————————————————————————————
+export const getCardRule = (card: CardType): CardRule | false => {
+  const rule = cardRules.find((cR) => cR.cardValue.includes(card.value));
+  return rule ? rule : false;
+};

@@ -5,7 +5,7 @@ import { createServer } from "http";
 import next from "next";
 import { Server } from "socket.io";
 
-import { cardRules, type CardRule } from "../kaboom/ruleHelpers";
+import { cardRules, type CardRule, getCardRule } from "../kaboom/ruleHelpers";
 import type {
   PlayerID,
   Player,
@@ -17,22 +17,26 @@ import type {
   RoundStateType,
   TurnStateType,
   Deck,
+  DeckType,
   HighlightCard,
 } from "../kaboom/types";
 
 import {
-  checkIfPlayable,
-  swopCardFromDeck,
-  swopCardFromGraveyard,
+  swapCardFromDeck,
+  swapCardFromGraveyard,
   cardFromDeckToGraveyard,
   cardShiftedToPlayer,
   calcPlayerPoints,
   cardSwoppedBetweenPlayers,
   calcIfEnded,
   checkIfPlayerHasZeroCards,
+  checkIfPlayable,
+  cardIsFromDeck,
 } from "../kaboom/kaboomRules";
 
 import { isDev } from "../utils";
+
+import { INITIAL_CARD_LOOK_DURATION } from "../utils/constants";
 
 import { createDefault, distribute, getNextPlayer } from "./deckFunctions";
 
@@ -75,14 +79,17 @@ let turnState: TurnStateType = { ...turnStateInit };
 /** the cards that should be highlighted */
 let highlightCards: HighlightCard[] = [];
 
+/** the cards that are needed for the effect to be played */
+let effectCards: HandCard[] = [];
+
 /** The ID of the player who's card was played last */
 let lastFiredCardStack: PlayerID | false = false;
 
-// Helper Functions ———————————————————————————————————————
-const getCardRule = (card: Card): CardRule | false => {
-  const rule = cardRules.find((cR) => cR.cardValue.includes(card.value));
-  return rule ? rule : false;
-};
+/** The players that just moved a card */
+let playersWhoCanMoveCards: { player: PlayerID; card: HandCard }[] = [];
+
+/** The card that is currently drawn and about to trigger an effect (potentially) */
+let cardInHand: Card | undefined = undefined;
 
 // Server setup ———————————————————————————————————————————
 
@@ -115,8 +122,11 @@ io.on("connection", (socket) => {
 
   const initPhaseCardInHand = () => {
     turnState.phase = "card in hand";
-    sendTurnState();
 
+    console.log("card in hand", cardInHand);
+    sendCardInHand();
+
+    sendTurnState();
     // wait for click
   };
 
@@ -124,14 +134,21 @@ io.on("connection", (socket) => {
     turnState.phase = "effect";
 
     // check if effect
-    const hasEffect =
-      turnState.playedCard && getCardRule(turnState.playedCard) !== false;
+    const effect = turnState.playedCard && getCardRule(turnState.playedCard);
 
-    if (hasEffect) {
+    if (effect) {
+      // reset card in hand
+      console.log(
+        "Effect",
+        turnState.playedCard?.value,
+        effect.actions[0].label,
+      );
+
       sendTurnState();
-
       // wait for effect being executed
     } else {
+      // reset card in hand
+      console.log("no effect", turnState.playedCard);
       nextPhase();
     }
   };
@@ -141,7 +158,7 @@ io.on("connection", (socket) => {
     sendTurnState();
 
     // send highlight for cards where an effect has been applied
-    sendHighlightCards();
+    // sendHighlightCards();
 
     // check if round is done
     const isEndRound = checkIfPlayerHasZeroCards(players, deck);
@@ -162,6 +179,7 @@ io.on("connection", (socket) => {
 
   const nextPhase = () => {
     const currentPhase = turnState.phase;
+    sendDeck();
 
     switch (currentPhase) {
       case "draw":
@@ -174,6 +192,7 @@ io.on("connection", (socket) => {
         initPhaseEnd();
         break;
       case "end":
+      case "pre round":
         // initPhaseDrawCard();
         initTurn();
         break;
@@ -193,8 +212,12 @@ io.on("connection", (socket) => {
     }
     turnState = { ...turnStateInit, currentPlayer: nextPlayer };
 
+    // empty card in hand
+    cardInHand = undefined;
     // empty highlight cards
     highlightCards = [];
+    // empty effect cards
+    effectCards = [];
 
     sendTurnState();
 
@@ -222,14 +245,21 @@ io.on("connection", (socket) => {
     sendGameState();
     sendRoundState();
 
-    // init the actual turn
-    initTurn();
+    turnState = { ...turnStateInit };
+    turnState.phase = "pre round";
+    sendTurnState();
+
+    setTimeout(() => {
+      // init the actual turn
+      initTurn();
+    }, INITIAL_CARD_LOOK_DURATION);
   };
 
   const endRound = (endingByChoice = false, endingPlayerID?: PlayerID) => {
     // end round state
     roundState = { ...roundState, isRunning: false };
     sendRoundState();
+    sendDeck();
 
     // store round data in game state
     const endingPlayer = endingPlayerID ?? turnState.currentPlayer;
@@ -285,7 +315,194 @@ io.on("connection", (socket) => {
 
   // Events —————————————————————————————————————————————————
 
-  const handleDrawCard = () => {};
+  const handleDrawCard = (position: DeckType) => {
+    // reset last fired card stack as new card is drawn
+    lastFiredCardStack = false;
+    if (position === "deck") {
+      // get current card from deck
+      cardInHand = deck.deck[0];
+    } else {
+      // draw card from graveyard
+      cardInHand = deck.graveyard[0];
+    }
+    nextPhase(); // card in hand
+  };
+
+  const checkEffect = () => {
+    console.log("check if play effect");
+    const currentRule =
+      turnState.playedCard && getCardRule(turnState.playedCard);
+
+    if (currentRule) {
+      const activeEffect = currentRule.actions[0];
+
+      switch (activeEffect.type) {
+        case "lookAt":
+          if (effectCards.length === 1) {
+            console.log("play Effect", "lookAt");
+            handleHighlightCard(effectCards, "lookAt");
+            nextPhase();
+          }
+          break;
+        case "swap":
+          if (effectCards.length === 2) {
+            console.log("play Effect", "swap");
+            handleHighlightCard(effectCards, "swap");
+            deck = cardSwoppedBetweenPlayers(deck, effectCards);
+            nextPhase();
+          }
+          break;
+      }
+    }
+
+    console.log(effectCards);
+  };
+
+  const handlePlayerCardClick = (playerCard: HandCard) => {
+    const currentPlayerID = socket.id;
+    let isSelectableCard = false;
+
+    // if player is can currently move a card
+    const cardToMove = playersWhoCanMoveCards.find(
+      (obj) => obj.player === currentPlayerID,
+    );
+    if (cardToMove && currentPlayerID === playerCard.player) {
+      cardShiftedToPlayer(deck, playerCard, cardToMove.card);
+      playersWhoCanMoveCards = playersWhoCanMoveCards.filter(
+        (c) => c.card.id !== cardToMove.card.id,
+      );
+      sendDeck();
+    } else {
+      // if is current player, check, otherwise is error already
+      // if is "effect" phase and is current player
+      if (currentPlayerID === turnState.currentPlayer) {
+        switch (turnState.phase) {
+          case "card in hand":
+            // if card is in hand, swap cards
+            if (currentPlayerID === playerCard.player) {
+              handleHandCardToPlayer(playerCard);
+              isSelectableCard = true;
+            }
+
+            break;
+          case "effect":
+            // get current effect
+            const currentRule =
+              turnState.playedCard && getCardRule(turnState.playedCard);
+
+            // if is "effect" phase and is selectable due to effect
+            if (currentRule) {
+              const activeEffect = currentRule.actions[0];
+
+              // check if clicked card is a card that can
+              // be selected due to the effect
+
+              // is current player
+              if (
+                activeEffect.clickableAreas.ownCards &&
+                playerCard.player === currentPlayerID
+              ) {
+                isSelectableCard = true;
+              }
+
+              // is other player
+              if (
+                activeEffect.clickableAreas.otherCards &&
+                playerCard.player !== currentPlayerID
+              ) {
+                isSelectableCard = true;
+              }
+
+              if (isSelectableCard) {
+                effectCards.push(playerCard);
+                checkEffect();
+              }
+            }
+
+            break;
+        }
+      }
+
+      if (!isSelectableCard) {
+        // if is not selectable
+        // --> is matching with graveyard --> start this
+        // --> is not matching with graveyard --> penalty
+        // ################################
+        const playableCard = checkIfPlayable(
+          deck,
+          playerCard,
+          currentPlayerID,
+          lastFiredCardStack,
+        );
+
+        console.log("fireable", playableCard.bool);
+
+        // ceck if fireable card is from other player
+        if (playableCard.bool && playerCard.player !== currentPlayerID) {
+          // --> if so, trigger move card event
+          console.log(currentPlayerID, "is allowed to move one of their cards");
+          playersWhoCanMoveCards.push({
+            player: currentPlayerID,
+            card: playerCard,
+          });
+
+          sendPlayerCanMoveCard();
+        }
+
+        lastFiredCardStack = playerCard.player;
+        deck = playableCard.deck;
+        sendDeck();
+      }
+    }
+  };
+
+  const handleHighlightCard = (cards: Card[], type: CardHighlightType) => {
+    const newHighlights: HighlightCard[] = cards.map((c) => ({
+      id: c.id,
+      type: type,
+    }));
+
+    // irrelevant?
+    highlightCards.push(...newHighlights);
+
+    console.log(highlightCards);
+
+    // send to players
+    sendHighlightCards();
+
+    // empty again
+    highlightCards = [];
+  };
+
+  const handleHandCardToPlayer = (playerCard: HandCard) => {
+    console.log(cardInHand, "→", playerCard);
+
+    if (cardInHand) {
+      if (cardIsFromDeck(deck, cardInHand)) {
+        // if card is originally from deck
+        handleHighlightCard([cardInHand], "drew_deck");
+        deck = swapCardFromDeck(deck, playerCard);
+      } else {
+        // if card is originally from graveyard
+        handleHighlightCard([cardInHand], "drew_graveyard");
+        deck = swapCardFromGraveyard(deck, playerCard);
+      }
+      nextPhase(); // effect --> end
+    } else {
+      console.log("no card in hand currently", cardInHand);
+    }
+  };
+
+  const handleHandCardToGraveyard = () => {
+    if (deck.deck.find((dc) => dc.id === cardInHand?.id)) {
+      console.log(cardInHand, "→ graveyard");
+      turnState.playedCard = cardInHand;
+      deck = cardFromDeckToGraveyard(deck);
+      nextPhase(); // effect --> end
+    } else {
+      console.log(color.red("Card cannot be sent from graveyard to graveyard"));
+    }
+  };
 
   const handlePlayerIsEnding = (pID: PlayerID) => {
     endRound(true, pID);
@@ -370,6 +587,14 @@ io.on("connection", (socket) => {
     !notToSelf && socket.emit("getHighlightCards", highlightCards);
     socket.broadcast.emit("getHighlightCards", highlightCards);
   };
+  const sendCardInHand = (notToOthers = false) => {
+    socket.emit("getCardInHand", cardInHand);
+    !notToOthers && socket.broadcast.emit("getCardInHand", cardInHand);
+  };
+
+  const sendPlayerCanMoveCard = () => {
+    socket.emit("canMoveCard");
+  };
 
   // Actual Event Listeners —————————————————————————————————
   socket.on("disconnect", handleDisconnect);
@@ -386,6 +611,11 @@ io.on("connection", (socket) => {
   socket.on("endRoundByPlayer", handlePlayerIsEnding);
 
   // events
+  socket.on("drawCard", handleDrawCard);
+  socket.on("handCardToPlayer", handleHandCardToPlayer);
+  socket.on("handCardToGraveyard", handleHandCardToGraveyard);
+
+  socket.on("playerCardClick", handlePlayerCardClick);
 
   // only dev
   socket.on("nextTurn", initPhaseEnd);

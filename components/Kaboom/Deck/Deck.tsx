@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 
 import clsx from "clsx";
 
-import type { Deck as DeckType, CardPosition } from "../../../types";
+import type {
+  Deck as DeckType,
+  CardPosition,
+  HighlightCard,
+} from "../../../kaboom/types";
 import Card from "../Card";
 
 import styles from "./Deck.module.scss";
@@ -14,7 +18,7 @@ interface DeckProps {
   deck: DeckType;
   drawCard: () => void;
   clickGraveyard: () => void;
-  swopHighlight?: CardPosition;
+  highlightCards: HighlightCard[];
   isClickable: {
     graveyard: boolean;
     deck: boolean;
@@ -28,7 +32,7 @@ const Deck = ({
   drawCard,
   isCurrent,
   isClickable,
-  swopHighlight,
+  highlightCards,
   spectatorMode,
 }: DeckProps) => {
   const [showNext, setShowNext] = useState(false);
@@ -51,6 +55,11 @@ const Deck = ({
 
   const nextCard = deck.deck.length > 0 ? deck.deck[0] : undefined;
 
+  const highlightDeck = highlightCards.some((hc) => hc.type === "drew_deck");
+  const highlightGraveyard = highlightCards.some(
+    (hc) => hc.type === "drew_graveyard",
+  );
+
   return (
     <div className={clsx(styles.Deck)}>
       {deck.graveyard.length > 0 && (
@@ -58,7 +67,7 @@ const Deck = ({
           <Card
             card={deck.graveyard[deck.graveyard.length - 1]}
             isClickable={isCurrent && isClickable.graveyard ? true : false}
-            indicatorType={swopHighlight === "graveyard" ? "lookAt" : undefined}
+            indicatorType={highlightGraveyard ? "drew_graveyard" : undefined}
             // indicatorType={isClickable.graveyard ? "lookAt" : undefined}
             onClick={handleGraveyardClick}
             isDeck
@@ -76,7 +85,7 @@ const Deck = ({
             card={nextCard}
             isClickable={isCurrent && isClickable.deck}
             // indicatorType={isClickable.deck ? "lookAt" : undefined}
-            indicatorType={swopHighlight === "deck" ? "lookAt" : undefined}
+            indicatorType={highlightDeck ? "drew_deck" : undefined}
             onClick={handleDeckClick}
             isDeck
             deckCardCount={deck.deck.length}

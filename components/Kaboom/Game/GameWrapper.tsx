@@ -28,7 +28,6 @@ const GameWrapper = ({}: GameWrapperProps) => {
     handleEndGame,
     handleEndRound,
     handleStartRound,
-    handleDrawCard,
     handleNextTurn,
     roundState,
     playEffect,
@@ -41,6 +40,10 @@ const GameWrapper = ({}: GameWrapperProps) => {
     turnState,
     players,
     handleExitGame,
+    handlePlayerCardClick,
+    // handleDrawCard,
+    handleDeckClick,
+    canMoveCard,
   } = useGame();
 
   // UI ———————————————————————————————————————————————————
@@ -100,7 +103,6 @@ const GameWrapper = ({}: GameWrapperProps) => {
         onEndGame={handleEndGame}
         playEffect={playEffect}
         onEndEffect={handleEndEffect}
-        onDrawCard={handleDrawCard}
         onNextTurn={handleNextTurn}
         onHighlightCard={handleHighlightCard}
         onCardPlayed={handleCardPlayed}
@@ -113,6 +115,9 @@ const GameWrapper = ({}: GameWrapperProps) => {
         onSetSelectedCard={setSelectedCard}
         players={players}
         turnState={turnState}
+        handleDeckClick={handleDeckClick}
+        handlePlayerCardClick={handlePlayerCardClick}
+        canMoveCard={canMoveCard}
       />
       {isDev && <GameDevUI socket={socket} />}
     </>

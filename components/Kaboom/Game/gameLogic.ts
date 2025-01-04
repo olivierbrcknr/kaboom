@@ -63,11 +63,11 @@ export const useGame = () => {
 
   const [highlightCards, setHighlightCards] = useState<HighlightCard[]>([]);
 
-  const [selectedCard, setSelectedCard] = useState<FocusCard | undefined>(
-    undefined,
-  );
+  const [selectedCard, setSelectedCard] = useState<Card | undefined>(undefined);
 
   const socket = useSocket();
+
+  const [canMoveCard, setCanMoveCard] = useState(false);
 
   // socket ———————————————————————————————————————————————
 
@@ -107,6 +107,10 @@ export const useGame = () => {
     socket.on("getHighlightCards", (data: HighlightCard[]) =>
       setHighlightCards(data),
     );
+    socket.on("getCardInHand", (data: Card | undefined) =>
+      setSelectedCard(data),
+    );
+    socket.on("canMoveCard", () => setCanMoveCard(true));
 
     return () => {
       socket.off("getPlayers");
@@ -203,8 +207,14 @@ export const useGame = () => {
 
   // Card Effects ———————————————————————————————————————————
 
-  const handleDrawCard = (position: CardPosition) => {
+  const handleDrawCard = (position: DeckType) => {
     isSocket(socket) && socket.emit("drawCard", position);
+
+    // if (position === "deck") {
+    //   setSelectedCard(currentDeck?.deck[0]);
+    // } else {
+    //   setSelectedCard(currentDeck?.graveyard[0]);
+    // }
   };
 
   const handleEndEffect = () => {
@@ -264,38 +274,36 @@ export const useGame = () => {
   // card clicks ————————————————————————————————————————————————
 
   const handlePlayerCardClick = (card: HandCard) => {
-    // if is "effect" phase and is selectable due to effect
-    // ################################
-    // if is not selectable
-    // --> is matching with graveyard --> start this
-    // --> is not matching with graveyard --> penalty
-    // ################################
+    setCanMoveCard(false);
+    isSocket(socket) && socket.emit("playerCardClick", card);
   };
 
   const handleDeckClick = (type: DeckType) => {
-    if (type === "deck") {
-    } else {
-      // graveyard
-    }
-
-    // if is "draw" phase
-    // ################################
     switch (turnState.phase) {
       case "draw":
+        // if is "draw" phase
+        // ################################
+        if (type === "deck") {
+          handleDrawCard("deck");
+        } else {
+          // graveyard
+          handleDrawCard("graveyard");
+        }
         break;
 
       case "card in hand":
+        // if is "card in hand" phase
+        // and click is graveyard
+        if (type === "graveyard") {
+          isSocket(socket) && socket.emit("handCardToGraveyard");
+        }
         break;
 
       default:
+        // else --> do nothing
+        // ################################
         break;
     }
-
-    // if is "card in hand" phase
-    // ################################
-
-    // else --> do nothing
-    // ################################
   };
 
   return {
@@ -329,5 +337,6 @@ export const useGame = () => {
     handleExitGame,
     handleDeckClick,
     handlePlayerCardClick,
+    canMoveCard,
   };
 };
