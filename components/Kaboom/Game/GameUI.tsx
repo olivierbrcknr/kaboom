@@ -101,6 +101,10 @@ const GameUI = ({
 
   const isCurrentPlayer = turnState.currentPlayer === myPlayerID;
 
+  const roundIsRunning =
+    roundState.phase === "running" || roundState.phase === "last round";
+  const isLastRound = roundState.phase === "last round";
+
   const myPos = players
     .filter((p) => p.isPlaying)
     .findIndex((p) => p.id === myPlayerID);
@@ -151,7 +155,7 @@ const GameUI = ({
     }
   }
 
-  const spectatorMode = isDev || !roundState.isRunning;
+  const spectatorMode = isDev;
 
   return (
     <div className={clsx(styles.Game)}>
@@ -184,16 +188,16 @@ const GameUI = ({
                 playerNo={k}
                 player={p}
                 isSelf={isSelf}
+                myPlayerID={myPlayerID}
                 isEndingPlayer={roundState.lastRoundStartedByPlayer === p.id}
-                isCurrent={
-                  p.id === turnState.currentPlayer && roundState.isRunning
-                }
+                isCurrent={p.id === turnState.currentPlayer && roundIsRunning}
                 cards={cards}
                 spectatorMode={spectatorMode}
                 onClick={handlePlayerCardClick}
                 isClickable={isClickable}
                 isHighlightDueToEffect={clickableAreas.dueToEffect}
                 turnState={turnState}
+                roundState={roundState}
               />
             );
           })}
@@ -203,29 +207,29 @@ const GameUI = ({
         deck={deck}
         drawCard={() => handleDeckClick("deck")}
         clickGraveyard={() => handleDeckClick("graveyard")}
-        isCurrent={isCurrentPlayer && roundState.isRunning}
+        isCurrent={isCurrentPlayer && roundIsRunning}
         isClickable={clickableAreas}
         highlightCards={highlightCards}
         spectatorMode={spectatorMode}
       />
 
-      {effectDisplayText && (
+      {roundIsRunning && effectDisplayText && (
         <div className={styles.EffectDisplay}>{effectDisplayText}</div>
       )}
 
-      {roundState.isLastRound ? (
+      {isLastRound ? (
         <div className={styles.LastRoundIndicator}>Last Round</div>
       ) : null}
 
       <ScoreDisplay
         id={myPlayerID}
         currentPlayerId={turnState.currentPlayer}
-        gameIsRunning={roundState.isRunning}
+        gameIsRunning={roundIsRunning}
         players={players}
       />
 
       {isCurrentPlayer &&
-        !roundState.isLastRound &&
+        !isLastRound &&
         !playEffect &&
         clickableAreas.deck && (
           <div className={styles.IWantToEndButton}>
@@ -233,7 +237,7 @@ const GameUI = ({
           </div>
         )}
 
-      {!roundState.isRunning && (
+      {roundState.phase === "setup" && (
         <div className={styles.StartRoundContainer}>
           <Button theme="primary" onClick={onStartRound}>
             Start {gameState.roundCount > 0 ? "Next" : ""} Round

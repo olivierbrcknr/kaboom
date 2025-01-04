@@ -71,6 +71,7 @@ type Deck = {
 type HighlightCard = {
   id: number | DeckType;
   type: CardHighlightType;
+  player: PlayerID;
 };
 
 const isHandCard = (value: any): value is HandCard => {
@@ -94,12 +95,14 @@ type GameStateType = {
   // }[][];
 };
 
+const gamePhases = ["setup", "running", "last round", "end"] as const;
+type GamePhase = (typeof gamePhases)[number];
+
 type RoundStateType = {
   turnCount: number;
   startingPlayer: PlayerID;
-  isLastRound: boolean;
+  phase: GamePhase;
   lastRoundStartedByPlayer?: PlayerID;
-  isRunning: boolean;
 };
 
 const roundPhases = [
@@ -142,4 +145,5 @@ export type {
   TurnStateType,
   DeckType,
   HighlightCard,
+  GamePhase,
 };
