@@ -1,24 +1,23 @@
 import * as RadixToggle from "@radix-ui/react-toggle";
-import React from "react";
-
 import clsx from "clsx";
+import React from "react";
 
 import styles from "./Toggle.module.scss";
 
 export interface ToggleProps {
-  value: boolean;
-  name?: string;
-  onChange: (value: boolean) => void;
   disabled?: boolean;
   id?: string;
+  name?: string;
+  onChange: (value: boolean) => void;
+  value: boolean;
 }
 
 const Toggle = ({
-  value,
-  onChange,
-  name,
   disabled = false,
   id,
+  name,
+  onChange,
+  value,
 }: ToggleProps) => {
   return (
     <RadixToggle.Root
@@ -27,11 +26,11 @@ const Toggle = ({
         value && styles.isPressed,
         disabled && styles.isDisabled,
       )}
-      name={name}
-      pressed={value}
-      onPressedChange={onChange}
       disabled={disabled}
       id={id}
+      name={name}
+      onPressedChange={onChange}
+      pressed={value}
     >
       <div className={styles.Knob} />
     </RadixToggle.Root>

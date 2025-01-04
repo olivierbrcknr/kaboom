@@ -1,5 +1,4 @@
 import ReactMarkdown from "react-markdown";
-
 import gfm from "remark-gfm";
 
 import styles from "./Markdown.module.scss";
@@ -18,7 +17,7 @@ const transformObjectArray = (val: string) => {
 };
 
 const Markdown = ({ content }: MarkdownProps) => {
-  const ImgRenderer = ({ src, alt }: { src: string; alt: string }) => {
+  const ImgRenderer = ({ alt, src }: { alt: string; src: string; }) => {
     return <img alt={alt} src={"/rulesImages/" + src} />;
   };
 
@@ -47,12 +46,12 @@ const Markdown = ({ content }: MarkdownProps) => {
 
   return (
     <ReactMarkdown
-      remarkPlugins={[gfm]}
       className={styles.Markdown}
       components={{
         code: codeRenderer,
         img: ImgRenderer,
       }}
+      remarkPlugins={[gfm]}
     >
       {content}
     </ReactMarkdown>

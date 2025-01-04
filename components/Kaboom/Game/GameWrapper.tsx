@@ -1,49 +1,50 @@
 import React from "react";
 
+import { useIsDev } from "../../../utils";
 import GameDevUI from "./GameDevUI";
 import GameEndUI from "./GameEndUI";
 import { useGame } from "./gameLogic";
 import GameSetupUI from "./GameSetupUI";
 import GameUI from "./GameUI";
 
-// import styles from "./Game.module.scss";
-
-const isDev = process.env.NODE_ENV !== "production";
-
 interface GameWrapperProps {}
 
 const GameWrapper = ({}: GameWrapperProps) => {
+  const isDev = useIsDev();
+
   const {
-    myState,
-    gameState,
-    handleChangeName,
-    handlePlayerToggle,
-    handleStartGame,
-    handleEndGame,
-    handleEndRound,
-    handleStartRound,
-    handleNextTurn,
-    roundState,
-    selectedCard,
+    canMoveCard,
     currentDeck,
     displayHighlightCards,
+    gameState,
+    handleChangeName,
+    handleDeckClick,
+    handleEndGame,
+    handleEndRound,
+    handleExitGame,
+    handleNextTurn,
+    handlePlayerCardClick,
+    handlePlayerToggle,
+    handleStartGame,
+    handleStartRound,
+    myState,
+    players,
+    roundState,
+    selectedCard,
     socket,
     turnState,
-    players,
-    handleExitGame,
-    handlePlayerCardClick,
-    handleDeckClick,
-    canMoveCard,
   } = useGame();
 
   // UI ———————————————————————————————————————————————————
 
-  console.log("gameState");
-  console.table(gameState);
-  console.log("roundState");
-  console.table(roundState);
-  console.log("turnState");
-  console.table(turnState);
+  if (isDev) {
+    console.log("gameState");
+    console.table(gameState);
+    console.log("roundState");
+    console.table(roundState);
+    console.log("turnState");
+    console.table(turnState);
+  }
 
   if (!myState.id) {
     console.log("no player id yet");
@@ -54,9 +55,9 @@ const GameWrapper = ({}: GameWrapperProps) => {
   if (gameState.hasEnded) {
     return (
       <GameEndUI
-        players={players}
         myPlayerID={myState.id}
         onExitGame={handleExitGame}
+        players={players}
       />
     );
   }
@@ -64,10 +65,10 @@ const GameWrapper = ({}: GameWrapperProps) => {
   if (!gameState.isRunning) {
     return (
       <GameSetupUI
+        myPlayerID={myState.id}
         onNameChange={handleChangeName}
         onPlayerToggle={handlePlayerToggle}
         onStartGame={handleStartGame}
-        myPlayerID={myState.id}
         players={players}
       />
     );
@@ -84,21 +85,21 @@ const GameWrapper = ({}: GameWrapperProps) => {
   return (
     <>
       <GameUI
-        gameState={gameState}
-        roundState={roundState}
+        canMoveCard={canMoveCard}
         deck={currentDeck}
-        myPlayerID={myState.id}
-        onPlayerIsEndingRound={handleEndRound}
-        onStartRound={handleStartRound}
-        onEndGame={handleEndGame}
-        onNextTurn={handleNextTurn}
-        highlightCards={displayHighlightCards}
-        selectedCard={selectedCard}
-        players={players}
-        turnState={turnState}
+        gameState={gameState}
         handleDeckClick={handleDeckClick}
         handlePlayerCardClick={handlePlayerCardClick}
-        canMoveCard={canMoveCard}
+        highlightCards={displayHighlightCards}
+        myPlayerID={myState.id}
+        onEndGame={handleEndGame}
+        onNextTurn={handleNextTurn}
+        onPlayerIsEndingRound={handleEndRound}
+        onStartRound={handleStartRound}
+        players={players}
+        roundState={roundState}
+        selectedCard={selectedCard}
+        turnState={turnState}
       />
       {isDev && <GameDevUI socket={socket} />}
     </>

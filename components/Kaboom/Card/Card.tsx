@@ -1,36 +1,35 @@
 import clsx from "clsx";
 
 import {
-  isHandCard,
-  type HandCard,
-  type Card as CardType,
   type CardHighlightType,
+  type Card as CardType,
+  type HandCard,
+  isHandCard,
 } from "../../../kaboom/types";
-
 import styles from "./Card.module.scss";
 
 interface CardProps {
-  card: HandCard | CardType;
+  card: CardType | HandCard;
+  deckCardCount?: number;
+  indicatorType?: CardHighlightType;
   isBack?: boolean;
   isClickable: boolean;
-  isSelected?: boolean;
-  onClick: () => void;
-  indicatorType?: CardHighlightType;
   isDeck?: boolean;
-  deckCardCount?: number;
+  isSelected?: boolean;
   isSpecator?: boolean;
+  onClick: () => void;
 }
 
 const Card = ({
   card,
+  deckCardCount,
   indicatorType,
   isBack,
   isClickable,
-  isSelected,
-  onClick,
   isDeck,
-  deckCardCount,
+  isSelected,
   isSpecator,
+  onClick,
 }: CardProps) => {
   let printSymbol: string;
   let color = "black";
@@ -69,7 +68,6 @@ const Card = ({
 
   return (
     <button
-      onClick={onClick}
       className={clsx(
         styles.Card,
         isBack && styles.isBack,
@@ -84,6 +82,7 @@ const Card = ({
         isDeck && styles.isDeck,
         isHandCard(card) && styles.isHandCard,
       )}
+      onClick={onClick}
       style={style}
     >
       {isBack && <div className={styles.BackArtwork} />}

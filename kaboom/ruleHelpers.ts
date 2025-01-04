@@ -1,22 +1,22 @@
-import type { Card as CardType, CardValue, CardActions } from "./types";
+import type { CardActions, Card as CardType, CardValue } from "./types";
+
+export type CardRule = {
+  actions: RuleAction[];
+  cardValue: CardValue[];
+};
 
 export interface HighlightObject {
   deck: boolean;
+  dueToEffect: boolean;
   graveyard: boolean;
   otherCards: boolean;
   ownCards: boolean;
-  dueToEffect: boolean;
 }
 
 export type RuleAction = {
-  label: string;
   clickableAreas: HighlightObject;
+  label: string;
   type: CardActions;
-};
-
-export type CardRule = {
-  cardValue: CardValue[];
-  actions: RuleAction[];
 };
 
 export const emptyHighlight: HighlightObject = {
@@ -29,67 +29,67 @@ export const emptyHighlight: HighlightObject = {
 
 export const cardRules: CardRule[] = [
   {
-    cardValue: [7, 8],
     actions: [
       {
+        clickableAreas: {
+          ...emptyHighlight,
+          ownCards: true,
+        },
         label: "Look at one of your own cards",
-        clickableAreas: {
-          ...emptyHighlight,
-          ownCards: true,
-        },
         type: "lookAt",
       },
     ],
+    cardValue: [7, 8],
   },
   {
-    cardValue: [9, 10],
     actions: [
       {
+        clickableAreas: {
+          ...emptyHighlight,
+          otherCards: true,
+        },
         label: "Look at an opponent‘s card",
-        clickableAreas: {
-          ...emptyHighlight,
-          otherCards: true,
-        },
         type: "lookAt",
       },
     ],
+    cardValue: [9, 10],
   },
   {
+    actions: [
+      {
+        clickableAreas: {
+          ...emptyHighlight,
+          otherCards: true,
+          ownCards: true,
+        },
+        label: "Swop any two cards",
+        type: "swap",
+      },
+    ],
     cardValue: ["J", "Q"],
-    actions: [
-      {
-        label: "Swop any two cards",
-        clickableAreas: {
-          ...emptyHighlight,
-          otherCards: true,
-          ownCards: true,
-        },
-        type: "swap",
-      },
-    ],
   },
   {
-    cardValue: ["K"],
     actions: [
       {
-        label: "Look at any one card, then swap any two cards",
         clickableAreas: {
           ...emptyHighlight,
-          ownCards: true,
           otherCards: true,
+          ownCards: true,
         },
+        label: "Look at any one card, then swap any two cards",
         type: "lookAt",
       },
       {
-        label: "Swop any two cards",
         clickableAreas: {
           ...emptyHighlight,
           otherCards: true,
           ownCards: true,
         },
+        label: "Swop any two cards",
         type: "swap",
       },
     ],
+    cardValue: ["K"],
   },
 ];
 

@@ -5,7 +5,7 @@ import Button from "../../Button";
 // const isDev = process.env.NODE_ENV !== "production";
 
 interface GameDevUIProps {
-  socket: Socket | null;
+  socket: null | Socket;
 }
 
 import styles from "./Game.module.scss";

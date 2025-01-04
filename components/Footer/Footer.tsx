@@ -8,7 +8,7 @@ const Footer = ({}: FooterProps) => {
   return (
     <footer className={clsx(styles.Footer)}>
       2020-{new Date().getFullYear()} &copy; a project by{" "}
-      <a target="_blank" href="https://olivierbrueckner.de/">
+      <a href="https://olivierbrueckner.de/" target="_blank">
         Olivier Brückner
       </a>
     </footer>

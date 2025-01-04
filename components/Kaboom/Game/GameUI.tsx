@@ -1,69 +1,68 @@
+import clsx from "clsx";
 import React from "react";
 
-import clsx from "clsx";
-
-import {
-  type HighlightObject,
-  emptyHighlight,
-  getCardRule,
-  type CardRule,
-} from "../../../kaboom/ruleHelpers";
 import type {
-  Player,
+  Card as CardType,
   Deck,
   DeckType,
-  Card as CardType,
-  HandCard,
-  PlayerID,
   GameStateType,
+  HandCard,
+  HighlightCard,
+  Player,
+  PlayerID,
   RoundStateType,
   TurnStateType,
-  HighlightCard,
 } from "../../../kaboom/types";
+
+import {
+  type CardRule,
+  emptyHighlight,
+  getCardRule,
+  type HighlightObject,
+} from "../../../kaboom/ruleHelpers";
 import Button from "../../Button";
 import DeckUI from "../Deck";
 import PlayerUI from "../PlayerUI";
 import ScoreDisplay from "../ScoreDisplay";
-
 import styles from "./Game.module.scss";
 
 const isDev = process.env.NODE_ENV !== "production";
 
 interface GameUIProps {
-  gameState: GameStateType;
-  roundState: RoundStateType;
+  canMoveCard: boolean;
   deck: Deck;
-  myPlayerID: PlayerID;
-  onPlayerIsEndingRound: () => void;
-  onStartRound: () => void;
-  onEndGame: () => void;
-  onNextTurn: () => void;
-  highlightCards: HighlightCard[];
-  selectedCard?: CardType;
-  players: Player[];
-  turnState: TurnStateType;
+  gameState: GameStateType;
   handleDeckClick: (type: DeckType) => void;
   handlePlayerCardClick: (card: CardType) => void;
-  canMoveCard: boolean;
+  highlightCards: HighlightCard[];
+  myPlayerID: PlayerID;
+  onEndGame: () => void;
+  onNextTurn: () => void;
+  onPlayerIsEndingRound: () => void;
+  onStartRound: () => void;
+  players: Player[];
+  roundState: RoundStateType;
+  selectedCard?: CardType;
+  turnState: TurnStateType;
 }
 
 const emptyClickableAreas: HighlightObject = { ...emptyHighlight };
 
 const GameUI = ({
-  gameState,
-  roundState,
+  canMoveCard,
   deck,
-  myPlayerID,
-  onPlayerIsEndingRound,
-  onStartRound,
-  onEndGame,
-  highlightCards,
-  selectedCard,
-  players,
-  turnState,
+  gameState,
   handleDeckClick,
   handlePlayerCardClick,
-  canMoveCard,
+  highlightCards,
+  myPlayerID,
+  onEndGame,
+  onPlayerIsEndingRound,
+  onStartRound,
+  players,
+  roundState,
+  selectedCard,
+  turnState,
 }: GameUIProps) => {
   let clickableAreas = { ...emptyClickableAreas };
 
@@ -77,7 +76,7 @@ const GameUI = ({
     .filter((p) => p.isPlaying)
     .findIndex((p) => p.id === myPlayerID);
   let effectDisplayText = "";
-  let currentRule: CardRule | undefined | false = undefined;
+  let currentRule: CardRule | false | undefined = undefined;
 
   if (turnState.phase === "pre round") {
     effectDisplayText = "Look at your own cards before the round begins";
@@ -99,17 +98,17 @@ const GameUI = ({
     // get clickable states if is current player
     if (isCurrentPlayer) {
       switch (turnState.phase) {
-        case "draw":
-          clickableAreas.deck = true;
-          clickableAreas.graveyard = true;
-
-          break;
         case "card in hand":
           clickableAreas.ownCards = true;
           // check if hand card is from deck or graveyard
           if (deck.deck.find((dc) => dc.id === selectedCard?.id)) {
             clickableAreas.graveyard = true;
           }
+          break;
+        case "draw":
+          clickableAreas.deck = true;
+          clickableAreas.graveyard = true;
+
           break;
         case "effect":
           // if is "effect" phase and is current player
@@ -148,34 +147,34 @@ const GameUI = ({
 
             return (
               <PlayerUI
-                key={"player-no_" + k}
-                startingPos={myPos}
-                highlightCards={highlightCards}
-                playerNo={k}
-                player={p}
-                isSelf={isSelf}
-                myPlayerID={myPlayerID}
-                isEndingPlayer={roundState.lastRoundStartedByPlayer === p.id}
-                isCurrent={p.id === turnState.currentPlayer && roundIsRunning}
                 cards={cards}
-                spectatorMode={spectatorMode}
-                onClick={handlePlayerCardClick}
+                highlightCards={highlightCards}
                 isClickable={isClickable}
+                isCurrent={p.id === turnState.currentPlayer && roundIsRunning}
+                isEndingPlayer={roundState.lastRoundStartedByPlayer === p.id}
                 isHighlightDueToEffect={clickableAreas.dueToEffect}
-                turnState={turnState}
+                isSelf={isSelf}
+                key={"player-no_" + k}
+                myPlayerID={myPlayerID}
+                onClick={handlePlayerCardClick}
+                player={p}
+                playerNo={k}
                 roundState={roundState}
+                spectatorMode={spectatorMode}
+                startingPos={myPos}
+                turnState={turnState}
               />
             );
           })}
       </div>
 
       <DeckUI
+        clickGraveyard={() => handleDeckClick("graveyard")}
         deck={deck}
         drawCard={() => handleDeckClick("deck")}
-        clickGraveyard={() => handleDeckClick("graveyard")}
-        isCurrent={isCurrentPlayer && roundIsRunning}
-        isClickable={clickableAreas}
         highlightCards={highlightCards}
+        isClickable={clickableAreas}
+        isCurrent={isCurrentPlayer && roundIsRunning}
         spectatorMode={spectatorMode}
       />
 
@@ -188,9 +187,9 @@ const GameUI = ({
       ) : null}
 
       <ScoreDisplay
-        id={myPlayerID}
         currentPlayerId={turnState.currentPlayer}
         gameIsRunning={roundIsRunning}
+        id={myPlayerID}
         players={players}
       />
 
@@ -205,13 +204,13 @@ const GameUI = ({
 
       {roundState.phase === "setup" && (
         <div className={styles.StartRoundContainer}>
-          <Button theme="primary" onClick={onStartRound}>
+          <Button onClick={onStartRound} theme="primary">
             Start {gameState.roundCount > 0 ? "Next" : ""} Round
           </Button>
         </div>
       )}
 
-      <div style={{ zIndex: 10 }} className={styles.ForceEndBtn}>
+      <div className={styles.ForceEndBtn} style={{ zIndex: 10 }}>
         <Button onClick={onEndGame} theme="red">
           Force End Game
         </Button>
