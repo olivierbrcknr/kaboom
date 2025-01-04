@@ -1,7 +1,6 @@
 import clsx from "clsx";
 
 import { useIsDarkmode, useKeyboardFocus } from "../utils";
-
 import "../styles/reset.scss";
 import "../styles/variables.scss";
 import "../styles/index.scss";

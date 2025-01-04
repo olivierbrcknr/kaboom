@@ -5,9 +5,9 @@ import type { Player, PlayerID } from "../../../kaboom/types";
 import styles from "./ScoreDisplay.module.scss";
 
 interface ScoreDisplayProps {
-  id: PlayerID;
   currentPlayerId?: PlayerID;
   gameIsRunning: boolean;
+  id: PlayerID;
   players: Player[];
 }
 

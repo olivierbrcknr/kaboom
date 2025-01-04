@@ -1,16 +1,16 @@
 import type {
+  CardColor,
   CardSlot,
   CardValue,
   Deck,
   HandCard,
-  CardColor,
   Player,
   PlayerID,
 } from "../kaboom/types";
 
 const positionCard = (
   id: number,
-  handCards: undefined | HandCard[] = undefined,
+  handCards: HandCard[] | undefined = undefined,
 ): CardSlot => {
   const upperRow = [2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23];
 
@@ -72,8 +72,8 @@ const positionCard = (
 
 const shuffleDeck = <T>(array: T[]): T[] => {
   let currentIndex: number = array.length,
-    temporaryValue: T,
-    randomIndex: number;
+    randomIndex: number,
+    temporaryValue: T;
 
   while (0 !== currentIndex) {
     randomIndex = Math.floor(Math.random() * currentIndex);
@@ -226,11 +226,11 @@ const getNextPlayer = (
 };
 
 export {
-  createDefaultCardSet as createDefault,
-  shuffleDeck as shuffle,
-  distributeCards as distribute,
-  positionCard,
   checkDeck,
   checkNextPlayer,
+  createDefaultCardSet as createDefault,
+  distributeCards as distribute,
   getNextPlayer,
+  positionCard,
+  shuffleDeck as shuffle,
 };

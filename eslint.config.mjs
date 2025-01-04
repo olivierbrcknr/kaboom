@@ -1,9 +1,7 @@
-import eslintPluginReact from "eslint-plugin-react";
-
 import eslint from "@eslint/js";
 import eslintPluginNext from "@next/eslint-plugin-next";
-import tsParser from "@typescript-eslint/parser";
 import perfectionist from "eslint-plugin-perfectionist";
+import eslintPluginReact from "eslint-plugin-react";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config([
@@ -21,8 +19,7 @@ export default tseslint.config([
   },
   {
     rules: {
-      "prefer-const": ["warn"],
-      "no-unused-vars": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {
@@ -31,76 +28,14 @@ export default tseslint.config([
           caughtErrors: "all",
           caughtErrorsIgnorePattern: "^_",
           destructuredArrayIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
           ignoreRestSiblings: true,
+          varsIgnorePattern: "^_",
         },
       ],
-      "@typescript-eslint/no-empty-object-type": "off",
       "no-empty-pattern": "off",
+      "no-unused-vars": "off",
+      "prefer-const": ["warn"],
     },
   },
-  {
-    languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        ecmaFeatures: {
-          modules: true,
-        },
-        ecmaVersion: "latest",
-        // project: "./tsconfig.json",
-      },
-    },
-    files: ["**/*.ts{,x}", "**/*.{,m}js{,x}"],
-    plugins: {
-      perfectionist,
-    },
-    rules: {
-      "perfectionist/sort-imports": [
-        "warn",
-        {
-          type: "alphabetical",
-          order: "asc",
-          ignoreCase: false,
-          // internalPattern: ["components/**", "pages/**", "server/**"],
-          newlinesBetween: "always",
-          maxLineLength: undefined,
-          groups: [
-            "react",
-            ["builtin", "external"],
-            "internal",
-            "parent",
-            "sibling",
-            "unknown",
-            "style",
-          ],
-          customGroups: {
-            value: {
-              react: ["react", "react-*"],
-              lodash: "lodash",
-            },
-            type: {
-              react: ["react", "react-*"],
-            },
-          },
-          environment: "node",
-        },
-      ],
-      // "perfectionist/sort-objects": [
-      //   "warn",
-      //   {
-      //     type: "natural",
-      //     order: "asc",
-      //     ignoreCase: true,
-      //     // specialCharacters: "keep",
-      //     partitionByComment: false,
-      //     partitionByNewLine: false,
-      //     // newlinesBetween: "ignore",
-      //     styledComponents: true,
-      //     ignorePattern: [],
-      //     groups: [],
-      //     customGroups: {},
-      //   },
-      // ],
-    },
-  },
+  perfectionist.configs["recommended-natural"],
 ]);

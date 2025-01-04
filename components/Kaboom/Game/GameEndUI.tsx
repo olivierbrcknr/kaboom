@@ -1,17 +1,17 @@
 import React from "react";
 
 import type { Player, PlayerID } from "../../../kaboom/types";
-import Button from "../../Button";
 
+import Button from "../../Button";
 import styles from "./Game.module.scss";
 
 interface GameEndUIProps {
-  players: Player[];
   myPlayerID: PlayerID;
   onExitGame: () => void;
+  players: Player[];
 }
 
-const GameEndUI = ({ players, myPlayerID, onExitGame }: GameEndUIProps) => {
+const GameEndUI = ({ myPlayerID, onExitGame, players }: GameEndUIProps) => {
   const podiumPlayers = players.sort((p1, p2) => {
     let comparison = 0;
     if (p1.points > p2.points) {
@@ -28,8 +28,8 @@ const GameEndUI = ({ players, myPlayerID, onExitGame }: GameEndUIProps) => {
         {podiumPlayers.map((player) => {
           return (
             <li
-              key={"podium-" + player.id}
               className={player.id === myPlayerID ? styles.isCurrent : ""}
+              key={"podium-" + player.id}
             >
               {player.name} [{player.points}]
             </li>

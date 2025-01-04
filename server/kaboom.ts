@@ -5,41 +5,41 @@ import { createServer } from "http";
 import next from "next";
 import { Server } from "socket.io";
 
-import {
-  swapCardFromDeck,
-  swapCardFromGraveyard,
-  cardFromDeckToGraveyard,
-  cardShiftedToPlayer,
-  calcPlayerPoints,
-  cardSwoppedBetweenPlayers,
-  calcIfEnded,
-  checkIfPlayerHasZeroCards,
-  checkIfPlayable,
-  cardIsFromDeck,
-} from "../kaboom/kaboomRules";
-import { getCardRule } from "../kaboom/ruleHelpers";
 import type {
-  PlayerID,
-  Player,
   Card,
-  HandCard,
   CardHighlightType,
-  GameStateType,
-  RoundStateType,
-  TurnStateType,
   Deck,
   DeckType,
+  GameStateType,
+  HandCard,
   HighlightCard,
+  Player,
+  PlayerID,
+  RoundStateType,
+  TurnStateType,
 } from "../kaboom/types";
-import { isDev } from "../utils";
-import {
-  INITIAL_CARD_LOOK_DURATION,
-  END_VISBILITY_DURATION,
-} from "../utils/constants";
 
+import {
+  calcIfEnded,
+  calcPlayerPoints,
+  cardFromDeckToGraveyard,
+  cardIsFromDeck,
+  cardShiftedToPlayer,
+  cardSwoppedBetweenPlayers,
+  checkIfPlayable,
+  checkIfPlayerHasZeroCards,
+  swapCardFromDeck,
+  swapCardFromGraveyard,
+} from "../kaboom/kaboomRules";
+import { getCardRule } from "../kaboom/ruleHelpers";
+import { useIsDev } from "../utils";
+import {
+  END_VISBILITY_DURATION,
+  INITIAL_CARD_LOOK_DURATION,
+} from "../utils/constants";
 import { createDefault, distribute, getNextPlayer } from "./deckFunctions";
 
-const dev = isDev();
+const isDev = useIsDev();
 const PORT = process.env.PORT || 3000;
 
 // all Players
@@ -48,9 +48,9 @@ let players: Player[] = [];
 let deck: Deck;
 
 const gameStateInit: GameStateType = {
+  hasEnded: false,
   // players: [],
   isRunning: false,
-  hasEnded: false,
   roundCount: 0,
   // roundScores: [],
 };
@@ -58,10 +58,10 @@ const gameStateInit: GameStateType = {
 let gameState: GameStateType = { ...gameStateInit };
 
 const roundStateInit: RoundStateType = {
-  phase: "running",
-  turnCount: 0,
-  startingPlayer: "",
   lastRoundStartedByPlayer: undefined,
+  phase: "running",
+  startingPlayer: "",
+  turnCount: 0,
 };
 
 let roundState: RoundStateType = { ...roundStateInit };
@@ -81,10 +81,10 @@ let highlightCards: HighlightCard[] = [];
 let effectCards: HandCard[] = [];
 
 /** The ID of the player who's card was played last */
-let lastFiredCardStack: PlayerID | false = false;
+let lastFiredCardStack: false | PlayerID = false;
 
 /** The players that just moved a card */
-let playersWhoCanMoveCards: { player: PlayerID; card: HandCard }[] = [];
+let playersWhoCanMoveCards: { card: HandCard; player: PlayerID }[] = [];
 
 /** The card that is currently drawn and about to trigger an effect (potentially) */
 let cardInHand: Card | undefined = undefined;
@@ -95,7 +95,7 @@ const app: Express = express();
 app.use(cors());
 const httpServer = createServer(app);
 const io = new Server(httpServer);
-const nextApp = next({ dev });
+const nextApp = next({ dev: isDev });
 const nextHandler = nextApp.getRequestHandler();
 
 nextApp.prepare().then(() => {
@@ -182,11 +182,11 @@ io.on("connection", (socket) => {
     sendDeck();
 
     switch (currentPhase) {
-      case "draw":
-        initPhaseCardInHand();
-        break;
       case "card in hand":
         initPhaseEffect();
+        break;
+      case "draw":
+        initPhaseCardInHand();
         break;
       case "effect":
         initPhaseEnd();
@@ -466,8 +466,8 @@ io.on("connection", (socket) => {
           // --> if so, trigger move card event
           console.log(currentPlayerID, "is allowed to move one of their cards");
           playersWhoCanMoveCards.push({
-            player: currentPlayerID,
             card: playerCard,
+            player: currentPlayerID,
           });
 
           sendPlayerCanMoveCard();
@@ -483,8 +483,8 @@ io.on("connection", (socket) => {
   const handleHighlightCard = (cards: Card[], type: CardHighlightType) => {
     const newHighlights: HighlightCard[] = cards.map((c) => ({
       id: c.id,
-      type: type,
       player: currentPlayerID,
+      type: type,
     }));
 
     // irrelevant?

@@ -1,26 +1,25 @@
+import clsx from "clsx";
 import React from "react";
 
-import clsx from "clsx";
-
 import type { Player, PlayerID } from "../../../kaboom/types";
+
 import Button from "../../Button";
 import PlayerSelection from "../PlayerSelection";
-
 import styles from "./Game.module.scss";
 
 interface GameSetupUIProps {
+  myPlayerID: PlayerID;
   onNameChange: (v: string) => void;
   onPlayerToggle: (v: PlayerID) => void;
   onStartGame: () => void;
-  myPlayerID: PlayerID;
   players: Player[];
 }
 
 const GameSetupUI = ({
+  myPlayerID,
   onNameChange,
   onPlayerToggle,
   onStartGame,
-  myPlayerID,
   players,
 }: GameSetupUIProps) => {
   let playingPlayers = 0;
@@ -36,16 +35,16 @@ const GameSetupUI = ({
       <h1>Kaboom</h1>
 
       <PlayerSelection
+        myPlayerID={myPlayerID}
         onNameChange={onNameChange}
         onPlayerToggle={onPlayerToggle}
-        myPlayerID={myPlayerID}
         players={players}
       />
 
       <Button
-        theme="primary"
-        onClick={onStartGame}
         disabled={playingPlayers < 2}
+        onClick={onStartGame}
+        theme="primary"
       >
         Start Game
       </Button>

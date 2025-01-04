@@ -1,14 +1,14 @@
 import clsx from "clsx";
 
 import type { Player, PlayerID } from "../../../kaboom/types";
-import Toggle from "../../Toggle";
 
+import Toggle from "../../Toggle";
 import styles from "./PlayerSelection.module.scss";
 
 interface PlayerSelectionProps {
+  myPlayerID: PlayerID;
   onNameChange: (v: string) => void;
   onPlayerToggle: (v: PlayerID) => void;
-  myPlayerID: PlayerID;
   players: Player[];
 }
 
@@ -29,18 +29,18 @@ const PlayerSelection = ({
             >
               {p.id === myPlayerID ? (
                 <input
-                  type="text"
-                  onChange={(v) => onNameChange(v.target.value)}
                   className={styles.PlayerName}
+                  onChange={(v) => onNameChange(v.target.value)}
                   placeholder={"You"}
+                  type="text"
                   value={p.name}
                 />
               ) : (
                 <div className={styles.PlayerName}>{p.name}</div>
               )}
               <Toggle
-                value={p.isPlaying}
                 onChange={() => onPlayerToggle(p.id)}
+                value={p.isPlaying}
               />
               {/* <div
                 onClick={() => onPlayerToggle(p.id)}

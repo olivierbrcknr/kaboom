@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { MOBILE_WIDTH, MAX_SCREEN_WIDTH } from "./constants";
+import { MAX_SCREEN_WIDTH, MOBILE_WIDTH } from "./constants";
 
 // Darkmode
 export const useIsDarkmode = () => {
@@ -32,17 +32,17 @@ export const useIsDarkmode = () => {
 
 // Window
 const getWindowDimensions = () => {
-  const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
+  const { innerHeight: windowHeight, innerWidth: windowWidth } = window;
   return {
-    windowWidth,
     windowHeight,
+    windowWidth,
   };
 };
 
 export const useWindowDimensions = () => {
   const [windowDimensions, setWindowDimensions] = useState({
-    windowWidth: 0, // default value before init
     windowHeight: 0, // default value before init
+    windowWidth: 0, // default value before init
   });
 
   useEffect(() => {
@@ -92,6 +92,6 @@ export const useIsWindows = () => {
   return isWindows;
 };
 
-export const isDev = () => {
+export const useIsDev = () => {
   return process.env.NODE_ENV !== "production";
 };

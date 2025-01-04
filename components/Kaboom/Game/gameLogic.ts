@@ -1,22 +1,22 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import type {
-  Player,
+  Card,
+  CardHighlightType,
+  CardPosition,
   Deck,
   DeckType,
-  Card,
-  HandCard,
-  PlayerID,
-  CardPosition,
-  CardHighlightType,
   GameStateType,
+  HandCard,
+  HighlightCard,
+  Player,
+  PlayerID,
   RoundStateType,
   TurnStateType,
-  HighlightCard,
 } from "../../../kaboom/types";
-import { EFFECT_VISIBILITY_DURATION } from "../../../utils/constants";
 
-import { useSocket, isSocket } from "./socket";
+import { EFFECT_VISIBILITY_DURATION } from "../../../utils/constants";
+import { isSocket, useSocket } from "./socket";
 
 export const useGame = () => {
   const [myState, setMyState] = useState<{
@@ -31,18 +31,18 @@ export const useGame = () => {
 
   // overarching game state = multiple rounds
   const [gameState, setGameState] = useState<GameStateType>({
+    hasEnded: false,
     // players: [],
     isRunning: false,
-    hasEnded: false,
     roundCount: 0,
   });
 
   // round state = multiple turns
   const [roundState, setRoundState] = useState<RoundStateType>({
-    phase: "setup",
-    turnCount: 0,
-    startingPlayer: "",
     lastRoundStartedByPlayer: undefined,
+    phase: "setup",
+    startingPlayer: "",
+    turnCount: 0,
   });
 
   // turn state
@@ -225,7 +225,7 @@ export const useGame = () => {
   const handleCardSwop = (
     position: CardPosition,
     card: HandCard,
-    secondCard?: HandCard | Card,
+    secondCard?: Card | HandCard,
   ) => {
     if (isSocket(socket)) {
       switch (position) {
@@ -268,17 +268,6 @@ export const useGame = () => {
 
   const handleDeckClick = (type: DeckType) => {
     switch (turnState.phase) {
-      case "draw":
-        // if is "draw" phase
-        // ################################
-        if (type === "deck") {
-          handleDrawCard("deck");
-        } else {
-          // graveyard
-          handleDrawCard("graveyard");
-        }
-        break;
-
       case "card in hand":
         // if is "card in hand" phase
         // and click is graveyard
@@ -289,6 +278,16 @@ export const useGame = () => {
         }
         break;
 
+      case "draw":
+        // if is "draw" phase
+        if (type === "deck") {
+          handleDrawCard("deck");
+        } else {
+          // graveyard
+          handleDrawCard("graveyard");
+        }
+        break;
+
       default:
         // else --> do nothing
         break;
@@ -296,34 +295,34 @@ export const useGame = () => {
   };
 
   return {
-    myState,
+    canMoveCard,
+    currentDeck,
+    displayHighlightCards,
     gameState,
-    handleSwopCardsBetweenPlayers,
     handleCardFromDeckToGraveyard,
-    handleCardSwop,
-    handleHighlightCard,
     handleCardPlayed,
+    handleCardSwop,
     handleChangeName,
+    handleDeckClick,
+    handleDrawCard,
+    handleEndGame,
+    handleEndRound,
+    handleExitGame,
+    handleHighlightCard,
+    handleNextTurn,
+    handlePlayerCardClick,
+    handlePlayerIsEnding,
     handlePlayerToggle,
     handleStartGame,
-    handleEndGame,
-    handlePlayerIsEnding,
-    handleEndRound,
     handleStartRound,
-    handleDrawCard,
-    handleNextTurn,
+    handleSwopCardsBetweenPlayers,
+    highlightCards,
+    myState,
+    players,
     roundState,
     selectedCard,
-    currentDeck,
-    highlightCards,
-    displayHighlightCards,
     setSelectedCard,
     socket,
     turnState,
-    players,
-    handleExitGame,
-    handleDeckClick,
-    handlePlayerCardClick,
-    canMoveCard,
   };
 };

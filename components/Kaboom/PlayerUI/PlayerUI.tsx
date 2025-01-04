@@ -1,59 +1,61 @@
 import clsx from "clsx";
 
-import { calcCardPoints } from "../../../kaboom/kaboomRules";
 import type {
-  Player,
-  HandCard,
-  CardHighlightType,
   CardEffect,
+  CardHighlightType,
+  HandCard,
   HighlightCard,
-  TurnStateType,
+  Player,
   PlayerID,
   RoundStateType,
+  TurnStateType,
 } from "../../../kaboom/types";
-import { isDev } from "../../../utils";
-import Card from "../Card";
 
+import { calcCardPoints } from "../../../kaboom/kaboomRules";
+import { useIsDev } from "../../../utils";
+import Card from "../Card";
 import styles from "./PlayerUI.module.scss";
 
 interface PlayerUIProps {
+  cards: HandCard[];
   effect?: CardEffect;
   highlightCards: HighlightCard[];
-  startingPos: number;
-  playerNo: number;
-  player: Player;
-  isSelf: boolean;
-  isEndingPlayer: boolean;
-  isCurrent: boolean;
-  cards: HandCard[];
-  spectatorMode: boolean;
-  onClick: (card: HandCard, triggeringEffect: boolean) => void;
   isClickable: boolean;
+  isCurrent: boolean;
+  isEndingPlayer: boolean;
   isHighlightDueToEffect: boolean;
-  turnState: TurnStateType;
+  isSelf: boolean;
   myPlayerID: PlayerID;
+  onClick: (card: HandCard, triggeringEffect: boolean) => void;
+  player: Player;
+  playerNo: number;
   roundState: RoundStateType;
+  spectatorMode: boolean;
+  startingPos: number;
+  turnState: TurnStateType;
 }
 
 const PlayerUI = ({
   cards,
   effect,
+  highlightCards,
+  isClickable,
   isCurrent,
   isEndingPlayer,
-  isClickable,
   isHighlightDueToEffect,
   isSelf,
+  myPlayerID,
   onClick,
   player,
   playerNo,
+  roundState,
   spectatorMode,
   startingPos,
-  highlightCards,
   turnState,
-  myPlayerID,
-  roundState,
 }: PlayerUIProps) => {
-  let position: "top" | "right" | "bottom" | "left" = "bottom";
+  let position: "bottom" | "left" | "right" | "top" = "bottom";
+
+  const isDev = useIsDev();
 
   switch (playerNo - startingPos) {
     case -3:
@@ -87,7 +89,7 @@ const PlayerUI = ({
         position === "left" && styles.posLeft,
       )}
     >
-      {(isDev() || spectatorMode) && (
+      {(isDev || spectatorMode) && (
         <div className={styles.Score}>{calcCardPoints(cards)}</div>
       )}
 
@@ -164,13 +166,13 @@ const PlayerUI = ({
               <Card
                 // className={styles.CardGrid_Card.toString()}
                 card={c}
-                key={"myCard-" + k}
                 indicatorType={indicatorType}
+                isBack={!isVisible}
                 isClickable={isClickable}
                 isSelected={isSelected}
-                onClick={handleClickCard}
-                isBack={!isVisible}
                 isSpecator={spectatorMode}
+                key={"myCard-" + k}
+                onClick={handleClickCard}
               />
             );
           })}

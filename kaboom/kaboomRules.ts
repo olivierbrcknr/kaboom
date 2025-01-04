@@ -1,6 +1,6 @@
-import { positionCard, checkDeck } from "../server/deckFunctions";
+import type { Card, Deck, HandCard, Player, PlayerID } from "./types";
 
-import type { Deck, HandCard, PlayerID, Card, Player } from "./types";
+import { checkDeck, positionCard } from "../server/deckFunctions";
 
 const checkIfPlayable = (
   deck: Deck,
@@ -196,17 +196,13 @@ const calcCardPoints = (cards: Card[]) => {
     let cardVal = 0;
 
     switch (card.value) {
-      case "Q":
-      case "J":
-        cardVal = 10;
-        break;
-
       case "A":
         cardVal = 1;
         break;
 
-      case "X":
-        cardVal = 0;
+      case "J":
+      case "Q":
+        cardVal = 10;
         break;
 
       case "K":
@@ -216,7 +212,10 @@ const calcCardPoints = (cards: Card[]) => {
         } else {
           cardVal = 10;
         }
+        break;
 
+      case "X":
+        cardVal = 0;
         break;
 
       default:
@@ -342,7 +341,7 @@ const calcIfEnded = (players: Player[]): boolean => {
 };
 
 const checkIfPlayerHasZeroCards = (players: Player[], deck: Deck) => {
-  let hasZeroCards: PlayerID | false = false;
+  let hasZeroCards: false | PlayerID = false;
 
   for (let i = 0; i < players.length; i++) {
     let cardCount = 0;
@@ -364,15 +363,15 @@ const cardIsFromDeck = (deck: Deck, card: Card): boolean => {
 };
 
 export {
+  calcCardPoints,
+  calcIfEnded,
+  calcPlayerPoints,
+  cardFromDeckToGraveyard,
+  cardIsFromDeck,
+  cardShiftedToPlayer,
+  cardSwoppedBetweenPlayers,
   checkIfPlayable,
+  checkIfPlayerHasZeroCards,
   swapCardFromDeck,
   swapCardFromGraveyard,
-  cardFromDeckToGraveyard,
-  cardShiftedToPlayer,
-  calcPlayerPoints,
-  cardSwoppedBetweenPlayers,
-  calcIfEnded,
-  checkIfPlayerHasZeroCards,
-  calcCardPoints,
-  cardIsFromDeck,
 };

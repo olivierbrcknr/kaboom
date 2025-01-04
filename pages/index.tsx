@@ -1,15 +1,12 @@
-import React, { useState } from "react";
-
 import clsx from "clsx";
+import React, { useState } from "react";
 
 import Footer from "../components/Footer";
 import Head from "../components/Head";
 import Game from "../components/Kaboom/Game";
 import Markdown from "../components/Markdown";
-
-import rulesMD from "./Rules.md";
-
 import styles from "./index.module.scss";
+import rulesMD from "./Rules.md";
 
 const Home = () => {
   const [showRules, setShowRules] = useState(false);

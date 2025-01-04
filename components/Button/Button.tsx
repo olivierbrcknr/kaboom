@@ -1,34 +1,33 @@
-import React from "react";
-
 import clsx from "clsx";
+import React from "react";
 
 import styles from "./Button.module.scss";
 
-type ButtonTheme = "default" | "primary" | "red";
-
 interface ButtonProps {
-  children?: string | string[] | React.JSX.Element;
-  onClick?: () => void;
+  children?: React.JSX.Element | string | string[];
   disabled?: boolean;
+  onClick?: () => void;
   theme?: ButtonTheme;
 }
 
+type ButtonTheme = "default" | "primary" | "red";
+
 const Button = ({
   children,
-  onClick,
   disabled,
+  onClick,
   theme = "default",
 }: ButtonProps) => {
   return (
     <button
-      onClick={onClick}
-      disabled={disabled}
       className={clsx(
         styles.Button,
         disabled && styles.isDisabled,
         theme === "primary" && styles.themePrimary,
         theme === "red" && styles.themeRed,
       )}
+      disabled={disabled}
+      onClick={onClick}
     >
       {children}
     </button>

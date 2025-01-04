@@ -1,3 +1,26 @@
+type Card = {
+  color: CardColor;
+  id: number;
+  value: CardValue;
+};
+
+type CardActions = "lookAt" | "swap";
+
+type CardColor = 0 | 1 | 2 | 3 | null; // Color null = joker
+
+type CardEffect = {
+  action: CardActions | undefined;
+  cards: HandCard[];
+  needsInteraction: boolean;
+  timer: number;
+};
+
+type CardHighlightType = "drew_deck" | "drew_graveyard" | "lookAt" | "swap";
+
+type CardPosition = "deck" | "graveyard" | "swap";
+
+type CardSlot = { x: number; y: number };
+
 type CardValue =
   | 2
   | 3
@@ -8,63 +31,40 @@ type CardValue =
   | 8
   | 9
   | 10
-  | "J"
-  | "Q"
-  | "K"
   | "A"
+  | "J"
+  | "K"
+  | "Q"
   | "X";
 
-type CardActions = "lookAt" | "swap";
+type Deck = {
+  deck: Card[];
+  graveyard: Card[];
+  hand: HandCard[];
+};
 
 type DeckType = "deck" | "graveyard";
-
-type CardPosition = "deck" | "swap" | "graveyard";
-
-type CardHighlightType = "swap" | "drew_deck" | "drew_graveyard" | "lookAt";
-
-type CardColor = 0 | 1 | 2 | 3 | null; // Color null = joker
-
-type CardSlot = { x: number; y: number };
-
-type CardEffect = {
-  action: CardActions | undefined;
-  cards: HandCard[];
-  timer: number;
-  needsInteraction: boolean;
-};
-
-type PlayerID = string;
-
-type Player = {
-  id: PlayerID;
-  name: string;
-  points: number;
-  roundPoints: number[];
-  isPlaying: boolean;
-};
-
-type Card = {
-  id: number;
-  color: CardColor;
-  value: CardValue;
-};
 
 interface HandCard extends Card {
   player: PlayerID;
   slot: CardSlot;
 }
 
-type Deck = {
-  hand: HandCard[];
-  deck: Card[];
-  graveyard: Card[];
+type HighlightCard = {
+  id: DeckType | number;
+  player: PlayerID;
+  type: CardHighlightType;
 };
 
-type HighlightCard = {
-  id: number | DeckType;
-  type: CardHighlightType;
-  player: PlayerID;
+type Player = {
+  id: PlayerID;
+  isPlaying: boolean;
+  name: string;
+  points: number;
+  roundPoints: number[];
 };
+
+type PlayerID = string;
 
 const isHandCard = (value: unknown): value is HandCard => {
   return (
@@ -77,9 +77,9 @@ const isHandCard = (value: unknown): value is HandCard => {
 
 // TODO: need to add round values
 type GameStateType = {
+  hasEnded: boolean;
   // players: Player[];
   isRunning: boolean;
-  hasEnded: boolean;
   roundCount: number;
   // roundScores: {
   //   player: PlayerID;
@@ -91,10 +91,10 @@ const gamePhases = ["setup", "running", "last round", "end"] as const;
 type GamePhase = (typeof gamePhases)[number];
 
 type RoundStateType = {
-  turnCount: number;
-  startingPlayer: PlayerID;
-  phase: GamePhase;
   lastRoundStartedByPlayer?: PlayerID;
+  phase: GamePhase;
+  startingPlayer: PlayerID;
+  turnCount: number;
 };
 
 const roundPhases = [
@@ -114,26 +114,26 @@ type TurnStateType = {
   playedCard?: Card;
 };
 
-export { isHandCard, gamePhases, roundPhases };
+export { gamePhases, isHandCard, roundPhases };
 
 export type {
-  Player,
   Card,
-  HandCard,
-  CardPosition,
-  CardValue,
-  Deck,
-  CardColor,
-  CardSlot,
-  PlayerID,
   CardActions,
+  CardColor,
   CardEffect,
   CardHighlightType,
-  GameStateType,
-  RoundStateType,
-  RoundPhase,
-  TurnStateType,
+  CardPosition,
+  CardSlot,
+  CardValue,
+  Deck,
   DeckType,
-  HighlightCard,
   GamePhase,
+  GameStateType,
+  HandCard,
+  HighlightCard,
+  Player,
+  PlayerID,
+  RoundPhase,
+  RoundStateType,
+  TurnStateType,
 };
