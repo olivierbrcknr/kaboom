@@ -35,6 +35,7 @@ const GameWrapper = ({}: GameWrapperProps) => {
     selectedCard,
     currentDeck,
     highlightCards,
+    displayHighlightCards,
     setSelectedCard,
     socket,
     turnState,
@@ -110,7 +111,7 @@ const GameWrapper = ({}: GameWrapperProps) => {
         onSwopCardsBetweenPlayers={handleSwopCardsBetweenPlayers}
         onCardFromDeckToGraveyard={handleCardFromDeckToGraveyard}
         highlightDeck={highlightDeck}
-        highlightCards={highlightCards}
+        highlightCards={displayHighlightCards}
         selectedCard={selectedCard}
         onSetSelectedCard={setSelectedCard}
         players={players}

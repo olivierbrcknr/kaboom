@@ -1,5 +1,6 @@
 import clsx from "clsx";
 
+import { calcCardPoints } from "../../../kaboom/kaboomRules";
 import type {
   Player,
   Card as CardType,
@@ -8,12 +9,11 @@ import type {
   CardEffect,
   HighlightCard,
   TurnStateType,
+  PlayerID,
+  RoundStateType,
 } from "../../../kaboom/types";
-import Card from "../Card";
-
-import { calcCardPoints } from "../../../kaboom/kaboomRules";
-
 import { isDev } from "../../../utils";
+import Card from "../Card";
 
 import styles from "./PlayerUI.module.scss";
 
@@ -32,6 +32,8 @@ interface PlayerUIProps {
   isClickable: boolean;
   isHighlightDueToEffect: boolean;
   turnState: TurnStateType;
+  myPlayerID: PlayerID;
+  roundState: RoundStateType;
 }
 
 const PlayerUI = ({
@@ -49,6 +51,8 @@ const PlayerUI = ({
   startingPos,
   highlightCards,
   turnState,
+  myPlayerID,
+  roundState,
 }: PlayerUIProps) => {
   let position: "top" | "right" | "bottom" | "left" = "bottom";
 
@@ -145,8 +149,15 @@ const PlayerUI = ({
               }
             };
 
-            // TODO: right thinkign, wrong execution
-            if (isHighlightCard && indicatorType === "lookAt" && isCurrent) {
+            if (
+              isHighlightCard &&
+              indicatorType === "lookAt" &&
+              isHighlightCard.player === myPlayerID
+            ) {
+              isVisible = true;
+            }
+
+            if (roundState.phase === "end") {
               isVisible = true;
             }
 

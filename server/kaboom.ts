@@ -36,7 +36,10 @@ import {
 
 import { isDev } from "../utils";
 
-import { INITIAL_CARD_LOOK_DURATION } from "../utils/constants";
+import {
+  INITIAL_CARD_LOOK_DURATION,
+  END_VISBILITY_DURATION,
+} from "../utils/constants";
 
 import { createDefault, distribute, getNextPlayer } from "./deckFunctions";
 
@@ -59,10 +62,9 @@ const gameStateInit: GameStateType = {
 let gameState: GameStateType = { ...gameStateInit };
 
 const roundStateInit: RoundStateType = {
-  isRunning: true,
+  phase: "running",
   turnCount: 0,
   startingPlayer: "",
-  isLastRound: false,
   lastRoundStartedByPlayer: undefined,
 };
 
@@ -119,6 +121,8 @@ io.on("connection", (socket) => {
   // const nextPlayer = getNextPlayer(players, turnState.currentPlayer);
   // turnState = { ...turnStateInit, currentPlayer: nextPlayer };
   // };
+
+  const currentPlayerID: PlayerID = socket.id;
 
   const initPhaseCardInHand = () => {
     turnState.phase = "card in hand";
@@ -250,6 +254,9 @@ io.on("connection", (socket) => {
     sendTurnState();
 
     setTimeout(() => {
+      roundState.phase = "running";
+      sendRoundState();
+
       // init the actual turn
       initTurn();
     }, INITIAL_CARD_LOOK_DURATION);
@@ -257,7 +264,7 @@ io.on("connection", (socket) => {
 
   const endRound = (endingByChoice = false, endingPlayerID?: PlayerID) => {
     // end round state
-    roundState = { ...roundState, isRunning: false };
+    roundState = { ...roundState, phase: "end" };
     sendRoundState();
     sendDeck();
 
@@ -273,6 +280,11 @@ io.on("connection", (socket) => {
       endGame();
     } else {
       // do nothing, round starts manually
+
+      setTimeout(() => {
+        roundState = { ...roundState, phase: "setup" };
+        sendRoundState();
+      }, END_VISBILITY_DURATION);
     }
   };
 
@@ -328,20 +340,36 @@ io.on("connection", (socket) => {
     nextPhase(); // card in hand
   };
 
+  let effectActionCount = 0;
+
   const checkEffect = () => {
     console.log("check if play effect");
     const currentRule =
       turnState.playedCard && getCardRule(turnState.playedCard);
 
+    const playNextEffect = () => {
+      effectActionCount++;
+
+      if (currentRule && currentRule.actions.length > effectActionCount) {
+        // reset effect cards
+        effectCards = [];
+        // start new effect
+        checkEffect();
+      } else {
+        effectActionCount = 0;
+        nextPhase();
+      }
+    };
+
     if (currentRule) {
-      const activeEffect = currentRule.actions[0];
+      const activeEffect = currentRule.actions[effectActionCount];
 
       switch (activeEffect.type) {
         case "lookAt":
           if (effectCards.length === 1) {
             console.log("play Effect", "lookAt");
             handleHighlightCard(effectCards, "lookAt");
-            nextPhase();
+            playNextEffect();
           }
           break;
         case "swap":
@@ -349,7 +377,7 @@ io.on("connection", (socket) => {
             console.log("play Effect", "swap");
             handleHighlightCard(effectCards, "swap");
             deck = cardSwoppedBetweenPlayers(deck, effectCards);
-            nextPhase();
+            playNextEffect();
           }
           break;
       }
@@ -359,7 +387,6 @@ io.on("connection", (socket) => {
   };
 
   const handlePlayerCardClick = (playerCard: HandCard) => {
-    const currentPlayerID = socket.id;
     let isSelectableCard = false;
 
     // if player is can currently move a card
@@ -460,6 +487,7 @@ io.on("connection", (socket) => {
     const newHighlights: HighlightCard[] = cards.map((c) => ({
       id: c.id,
       type: type,
+      player: currentPlayerID,
     }));
 
     // irrelevant?
@@ -513,7 +541,7 @@ io.on("connection", (socket) => {
   };
 
   const handlePlayerNameChange = (newName: string) => {
-    const relID = players.findIndex((p) => p.id === socket.id);
+    const relID = players.findIndex((p) => p.id === currentPlayerID);
     players[relID].name = newName;
 
     sendPlayers();
@@ -541,7 +569,9 @@ io.on("connection", (socket) => {
   };
 
   const handleDisconnect = () => {
-    const closedSocketIndex = players.findIndex((p) => p.id === socket.id);
+    const closedSocketIndex = players.findIndex(
+      (p) => p.id === currentPlayerID,
+    );
     const closedPlayer = players[closedSocketIndex];
 
     console.log(color.red(`⭕️ ${closedPlayer.name} disconnected`));
@@ -624,7 +654,7 @@ io.on("connection", (socket) => {
   console.log(color.green(`🔌 New client connected`));
 
   players.push({
-    id: socket.id,
+    id: currentPlayerID,
     isPlaying: false,
     name: "Player " + players.length,
     points: 0,

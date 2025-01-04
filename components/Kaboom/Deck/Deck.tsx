@@ -68,7 +68,6 @@ const Deck = ({
             card={deck.graveyard[deck.graveyard.length - 1]}
             isClickable={isCurrent && isClickable.graveyard ? true : false}
             indicatorType={highlightGraveyard ? "drew_graveyard" : undefined}
-            // indicatorType={isClickable.graveyard ? "lookAt" : undefined}
             onClick={handleGraveyardClick}
             isDeck
             deckCardCount={deck.graveyard.length}
@@ -84,7 +83,6 @@ const Deck = ({
             isBack={!showNext}
             card={nextCard}
             isClickable={isCurrent && isClickable.deck}
-            // indicatorType={isClickable.deck ? "lookAt" : undefined}
             indicatorType={highlightDeck ? "drew_deck" : undefined}
             onClick={handleDeckClick}
             isDeck

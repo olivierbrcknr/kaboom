@@ -16,6 +16,8 @@ import type {
   HighlightCard,
 } from "../../../kaboom/types";
 
+import { EFFECT_VISIBILITY_DURATION } from "../../../utils/constants";
+
 import { useSocket, isSocket } from "./socket";
 
 export const useGame = () => {
@@ -62,12 +64,28 @@ export const useGame = () => {
   );
 
   const [highlightCards, setHighlightCards] = useState<HighlightCard[]>([]);
+  const [displayHighlightCards, setDisplayHighlightCards] = useState<
+    HighlightCard[]
+  >([]);
 
   const [selectedCard, setSelectedCard] = useState<Card | undefined>(undefined);
 
   const socket = useSocket();
 
   const [canMoveCard, setCanMoveCard] = useState(false);
+
+  useEffect(() => {
+    setDisplayHighlightCards(highlightCards);
+
+    // clear display timer
+    const timer = setTimeout(() => {
+      setDisplayHighlightCards([]);
+    }, EFFECT_VISIBILITY_DURATION);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [highlightCards]);
 
   // socket ———————————————————————————————————————————————
 
@@ -330,6 +348,7 @@ export const useGame = () => {
     selectedCard,
     currentDeck,
     highlightCards,
+    displayHighlightCards,
     setSelectedCard,
     socket,
     turnState,
