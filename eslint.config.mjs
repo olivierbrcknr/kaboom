@@ -1,11 +1,14 @@
 import eslintPluginReact from "eslint-plugin-react";
 
+import eslint from "@eslint/js";
 import eslintPluginNext from "@next/eslint-plugin-next";
 import tsParser from "@typescript-eslint/parser";
 import perfectionist from "eslint-plugin-perfectionist";
-import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import tseslint from "typescript-eslint";
 
-export default [
+export default tseslint.config([
+  eslint.configs.recommended,
+  tseslint.configs.recommended,
   { ignores: ["node_modules/*", ".next/*"] },
   {
     plugins: {
@@ -16,41 +19,26 @@ export default [
       "@next/next/google-font-display": ["off"],
     },
   },
-  eslintPluginPrettierRecommended,
   {
     rules: {
-      "no-unused-vars": [
+      "prefer-const": ["warn"],
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
         "warn",
         {
-          vars: "all",
-          args: "after-used",
+          args: "all",
+          argsIgnorePattern: "^_",
           caughtErrors: "all",
-          ignoreRestSiblings: false,
-          reportUsedIgnorePattern: false,
-          varsIgnorePattern: "exhaustiveCheck",
+          caughtErrorsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
         },
       ],
-      "prefer-const": ["warn"],
+      "@typescript-eslint/no-empty-object-type": "off",
+      "no-empty-pattern": "off",
     },
   },
-  // {
-  //   plugins: {
-  //     tsPlugin,
-  //   },
-  //   rules: {
-  //     "@typescript-eslint/no-unused-vars": [
-  //       // "no-unused-vars": [
-  //       "warn",
-  //       {
-  //         vars: "all",
-  //         args: "after-used",
-  //         caughtErrors: "all",
-  //         ignoreRestSiblings: false,
-  //         reportUsedIgnorePattern: false,
-  //       },
-  //     ],
-  //   },
-  // },
   {
     languageOptions: {
       parser: tsParser,
@@ -115,4 +103,4 @@ export default [
       // ],
     },
   },
-];
+]);

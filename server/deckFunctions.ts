@@ -70,9 +70,9 @@ const positionCard = (
   };
 };
 
-const shuffleDeck = (array: any[]) => {
+const shuffleDeck = <T>(array: T[]): T[] => {
   let currentIndex: number = array.length,
-    temporaryValue: any,
+    temporaryValue: T,
     randomIndex: number;
 
   while (0 !== currentIndex) {

@@ -1,25 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import clsx from "clsx";
 
 import {
   type HighlightObject,
-  cardRules,
   emptyHighlight,
   getCardRule,
   type CardRule,
 } from "../../../kaboom/ruleHelpers";
 import type {
   Player,
-  FocusCard,
   Deck,
   DeckType,
   Card as CardType,
   HandCard,
   PlayerID,
-  CardEffect,
-  CardPosition,
-  CardHighlightType,
   GameStateType,
   RoundStateType,
   TurnStateType,
@@ -43,22 +38,8 @@ interface GameUIProps {
   onStartRound: () => void;
   onEndGame: () => void;
   onNextTurn: () => void;
-  playEffect: boolean;
-  onEndEffect: () => void;
-  onDrawCard: (v: CardPosition) => void;
-  onHighlightCard: (cards: HandCard[], action: CardHighlightType) => void;
-  onCardPlayed: (card: HandCard) => void;
-  onCardSwop: (
-    position: CardPosition,
-    card: HandCard,
-    secondCard?: HandCard | CardType,
-  ) => void;
-  onSwopCardsBetweenPlayers: (card1: HandCard, card2: HandCard) => void;
-  onCardFromDeckToGraveyard: () => void;
-  highlightDeck?: CardPosition;
   highlightCards: HighlightCard[];
-  selectedCard?: FocusCard;
-  onSetSelectedCard: (c: FocusCard | undefined) => void;
+  selectedCard?: CardType;
   players: Player[];
   turnState: TurnStateType;
   handleDeckClick: (type: DeckType) => void;
@@ -76,19 +57,8 @@ const GameUI = ({
   onPlayerIsEndingRound,
   onStartRound,
   onEndGame,
-  onNextTurn,
-  playEffect,
-  onEndEffect,
-  onDrawCard,
-  onHighlightCard,
-  onCardPlayed,
-  onCardSwop,
-  onSwopCardsBetweenPlayers,
-  onCardFromDeckToGraveyard,
-  highlightDeck,
   highlightCards,
   selectedCard,
-  onSetSelectedCard,
   players,
   turnState,
   handleDeckClick,
@@ -96,8 +66,6 @@ const GameUI = ({
   canMoveCard,
 }: GameUIProps) => {
   let clickableAreas = { ...emptyClickableAreas };
-
-  console.log(highlightCards);
 
   const isCurrentPlayer = turnState.currentPlayer === myPlayerID;
 
@@ -146,7 +114,6 @@ const GameUI = ({
         case "effect":
           // if is "effect" phase and is current player
           // --> cards accordingly (own and/or others)
-          // ################################
           if (currentRule) {
             clickableAreas = { ...currentRule.actions[0].clickableAreas };
           }
@@ -182,7 +149,6 @@ const GameUI = ({
             return (
               <PlayerUI
                 key={"player-no_" + k}
-                // effect={effectContainer}
                 startingPos={myPos}
                 highlightCards={highlightCards}
                 playerNo={k}
@@ -229,8 +195,8 @@ const GameUI = ({
       />
 
       {isCurrentPlayer &&
+        roundIsRunning &&
         !isLastRound &&
-        !playEffect &&
         clickableAreas.deck && (
           <div className={styles.IWantToEndButton}>
             <Button onClick={onPlayerIsEndingRound}>I want to end</Button>

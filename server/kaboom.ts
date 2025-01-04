@@ -5,22 +5,6 @@ import { createServer } from "http";
 import next from "next";
 import { Server } from "socket.io";
 
-import { cardRules, type CardRule, getCardRule } from "../kaboom/ruleHelpers";
-import type {
-  PlayerID,
-  Player,
-  Card,
-  HandCard,
-  CardPosition,
-  CardHighlightType,
-  GameStateType,
-  RoundStateType,
-  TurnStateType,
-  Deck,
-  DeckType,
-  HighlightCard,
-} from "../kaboom/types";
-
 import {
   swapCardFromDeck,
   swapCardFromGraveyard,
@@ -33,9 +17,21 @@ import {
   checkIfPlayable,
   cardIsFromDeck,
 } from "../kaboom/kaboomRules";
-
+import { getCardRule } from "../kaboom/ruleHelpers";
+import type {
+  PlayerID,
+  Player,
+  Card,
+  HandCard,
+  CardHighlightType,
+  GameStateType,
+  RoundStateType,
+  TurnStateType,
+  Deck,
+  DeckType,
+  HighlightCard,
+} from "../kaboom/types";
 import { isDev } from "../utils";
-
 import {
   INITIAL_CARD_LOOK_DURATION,
   END_VISBILITY_DURATION,
@@ -200,10 +196,11 @@ io.on("connection", (socket) => {
         // initPhaseDrawCard();
         initTurn();
         break;
-      default:
-        const exhaustiveCheck: never = currentPhase;
+      default: {
+        const _exhaustiveCheck: never = currentPhase;
         throw new Error(`Not every phase is accounted for`);
         break;
+      }
     }
   };
 
@@ -412,7 +409,7 @@ io.on("connection", (socket) => {
             }
 
             break;
-          case "effect":
+          case "effect": {
             // get current effect
             const currentRule =
               turnState.playedCard && getCardRule(turnState.playedCard);
@@ -445,8 +442,8 @@ io.on("connection", (socket) => {
                 checkEffect();
               }
             }
-
             break;
+          }
         }
       }
 
@@ -536,9 +533,9 @@ io.on("connection", (socket) => {
     endRound(true, pID);
   };
 
-  const handleStartGame = () => {
-    initGame();
-  };
+  // const handleStartGame = () => {
+  //   initGame();
+  // };
 
   const handlePlayerNameChange = (newName: string) => {
     const relID = players.findIndex((p) => p.id === currentPlayerID);
@@ -594,32 +591,46 @@ io.on("connection", (socket) => {
   // Events send ————————————————————————————————————————————
 
   const sendPlayers = (notToSelf = false) => {
-    !notToSelf && socket.emit("getPlayers", players);
+    if (!notToSelf) {
+      socket.emit("getPlayers", players);
+    }
     socket.broadcast.emit("getPlayers", players);
   };
   const sendDeck = (notToSelf = false) => {
-    !notToSelf && socket.emit("getDeck", deck);
+    if (!notToSelf) {
+      socket.emit("getDeck", deck);
+    }
     socket.broadcast.emit("getDeck", deck);
   };
   const sendGameState = (notToSelf = false) => {
-    !notToSelf && socket.emit("getGameState", gameState);
+    if (!notToSelf) {
+      socket.emit("getGameState", gameState);
+    }
     socket.broadcast.emit("getGameState", gameState);
   };
   const sendRoundState = (notToSelf = false) => {
-    !notToSelf && socket.emit("getRoundState", roundState);
+    if (!notToSelf) {
+      socket.emit("getRoundState", roundState);
+    }
     socket.broadcast.emit("getRoundState", roundState);
   };
   const sendTurnState = (notToSelf = false) => {
-    !notToSelf && socket.emit("getTurnState", turnState);
+    if (!notToSelf) {
+      socket.emit("getTurnState", turnState);
+    }
     socket.broadcast.emit("getTurnState", turnState);
   };
   const sendHighlightCards = (notToSelf = false) => {
-    !notToSelf && socket.emit("getHighlightCards", highlightCards);
+    if (!notToSelf) {
+      socket.emit("getHighlightCards", highlightCards);
+    }
     socket.broadcast.emit("getHighlightCards", highlightCards);
   };
   const sendCardInHand = (notToOthers = false) => {
     socket.emit("getCardInHand", cardInHand);
-    !notToOthers && socket.broadcast.emit("getCardInHand", cardInHand);
+    if (!notToOthers) {
+      socket.broadcast.emit("getCardInHand", cardInHand);
+    }
   };
 
   const sendPlayerCanMoveCard = () => {

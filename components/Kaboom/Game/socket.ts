@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 
 import { io, Socket } from "socket.io-client";
 
-const dev = process.env.NODE_ENV !== "production";
 const PORT = process.env.PORT || 3000;
 
 // let socketURL = "https://kaboom-game.herokuapp.com/";
@@ -32,6 +31,6 @@ export const useSocket = () => {
   return socket;
 };
 
-export const isSocket = (v: any): v is Socket => {
+export const isSocket = (v: unknown): v is Socket => {
   return v !== null;
 };

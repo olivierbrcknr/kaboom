@@ -1,16 +1,4 @@
-import type {
-  Player,
-  FocusCard,
-  Deck as DeckType,
-  Card as CardType,
-  HandCard,
-  PlayerID,
-  CardEffect,
-  CardPosition,
-  CardHighlightType,
-  CardValue,
-  CardActions,
-} from "./types";
+import type { Card as CardType, CardValue, CardActions } from "./types";
 
 export interface HighlightObject {
   deck: boolean;

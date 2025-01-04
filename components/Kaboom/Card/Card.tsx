@@ -54,23 +54,6 @@ const Card = ({
       break;
   }
 
-  let cardInner: React.JSX.Element;
-
-  //      if (isBack && !isSpecator) {
-  //   cardInner = <div className={styles.BackArtwork} />;
-  // } else {
-  //   if (card.value === "X") {
-  //     cardInner = <div className={styles.Joker}>⍟</div>;
-  //   } else {
-  //     cardInner = (
-  //       <>
-  //         <div className={styles.Number}>{card.value}</div>
-  //         <div className={styles.Symbol}>{printSymbol}</div>
-  //       </>
-  //     );
-  //   }
-  // }
-
   let style: React.CSSProperties = {};
 
   if (isHandCard(card)) {
