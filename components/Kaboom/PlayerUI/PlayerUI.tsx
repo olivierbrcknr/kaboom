@@ -3,7 +3,6 @@ import clsx from "clsx";
 import { calcCardPoints } from "../../../kaboom/kaboomRules";
 import type {
   Player,
-  Card as CardType,
   HandCard,
   CardHighlightType,
   CardEffect,

@@ -2,11 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import clsx from "clsx";
 
-import type {
-  Deck as DeckType,
-  CardPosition,
-  HighlightCard,
-} from "../../../kaboom/types";
+import type { Deck as DeckType, HighlightCard } from "../../../kaboom/types";
 import Card from "../Card";
 
 import styles from "./Deck.module.scss";

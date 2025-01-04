@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 
 import type {
   Player,
-  FocusCard,
   Deck,
   DeckType,
   Card,
@@ -15,7 +14,6 @@ import type {
   TurnStateType,
   HighlightCard,
 } from "../../../kaboom/types";
-
 import { EFFECT_VISIBILITY_DURATION } from "../../../utils/constants";
 
 import { useSocket, isSocket } from "./socket";
@@ -41,10 +39,9 @@ export const useGame = () => {
 
   // round state = multiple turns
   const [roundState, setRoundState] = useState<RoundStateType>({
-    isRunning: false,
+    phase: "setup",
     turnCount: 0,
     startingPlayer: "",
-    isLastRound: false,
     lastRoundStartedByPlayer: undefined,
   });
 
@@ -56,12 +53,6 @@ export const useGame = () => {
   });
 
   const [currentDeck, setCurrentDeck] = useState<Deck>();
-
-  const [playEffect, setPlayEffect] = useState(false);
-
-  const [highlightDeck, setHighlightDeck] = useState<CardPosition | undefined>(
-    undefined,
-  );
 
   const [highlightCards, setHighlightCards] = useState<HighlightCard[]>([]);
   const [displayHighlightCards, setDisplayHighlightCards] = useState<
@@ -140,22 +131,6 @@ export const useGame = () => {
     };
   }, [socket]);
 
-  /*
-  useEffect(() => {
-    // hide highlight after 2sec
-    if (highlightCards.cards.length > 0) {
-      setTimeout(() => {
-        setHighlightCards({
-          cards: [],
-          type: undefined,
-        });
-
-        setHighlightDeck(undefined);
-      }, 2000);
-    }
-  }, [highlightCards]);
-  */
-
   // Player Control —————————————————————————————————————————
 
   const handleChangeName = (v: string) => {
@@ -175,68 +150,61 @@ export const useGame = () => {
   // Game
   const handleStartGame = () => {
     console.log("Start Game");
-    isSocket(socket) && socket.emit("startGame");
+    if (isSocket(socket)) {
+      socket.emit("startGame");
+    }
   };
 
   const handleEndGame = () => {
-    isSocket(socket) && socket.emit("endGame");
+    if (isSocket(socket)) {
+      socket.emit("endGame");
+    }
   };
 
   const handleExitGame = () => {
-    isSocket(socket) && socket.emit("exitGame");
+    if (isSocket(socket)) {
+      socket.emit("exitGame");
+    }
   };
 
   // Round
   const handleStartRound = () => {
-    isSocket(socket) && socket.emit("startRound");
+    if (isSocket(socket)) {
+      socket.emit("startRound");
+    }
   };
 
   const handlePlayerIsEnding = () => {
-    isSocket(socket) && myState.id && socket.emit("playerIsEnding", myState.id);
+    if (myState.id && isSocket(socket)) {
+      socket.emit("playerIsEnding", myState.id);
+    }
   };
 
   const handleEndRound = () => {
-    isSocket(socket) && socket.emit("endRoundByPlayer", myState.id);
+    if (isSocket(socket)) {
+      socket.emit("endRoundByPlayer", myState.id);
+    }
   };
 
   // Turn
   const handleNextTurn = () => {
-    isSocket(socket) && socket.emit("nextTurn");
+    if (isSocket(socket)) {
+      socket.emit("nextTurn");
+    }
   };
-
-  // const handleEffect = (action: CardActions) => {
-  //   switch (action) {
-  //     case "lookAt":
-  //       break;
-  //     case "swop":
-  //       break;
-  //     case "lookAtKing":
-  //       break;
-  //     case "initialBottomRow":
-  //       break;
-  //     case "endRound":
-  //       break;
-  //     default:
-  //       const exhaustiveCheck: never = action;
-  //       throw new Error(`Board has no firmata: ${exhaustiveCheck}`);
-  //       break;
-  //   }
-  // };
 
   // Card Effects ———————————————————————————————————————————
 
   const handleDrawCard = (position: DeckType) => {
-    isSocket(socket) && socket.emit("drawCard", position);
+    if (isSocket(socket)) {
+      socket.emit("drawCard", position);
+    }
 
     // if (position === "deck") {
     //   setSelectedCard(currentDeck?.deck[0]);
     // } else {
     //   setSelectedCard(currentDeck?.graveyard[0]);
     // }
-  };
-
-  const handleEndEffect = () => {
-    setPlayEffect(false);
   };
 
   const handleHighlightCard = (
@@ -269,8 +237,8 @@ export const useGame = () => {
         case "graveyard":
           socket.emit("cardSwoppedFromGraveyard", card);
           break;
-        // select to swop
-        case "swop":
+        // select to swap
+        case "swap":
           socket.emit("cardShiftedToPlayer", card, secondCard);
           break;
       }
@@ -293,7 +261,9 @@ export const useGame = () => {
 
   const handlePlayerCardClick = (card: HandCard) => {
     setCanMoveCard(false);
-    isSocket(socket) && socket.emit("playerCardClick", card);
+    if (isSocket(socket)) {
+      socket.emit("playerCardClick", card);
+    }
   };
 
   const handleDeckClick = (type: DeckType) => {
@@ -313,13 +283,14 @@ export const useGame = () => {
         // if is "card in hand" phase
         // and click is graveyard
         if (type === "graveyard") {
-          isSocket(socket) && socket.emit("handCardToGraveyard");
+          if (isSocket(socket)) {
+            socket.emit("handCardToGraveyard");
+          }
         }
         break;
 
       default:
         // else --> do nothing
-        // ################################
         break;
     }
   };
@@ -330,7 +301,6 @@ export const useGame = () => {
     handleSwopCardsBetweenPlayers,
     handleCardFromDeckToGraveyard,
     handleCardSwop,
-    handleEndEffect,
     handleHighlightCard,
     handleCardPlayed,
     handleChangeName,
@@ -343,8 +313,6 @@ export const useGame = () => {
     handleDrawCard,
     handleNextTurn,
     roundState,
-    playEffect,
-    highlightDeck,
     selectedCard,
     currentDeck,
     highlightCards,

@@ -16,12 +16,6 @@ const GameWrapper = ({}: GameWrapperProps) => {
   const {
     myState,
     gameState,
-    handleSwopCardsBetweenPlayers,
-    handleCardFromDeckToGraveyard,
-    handleCardSwop,
-    handleEndEffect,
-    handleHighlightCard,
-    handleCardPlayed,
     handleChangeName,
     handlePlayerToggle,
     handleStartGame,
@@ -30,19 +24,14 @@ const GameWrapper = ({}: GameWrapperProps) => {
     handleStartRound,
     handleNextTurn,
     roundState,
-    playEffect,
-    highlightDeck,
     selectedCard,
     currentDeck,
-    highlightCards,
     displayHighlightCards,
-    setSelectedCard,
     socket,
     turnState,
     players,
     handleExitGame,
     handlePlayerCardClick,
-    // handleDrawCard,
     handleDeckClick,
     canMoveCard,
   } = useGame();
@@ -102,18 +91,9 @@ const GameWrapper = ({}: GameWrapperProps) => {
         onPlayerIsEndingRound={handleEndRound}
         onStartRound={handleStartRound}
         onEndGame={handleEndGame}
-        playEffect={playEffect}
-        onEndEffect={handleEndEffect}
         onNextTurn={handleNextTurn}
-        onHighlightCard={handleHighlightCard}
-        onCardPlayed={handleCardPlayed}
-        onCardSwop={handleCardSwop}
-        onSwopCardsBetweenPlayers={handleSwopCardsBetweenPlayers}
-        onCardFromDeckToGraveyard={handleCardFromDeckToGraveyard}
-        highlightDeck={highlightDeck}
         highlightCards={displayHighlightCards}
         selectedCard={selectedCard}
-        onSetSelectedCard={setSelectedCard}
         players={players}
         turnState={turnState}
         handleDeckClick={handleDeckClick}

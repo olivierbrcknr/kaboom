@@ -15,13 +15,10 @@ type CardValue =
   | "X";
 
 type CardActions = "lookAt" | "swap";
-// | "lookAtKing"
-// | "initialBottomRow"
-// | "endRound";
 
 type DeckType = "deck" | "graveyard";
 
-type CardPosition = "deck" | "swap" | "graveyard"; // | null;
+type CardPosition = "deck" | "swap" | "graveyard";
 
 type CardHighlightType = "swap" | "drew_deck" | "drew_graveyard" | "lookAt";
 
@@ -52,11 +49,6 @@ type Card = {
   value: CardValue;
 };
 
-interface FocusCard extends Card {
-  position?: CardPosition;
-  slot?: CardSlot;
-}
-
 interface HandCard extends Card {
   player: PlayerID;
   slot: CardSlot;
@@ -74,12 +66,12 @@ type HighlightCard = {
   player: PlayerID;
 };
 
-const isHandCard = (value: any): value is HandCard => {
+const isHandCard = (value: unknown): value is HandCard => {
   return (
-    value &&
+    value !== undefined &&
     typeof value === "object" &&
-    (typeof value.color === "number" || value.color === null) &&
-    typeof value.player === "string"
+    (typeof value?.["color"] === "number" || value?.["color"] === null) &&
+    typeof value?.["player"] === "string"
   );
 };
 
@@ -122,13 +114,12 @@ type TurnStateType = {
   playedCard?: Card;
 };
 
-export { isHandCard };
+export { isHandCard, gamePhases, roundPhases };
 
 export type {
   Player,
   Card,
   HandCard,
-  FocusCard,
   CardPosition,
   CardValue,
   Deck,
@@ -140,7 +131,6 @@ export type {
   CardHighlightType,
   GameStateType,
   RoundStateType,
-  roundPhases,
   RoundPhase,
   TurnStateType,
   DeckType,
