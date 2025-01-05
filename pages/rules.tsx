@@ -1,12 +1,15 @@
-import Link from "next/link";
 // React
 import React from "react";
+
+import Link from "next/link";
 
 import Footer from "../components/Footer";
 import Head from "../components/Head";
 import Markdown from "../components/Markdown";
-import styles from "./index.module.scss";
+
 import rulesMD from "./Rules.md";
+
+import styles from "./index.module.scss";
 
 const Home = () => {
   return (

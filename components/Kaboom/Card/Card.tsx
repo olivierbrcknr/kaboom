@@ -6,6 +6,7 @@ import {
   type HandCard,
   isHandCard,
 } from "../../../kaboom/types";
+
 import styles from "./Card.module.scss";
 
 interface CardProps {

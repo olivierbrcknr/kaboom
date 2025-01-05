@@ -2,8 +2,8 @@
 
 :root {
   /* Typography */
-  --font-family-reg: "IBM Plex Sans", sans-serif;
-  --font-family-mono: "Space Mono", monospace;
+  // --font-family-reg: "IBM Plex Sans", sans-serif;
+  // --font-family-mono: "Space Mono", monospace;
   /* Colors */
   --color-white: #fff;
   --color-black: #000;
@@ -23,7 +23,7 @@
   /* special card colors */
   --color-draw: #ffc700;
   --color-lookAt: #ffa234;
-  --color-swop: #d43232;
+  --color-swap: #d43232;
   --color-select: var(--color-highlight);
 
   /* Sizes */
@@ -56,7 +56,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --color-white: #111;
-    --color-black: #aaa;
+    --color-black: #ccc;
     --color-gray: #333;
     --color-gray-lighter: #444;
     --color-gray-very-light: #1a1a1a;

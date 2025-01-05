@@ -1,5 +1,6 @@
 import clsx from "clsx";
 
+import { calcCardPoints } from "../../../kaboom/kaboomRules";
 import type {
   CardEffect,
   CardHighlightType,
@@ -10,10 +11,9 @@ import type {
   RoundStateType,
   TurnStateType,
 } from "../../../kaboom/types";
-
-import { calcCardPoints } from "../../../kaboom/kaboomRules";
 import { useIsDev } from "../../../utils";
 import Card from "../Card";
+
 import styles from "./PlayerUI.module.scss";
 
 interface PlayerUIProps {
@@ -89,10 +89,6 @@ const PlayerUI = ({
         position === "left" && styles.posLeft,
       )}
     >
-      {(isDev || spectatorMode) && (
-        <div className={styles.Score}>{calcCardPoints(cards)}</div>
-      )}
-
       <div className={styles.CardGrid}>
         {cards &&
           cards.length > 0 &&
@@ -178,7 +174,12 @@ const PlayerUI = ({
           })}
       </div>
 
-      <div className={styles.Name}>{player.name}</div>
+      <div className={styles.Name}>
+        {player.name}{" "}
+        {(isDev || spectatorMode) && (
+          <div className={styles.Score}>({calcCardPoints(cards)})</div>
+        )}
+      </div>
     </div>
   );
 };

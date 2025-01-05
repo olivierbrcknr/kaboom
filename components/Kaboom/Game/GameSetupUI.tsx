@@ -1,10 +1,11 @@
-import clsx from "clsx";
 import React from "react";
 
-import type { Player, PlayerID } from "../../../kaboom/types";
+import clsx from "clsx";
 
+import type { Player, PlayerID } from "../../../kaboom/types";
 import Button from "../../Button";
 import PlayerSelection from "../PlayerSelection";
+
 import styles from "./Game.module.scss";
 
 interface GameSetupUIProps {

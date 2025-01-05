@@ -1,3 +1,5 @@
+@use "../../../styles/mixins" as *;
+
 .Game {
   position: absolute;
   top: 0;
@@ -100,13 +102,9 @@
   margin-bottom: 14px;
 }
 
-.Podium li.isCurrent {
+.Podium li.isSelf {
   font-weight: bold;
-}
-.Podium li.isCurrent:before {
-  content: "→";
-  position: absolute;
-  left: -60px;
+  @include is-you-badge;
 }
 .Podium li:nth-child(n + 2) {
   opacity: 0.5;

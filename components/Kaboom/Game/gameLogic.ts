@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 
 import type {
   Card,
-  CardHighlightType,
-  CardPosition,
   Deck,
   DeckType,
   GameStateType,
@@ -14,8 +12,8 @@ import type {
   RoundStateType,
   TurnStateType,
 } from "../../../kaboom/types";
-
 import { EFFECT_VISIBILITY_DURATION } from "../../../utils/constants";
+
 import { isSocket, useSocket } from "./socket";
 
 export const useGame = () => {
@@ -174,11 +172,12 @@ export const useGame = () => {
     }
   };
 
-  const handlePlayerIsEnding = () => {
-    if (myState.id && isSocket(socket)) {
-      socket.emit("playerIsEnding", myState.id);
-    }
-  };
+  // Might be needed later
+  // const handlePlayerIsEnding = () => {
+  //   if (myState.id && isSocket(socket)) {
+  //     socket.emit("playerIsEnding", myState.id);
+  //   }
+  // };
 
   const handleEndRound = () => {
     if (isSocket(socket)) {
@@ -205,56 +204,6 @@ export const useGame = () => {
     // } else {
     //   setSelectedCard(currentDeck?.graveyard[0]);
     // }
-  };
-
-  const handleHighlightCard = (
-    cards: HandCard[],
-    highlight: CardHighlightType,
-  ) => {
-    if (isSocket(socket)) {
-      socket.emit("highlightCard", cards, highlight);
-    }
-  };
-
-  const handleCardPlayed = (card: HandCard) => {
-    if (isSocket(socket)) {
-      socket.emit("cardPlayed", card);
-    }
-  };
-
-  const handleCardSwop = (
-    position: CardPosition,
-    card: HandCard,
-    secondCard?: Card | HandCard,
-  ) => {
-    if (isSocket(socket)) {
-      switch (position) {
-        // swopped with deck
-        case "deck":
-          socket.emit("cardSwoppedFromDeck", card);
-          break;
-        // swopped with graveyard
-        case "graveyard":
-          socket.emit("cardSwoppedFromGraveyard", card);
-          break;
-        // select to swap
-        case "swap":
-          socket.emit("cardShiftedToPlayer", card, secondCard);
-          break;
-      }
-    }
-  };
-
-  const handleSwopCardsBetweenPlayers = (card1: HandCard, card2: HandCard) => {
-    if (isSocket(socket)) {
-      socket.emit("cardSwoppedBetweenPlayers", [card1, card2]);
-    }
-  };
-
-  const handleCardFromDeckToGraveyard = () => {
-    if (isSocket(socket)) {
-      socket.emit("cardFromDeckToGraveyard");
-    }
   };
 
   // card clicks ————————————————————————————————————————————————
@@ -299,29 +248,20 @@ export const useGame = () => {
     currentDeck,
     displayHighlightCards,
     gameState,
-    handleCardFromDeckToGraveyard,
-    handleCardPlayed,
-    handleCardSwop,
     handleChangeName,
     handleDeckClick,
-    handleDrawCard,
     handleEndGame,
     handleEndRound,
     handleExitGame,
-    handleHighlightCard,
     handleNextTurn,
     handlePlayerCardClick,
-    handlePlayerIsEnding,
     handlePlayerToggle,
     handleStartGame,
     handleStartRound,
-    handleSwopCardsBetweenPlayers,
-    highlightCards,
     myState,
     players,
     roundState,
     selectedCard,
-    setSelectedCard,
     socket,
     turnState,
   };

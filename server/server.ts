@@ -5,20 +5,6 @@ import { createServer } from "http";
 import next from "next";
 import { Server } from "socket.io";
 
-import type {
-  Card,
-  CardHighlightType,
-  Deck,
-  DeckType,
-  GameStateType,
-  HandCard,
-  HighlightCard,
-  Player,
-  PlayerID,
-  RoundStateType,
-  TurnStateType,
-} from "../kaboom/types";
-
 import {
   calcIfEnded,
   calcPlayerPoints,
@@ -32,11 +18,25 @@ import {
   swapCardFromGraveyard,
 } from "../kaboom/kaboomRules";
 import { getCardRule } from "../kaboom/ruleHelpers";
+import type {
+  Card,
+  CardHighlightType,
+  Deck,
+  DeckType,
+  GameStateType,
+  HandCard,
+  HighlightCard,
+  Player,
+  PlayerID,
+  RoundStateType,
+  TurnStateType,
+} from "../kaboom/types";
 import { useIsDev } from "../utils";
 import {
   END_VISBILITY_DURATION,
   INITIAL_CARD_LOOK_DURATION,
 } from "../utils/constants";
+
 import { createDefault, distribute, getNextPlayer } from "./deckFunctions";
 
 const isDev = useIsDev();

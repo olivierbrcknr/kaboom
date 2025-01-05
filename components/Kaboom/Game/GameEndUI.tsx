@@ -1,8 +1,8 @@
 import React from "react";
 
 import type { Player, PlayerID } from "../../../kaboom/types";
-
 import Button from "../../Button";
+
 import styles from "./Game.module.scss";
 
 interface GameEndUIProps {
@@ -28,7 +28,7 @@ const GameEndUI = ({ myPlayerID, onExitGame, players }: GameEndUIProps) => {
         {podiumPlayers.map((player) => {
           return (
             <li
-              className={player.id === myPlayerID ? styles.isCurrent : ""}
+              className={player.id === myPlayerID ? styles.isSelf : ""}
               key={"podium-" + player.id}
             >
               {player.name} [{player.points}]

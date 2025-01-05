@@ -1,9 +1,10 @@
-import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 
-import type { Deck as DeckType, HighlightCard } from "../../../kaboom/types";
+import clsx from "clsx";
 
+import type { Deck as DeckType, HighlightCard } from "../../../kaboom/types";
 import Card from "../Card";
+
 import styles from "./Deck.module.scss";
 
 const isDev = process.env.NODE_ENV !== "production";

@@ -2,7 +2,7 @@ $mobile_threshold: 640px;
 $tablet_threshold: 960px;
 $laptop_threshold: 1600px;
 
-// Other Mixins ————————————————————————————————————————
+// Other Mixins ———————————————————————————————————————————
 @mixin center-children {
   display: flex;
   justify-content: center;
@@ -42,4 +42,51 @@ $laptop_threshold: 1600px;
 
   @if $position == "inside" {
   }
+}
+
+@mixin is-you-badge() {
+  &:before {
+    content: "you";
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translate(-100%, -50%);
+
+    background: var(--color-interaction);
+    color: var(--color-white);
+    padding: 0.2em 0.6em;
+    border-radius: 1000px;
+
+    @include font-zeta;
+  }
+}
+
+// Fonts ——————————————————————————————————————————————————
+
+// H1
+@mixin font-alpha() {
+}
+
+// H2
+@mixin font-beta() {
+}
+
+// H3
+@mixin font-gamma() {
+}
+
+// text
+@mixin font-delta() {
+}
+
+// small text
+@mixin font-epsilon() {
+}
+
+// tiny label
+@mixin font-zeta() {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  font-weight: 800;
+  text-transform: uppercase;
 }

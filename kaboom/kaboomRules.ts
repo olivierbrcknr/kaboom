@@ -1,6 +1,6 @@
-import type { Card, Deck, HandCard, Player, PlayerID } from "./types";
-
 import { checkDeck, positionCard } from "../server/deckFunctions";
+
+import type { Card, Deck, HandCard, Player, PlayerID } from "./types";
 
 const checkIfPlayable = (
   deck: Deck,

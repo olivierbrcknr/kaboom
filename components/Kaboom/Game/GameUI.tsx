@@ -1,6 +1,13 @@
-import clsx from "clsx";
 import React from "react";
 
+import clsx from "clsx";
+
+import {
+  type CardRule,
+  emptyHighlight,
+  getCardRule,
+  type HighlightObject,
+} from "../../../kaboom/ruleHelpers";
 import type {
   Card as CardType,
   Deck,
@@ -13,17 +20,11 @@ import type {
   RoundStateType,
   TurnStateType,
 } from "../../../kaboom/types";
-
-import {
-  type CardRule,
-  emptyHighlight,
-  getCardRule,
-  type HighlightObject,
-} from "../../../kaboom/ruleHelpers";
 import Button from "../../Button";
 import DeckUI from "../Deck";
 import PlayerUI from "../PlayerUI";
 import ScoreDisplay from "../ScoreDisplay";
+
 import styles from "./Game.module.scss";
 
 const isDev = process.env.NODE_ENV !== "production";

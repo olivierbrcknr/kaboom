@@ -7,7 +7,8 @@ import tseslint from "typescript-eslint";
 export default tseslint.config([
   eslint.configs.recommended,
   tseslint.configs.recommended,
-  { ignores: ["node_modules/*", ".next/*"] },
+  perfectionist.configs["recommended-natural"],
+  { ignores: ["node_modules/*", ".next/*", "eslint.config.mjs"] },
   {
     plugins: {
       eslintPluginNext,
@@ -34,8 +35,36 @@ export default tseslint.config([
       ],
       "no-empty-pattern": "off",
       "no-unused-vars": "off",
+      "perfectionist/sort-imports": [
+        "warn",
+        {
+          type: "alphabetical",
+          order: "asc",
+          ignoreCase: false,
+          newlinesBetween: "always",
+          maxLineLength: undefined,
+          groups: [
+            "react",
+            ["builtin", "external"],
+            "internal",
+            "parent",
+            "sibling",
+            "unknown",
+            "style",
+          ],
+          customGroups: {
+            value: {
+              react: ["react", "react-*"],
+              lodash: "lodash",
+            },
+            type: {
+              react: ["react", "react-*"],
+            },
+          },
+          environment: "node",
+        },
+      ],
       "prefer-const": ["warn"],
     },
   },
-  perfectionist.configs["recommended-natural"],
 ]);
