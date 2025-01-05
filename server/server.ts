@@ -332,8 +332,9 @@ io.on("connection", (socket) => {
       cardInHand = deck.deck[0];
     } else {
       // draw card from graveyard
-      cardInHand = deck.graveyard[0];
+      cardInHand = deck.graveyard[deck.graveyard.length - 1];
     }
+    handleHighlightCard([cardInHand], "selected");
     nextPhase(); // card in hand
   };
 
@@ -375,6 +376,9 @@ io.on("connection", (socket) => {
             handleHighlightCard(effectCards, "swap");
             deck = cardSwoppedBetweenPlayers(deck, effectCards);
             playNextEffect();
+          } else {
+            console.log("select second card", "swap");
+            handleHighlightCard(effectCards, "selected");
           }
           break;
       }

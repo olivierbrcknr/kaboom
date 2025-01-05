@@ -50,8 +50,14 @@ const Deck = ({
   };
 
   const nextCard = deck.deck.length > 0 ? deck.deck[0] : undefined;
+  const deckHighlightCard = highlightCards.find((hc) => hc.id === nextCard?.id);
 
-  const highlightDeck = highlightCards.some((hc) => hc.type === "drew_deck");
+  const topGraveyardCard = deck.graveyard[deck.graveyard.length - 1];
+  const graveyardHighlightCard = highlightCards.find(
+    (hc) => hc.id === topGraveyardCard.id,
+  );
+
+  // const highlightDeck = highlightCards.some((hc) => hc.type === "drew_deck");
   const highlightGraveyard = highlightCards.some(
     (hc) => hc.type === "drew_graveyard",
   );
@@ -61,9 +67,12 @@ const Deck = ({
       {deck.graveyard.length > 0 && (
         <div className={styles.OpenDeck}>
           <Card
-            card={deck.graveyard[deck.graveyard.length - 1]}
+            card={topGraveyardCard}
             deckCardCount={deck.graveyard.length}
-            indicatorType={highlightGraveyard ? "drew_graveyard" : undefined}
+            indicatorType={
+              graveyardHighlightCard?.type ??
+              (highlightGraveyard ? "drew_graveyard" : undefined)
+            }
             isClickable={isCurrent && isClickable.graveyard ? true : false}
             isDeck
             onClick={handleGraveyardClick}
@@ -73,12 +82,18 @@ const Deck = ({
 
       {nextCard && (
         <div className={styles.ClosedDeck}>
-          {isDev && <div>{deck.deck.length}/55</div>}
+          {isDev && (
+            <div className={styles.CardCount}>{deck.deck.length}/55</div>
+          )}
 
           <Card
             card={nextCard}
             deckCardCount={deck.deck.length}
-            indicatorType={highlightDeck ? "drew_deck" : undefined}
+            indicatorType={
+              deckHighlightCard?.type
+              // ??
+              // (highlightDeck ? "drew_deck" : undefined)
+            }
             isBack={!showNext}
             isClickable={isCurrent && isClickable.deck}
             isDeck

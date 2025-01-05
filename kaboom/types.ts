@@ -15,7 +15,12 @@ type CardEffect = {
   timer: number;
 };
 
-type CardHighlightType = "drew_deck" | "drew_graveyard" | "lookAt" | "swap";
+type CardHighlightType =
+  | "drew_deck"
+  | "drew_graveyard"
+  | "lookAt"
+  | "selected"
+  | "swap";
 
 type CardPosition = "deck" | "graveyard" | "swap";
 

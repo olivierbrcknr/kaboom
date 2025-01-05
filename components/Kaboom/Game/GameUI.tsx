@@ -20,14 +20,13 @@ import type {
   RoundStateType,
   TurnStateType,
 } from "../../../kaboom/types";
+import { useIsDev } from "../../../utils";
 import Button from "../../Button";
 import DeckUI from "../Deck";
 import PlayerUI from "../PlayerUI";
 import ScoreDisplay from "../ScoreDisplay";
 
 import styles from "./Game.module.scss";
-
-const isDev = process.env.NODE_ENV !== "production";
 
 interface GameUIProps {
   canMoveCard: boolean;
@@ -67,11 +66,15 @@ const GameUI = ({
 }: GameUIProps) => {
   let clickableAreas = { ...emptyClickableAreas };
 
+  const isDev = useIsDev();
+
   const isCurrentPlayer = turnState.currentPlayer === myPlayerID;
 
   const roundIsRunning =
     roundState.phase === "running" || roundState.phase === "last round";
   const isLastRound = roundState.phase === "last round";
+
+  console.log(highlightCards);
 
   const myPos = players
     .filter((p) => p.isPlaying)

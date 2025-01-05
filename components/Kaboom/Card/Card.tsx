@@ -6,6 +6,7 @@ import {
   type HandCard,
   isHandCard,
 } from "../../../kaboom/types";
+import { useIsDev } from "../../../utils";
 
 import styles from "./Card.module.scss";
 
@@ -32,6 +33,8 @@ const Card = ({
   isSpecator,
   onClick,
 }: CardProps) => {
+  const isDev = useIsDev();
+
   let printSymbol: string;
   let color = "black";
   switch (card.color) {
@@ -78,14 +81,17 @@ const Card = ({
         color === "red" ? styles.isRed : styles.isBlack,
         (indicatorType === "drew_deck" || indicatorType === "drew_graveyard") &&
           styles.isDrawn,
-        indicatorType === "swap" && styles.isSwopped,
+        indicatorType === "swap" && styles.isSwapped,
         indicatorType === "lookAt" && styles.isLookedAt,
+        indicatorType === "selected" && styles.isSelected,
         isDeck && styles.isDeck,
         isHandCard(card) && styles.isHandCard,
       )}
       onClick={onClick}
       style={style}
     >
+      {isDev && <div className={styles.ID}>{card.id}</div>}
+
       {isBack && <div className={styles.BackArtwork} />}
 
       {(!isBack || isSpecator) && (
