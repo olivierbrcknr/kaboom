@@ -8,13 +8,13 @@ This is a card game that combines the rules of Memory and Uno at the same time. 
 
 The goal is to have as few points as possible at the end of a round and ultimately the game. Each card has as many points as its numeric value. For the picture cards it generally counts as `10` points. However, an **Ace** only counts as `1` point, a **Joker** as `0` points, and a **red King** even as `-1` point.
 
-| Card          | Value      |
-| ------------- | ---------- |
-| 2-10          | As on card |
-| J,Q,K (black) | 10         |
-| K (red)       | -1         |
-| A             | 1          |
-| Joker         | 0          |
+| Card          | Value             |
+| ------------- | ----------------- |
+| 2-10          | As on card (2-10) |
+| J,Q,K (black) | 10                |
+| K (red)       | -1                |
+| A             | 1                 |
+| Joker         | 0                 |
 
 Whoever exceeds `100` points has lost the game. Directly hitting `50` points decreases the points to `0` again, directly hitting `100` decreases to points to `50`.
 
@@ -32,7 +32,7 @@ The game is played clock-wise. At each player's turn, the player can either draw
 
 ### Adding A Card To The Player's Hand
 
-If the player decides to add the card to their hand, the card is covertly swopped with one of the cards lying in front of them. **The position must not be changed!** The card that has been there previously is then put onto the _graveyard_.
+If the player decides to add the card to their hand, the card is covertly swapped with one of the cards lying in front of them. **The position must not be changed!** The card that has been there previously is then put onto the _graveyard_.
 
 ### Playing A Card From The Deck
 
@@ -43,9 +43,9 @@ If the player decides to not take the card but directly throwing it onto the _gr
 | 2-6       | none                                   |
 | 7,8       | look at one own card                   |
 | 9,10      | look at someone else's card            |
-| J,Q       | swop any two cards                     |
-| K (black) | Look any card, then swop any two cards |
-| K (red)   | none                                   |
+| J,Q       | swap any two cards                     |
+| K (black) | look any card, then swap any two cards |
+| K (red)   | look any card, then swap any two cards |
 | A         | none                                   |
 | Joker     | none                                   |
 
@@ -78,8 +78,8 @@ Another way to end a round is by having no cards on their hand, thus preventing 
     type: 'Looking At A Card'
   },
   {
-    color: 'var(--color-swop)',
-    type: 'Swopping A Card'
+    color: 'var(--color-swap)',
+    type: 'Swapping A Card'
   },
   {
     color: 'var(--color-select)',
