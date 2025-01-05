@@ -16,7 +16,7 @@ const Head = ({ title }) => {
       <meta content="Kaboom" name="apple-mobile-web-app-title" />
       <meta content="yes" name="apple-mobile-web-app-capable" />
       <meta content="yes" name="mobile-web-app-capable" />
-      <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+      <meta content="default" name="apple-mobile-web-app-status-bar-style" />
       <link href="/AppIcon.png" rel="apple-touch-icon" />
     </NextHead>
   );
